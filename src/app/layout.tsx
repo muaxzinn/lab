@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sarabun, Prompt, JetBrains_Mono } from "next/font/google";
+import { KioskShell } from "@/components/layout/KioskShell";
 import "./globals.css";
 
 const sarabun = Sarabun({
@@ -38,7 +39,7 @@ export default function RootLayout({
       <body
         className={`${sarabun.variable} ${prompt.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        {children}
+        <KioskShell>{children}</KioskShell>
       </body>
     </html>
   );

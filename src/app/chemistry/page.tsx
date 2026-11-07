@@ -1,0 +1,51 @@
+import type { Metadata } from "next";
+import { FlaskConical, Atom, Sparkles } from "lucide-react";
+import { PeriodicTableViewer } from "@/components/chemistry/PeriodicTableViewer";
+
+export const metadata: Metadata = {
+  title: "Chemistry Workstation | IUPAC 118 Elements & Bohr Orbitals",
+  description:
+    "Interactive IUPAC Periodic Table of all 118 elements with Bohr electron shell orbitals, Pauling electronegativity heatmap, and block filtering.",
+};
+
+export default function ChemistryPage() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Laboratory Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-neutral-800">
+        <div className="flex items-start gap-3.5">
+          <div className="p-2.5 rounded-xl bg-orange-950/60 border border-orange-800/80 text-orange-300">
+            <FlaskConical className="h-6 w-6 stroke-[1.8]" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-heading font-semibold text-neutral-100">
+                Chemistry Workstation & Periodic System
+              </h1>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-950 border border-orange-800/80 text-orange-300">
+                FEAT-05 IUPAC 118
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
+              สถานีปฏิบัติการเคมี: ตารางธาตุมาตรฐาน IUPAC ครบ 118 ธาตุ, แบบจำลองวงโคจรอิเล็กตรอนของบอห์ร และแผนภาพความหนาแน่นอิเล็กโตรเนกาติวิตี
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
+            <Atom className="h-3.5 w-3.5 text-orange-400" />
+            <span>118 Elements Complete</span>
+          </span>
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
+            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            <span>Bohr Electron Shells</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Main Interactive Periodic Table */}
+      <PeriodicTableViewer />
+    </div>
+  );
+}

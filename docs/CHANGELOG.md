@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.5.1] - 2026-11-07
+
+### Added
+- **Multi-Route Modular Educational Platform Architecture (Next.js 15 App Router & Turbopack)**:
+  - Re-architected platform from a monolithic tabbed single page into a high-performance modular multi-route system:
+    - `/` (Platform Portal / Dashboard): Master system overview, telemetry HUD, quick launch workstation cards, 9 curriculum subject tracks, and 10 feature module roadmap.
+    - `/math` (Mathematics Laboratory): Dedicated route for dynamic 2D function graphing with Mafs v0.21, KaTeX formula typesetting, and Math.js AST evaluation.
+    - `/physics` (Physics Laboratory): Dedicated route for 2-body Keplerian planetary orbit simulation running Velocity Verlet vs. Explicit Euler with real-time Hamiltonian energy conservation gauge.
+    - `/chemistry` (Chemistry Workstation): Dedicated route for IUPAC 118-element periodic table, SVG Bohr electron shell orbitals, and Pauling electronegativity heatmap.
+    - `/biology` (Cytology & Cellular Biology): Dedicated route for eukaryotic plant and animal cell explorer with 12 clickable organelles, internal cross-section mode, and exam notes.
+    - `/thai` (Thai Language Studio): Dedicated route for 3-byte safe syllable deconstruction, Triyang consonant classes, 8 spelling sections, and dynamic SVG pitch contour plots.
+    - `/practice` (Universal Practice Engine): Dedicated route for 20 curriculum questions across 5 subjects with instant auto-grading, step-by-step breakdown, and streak tracking.
+    - `/_not-found` (`src/app/not-found.tsx`): Kiosk-contained 404 recovery page enabling 100% static page prerendering in Turbopack.
+- **Enterprise App Shell & Navigation Framework (`src/components/layout/`)**:
+  - Created `src/components/layout/nav-data.ts`: Central typed navigation registry with routes, Thai/English bilingual metadata, category grouping, and multi-criteria search.
+  - Created `src/components/layout/AppHeader.tsx`: Breadcrumb trail, quick navigation search modal (`⌘K`), active subject indicator badge with pulsing Mint/Cyan gradient dot, and Fullscreen Kiosk toggle.
+  - Created `src/components/layout/AppSidebar.tsx`: Desktop responsive category navigation with Mint/Cyan gradient active accents (`linear-gradient(135deg, #2ef2a0, #00f0ff)`), platform HUD, and 100% Lucide SVG vector iconography (Anti-Emoji mandate).
+  - Created `src/components/layout/AppNavbar.tsx`: Touchscreen mobile kiosk bottom navigation bar with 44px+ tap targets.
+  - Created `src/components/layout/KioskShell.tsx`: Global layout wrapper integrating lockdown containment (`overscroll-behavior: none`), touchscreen popstate trapping, and responsive viewport shell.
+- **AI Agent Skills via `npx` Integration**:
+  - Discovered and executed skills from GitHub / npm via `npx skills find` and `npx skills use`:
+    - `vercel-labs/agent-skills@vercel-react-best-practices`: Integrated 70 rules for chunk isolation, zero barrel imports, and memoized rendering.
+    - `wshobson/agents@nextjs-app-router-patterns`: Implemented Next.js App Router multi-route topology, RSC default boundaries, and layout composition.
+    - `vercel-labs/agent-skills@vercel-composition-patterns`: Applied compound component composition and state lifting for App Shell.
+  - Logged all 7 new `npx` executions into `docs/NPX_SKILLS_REGISTRY.md`.
+- **Automated Tests & Quality Assurance**:
+  - Created `src/components/layout/layout.test.ts` (6 unit tests) verifying route completeness, uniqueness, path formatting, breadcrumb hierarchy, and search filtering.
+  - Expanded test suite from 69 to 75 unit tests (22 suites, 100% pass rate).
+  - Production build prerendered 100% static pages (11/11 routes), dropping home page JS size from 420 kB down to 0 kB initial page JS.
+  - Achieved 99.89% overall TypeScript coverage (17,578/17,597 symbols) via `npx typescript-coverage-report` (100.00% across all new routes and app shell components).
+  - Verified 0 dead code issues via `npx knip`.
+
+---
+
 ## [0.5.0] - 2026-11-07
 
 ### Added

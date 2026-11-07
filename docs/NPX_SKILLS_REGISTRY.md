@@ -17,6 +17,13 @@
 | 6 | Phase 5-6 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Unused Files, Exports และ Dependencies ทั่วทั้งโปรเจกต์ | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 7 | Phase 7 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code และ Unused Exports หลังพัฒนา Phase 7 (ExerciseEngine, PeriodicTable, CellStructure) | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 8 | Phase 7 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 7 | 99.88% overall coverage (15,838/15,857 symbols); All components & datasets 100.00% | Verified |
+| 9 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills find react` | `skills.sh / vercel-labs` | ค้นหา AI Agent Skills สำหรับ React & Component Optimization | ค้นพบ 50+ รายการรวม vercel-react-best-practices และ vercel-composition-patterns | Verified |
+| 10 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills find nextjs` | `skills.sh / vercel-labs` | ค้นหา AI Agent Skills สำหรับ Next.js 14-15 App Router Architecture | ค้นพบ 50+ รายการรวม wshobson/agents@nextjs-app-router-patterns | Verified |
+| 11 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills use vercel-labs/agent-skills@vercel-react-best-practices` | `vercel-labs/agent-skills` | สกัด Best Practices 70 ข้อ (Chunk isolation, zero barrel imports, waterfall elimination, memoized renders) | นำกฎสถาปัตยกรรมระดับโลกมาปรับใช้ใน App Router และ Component Tree | Verified |
+| 12 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills use wshobson/agents@nextjs-app-router-patterns` | `wshobson/agents` | สกัดแพทเทิร์น Next.js App Router multi-route, Server Components default, streaming และ layout composition | ปรับโครงสร้างเว็บเป็น Multi-Route Platform 7 หน้าแยก Chunk อิสระ | Verified |
+| 13 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills use vercel-labs/agent-skills@vercel-composition-patterns` | `vercel-labs/agent-skills` | สกัดกฎการออกแบบ Compound Component และ State Lifting ป้องกัน Boolean Prop Proliferation | ออกแบบ AppHeader, AppSidebar, AppNavbar และ KioskShell ได้ตามมาตรฐาน | Verified |
+| 14 | Pre-Phase 8 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code, Unused Exports และ Dependencies หลังปรับ Multi-Route Modular Platform | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
+| 15 | Pre-Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูล, Route ย่อย และ App Shell ใน v0.5.1 | 99.89% overall coverage (17,578/17,597 symbols); All 7 routes & App Shell 100.00% | Verified |
 
 ---
 
