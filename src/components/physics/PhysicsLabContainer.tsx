@@ -11,9 +11,12 @@ export function PhysicsLabContainer() {
   return (
     <div className="space-y-6">
       {/* Module Mode Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-2 rounded-xl bg-neutral-900/80 border border-neutral-800">
+      <div role="tablist" aria-label="Physics Laboratory Modules" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-2 rounded-xl bg-neutral-900/80 border border-neutral-800">
         <div className="flex items-center gap-2">
           <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "circuits"}
             onClick={() => setActiveTab("circuits")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
               activeTab === "circuits"
@@ -29,6 +32,9 @@ export function PhysicsLabContainer() {
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "orbits"}
             onClick={() => setActiveTab("orbits")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
               activeTab === "orbits"

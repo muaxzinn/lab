@@ -116,6 +116,7 @@ export function ChemicalReactionViewer() {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => {
                 setCustomEquation("CH4 + O2 -> CO2 + H2O");
                 setSelectedPresetId("methane-combustion");
@@ -138,6 +139,8 @@ export function ChemicalReactionViewer() {
             return (
               <button
                 key={p.id}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => handleSelectPreset(p)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isActive
@@ -291,8 +294,11 @@ export function ChemicalReactionViewer() {
                 ))}
               </select>
 
-              <div className="flex items-center gap-1 bg-neutral-800 p-1 rounded-lg border border-neutral-700">
+              <div role="radiogroup" aria-label="Quantity Unit" className="flex items-center gap-1 bg-neutral-800 p-1 rounded-lg border border-neutral-700">
                 <button
+                  type="button"
+                  role="radio"
+                  aria-checked={refUnit === "moles"}
                   onClick={() => setRefUnit("moles")}
                   className={`px-2.5 py-1 rounded text-xs font-mono transition ${
                     refUnit === "moles"
@@ -303,6 +309,9 @@ export function ChemicalReactionViewer() {
                   Moles (mol)
                 </button>
                 <button
+                  type="button"
+                  role="radio"
+                  aria-checked={refUnit === "grams"}
                   onClick={() => setRefUnit("grams")}
                   className={`px-2.5 py-1 rounded text-xs font-mono transition ${
                     refUnit === "grams"

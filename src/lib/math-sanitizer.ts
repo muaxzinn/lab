@@ -56,6 +56,7 @@ const FORBIDDEN_IDENTIFIERS = [
   'Function',
   'process',
   'global',
+  'globalThis',
   'window',
   'document',
   'import',

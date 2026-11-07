@@ -109,6 +109,8 @@ export function LogicGateSandbox() {
             return (
               <button
                 key={p.id}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => handleSelectPreset(p.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isActive
@@ -122,6 +124,7 @@ export function LogicGateSandbox() {
           })}
 
           <button
+            type="button"
             onClick={handleReset}
             className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700 transition"
             title="Reset Logic Circuit"
@@ -201,8 +204,11 @@ export function LogicGateSandbox() {
       </div>
 
       {/* View Switcher: Interactive Schematic vs Truth Table */}
-      <div className="flex items-center gap-2 border-b border-neutral-800 pb-2">
+      <div role="tablist" aria-label="Logic Gate Views" className="flex items-center gap-2 border-b border-neutral-800 pb-2">
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "schematic"}
           onClick={() => setActiveTab("schematic")}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
             activeTab === "schematic"
@@ -214,6 +220,9 @@ export function LogicGateSandbox() {
           <span>Interactive Schematic Diagram</span>
         </button>
         <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "truth-table"}
           onClick={() => setActiveTab("truth-table")}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
             activeTab === "truth-table"
@@ -480,6 +489,8 @@ export function LogicGateSandbox() {
                       </div>
                     </div>
                     <button
+                      type="button"
+                      aria-label={`Toggle input line ${inp.label} current state ${isHigh ? '1 high' : '0 low'}`}
                       onClick={() => handleToggleInput(inp.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition ${
                         isHigh

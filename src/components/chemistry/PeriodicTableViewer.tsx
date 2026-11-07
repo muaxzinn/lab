@@ -190,6 +190,7 @@ export function PeriodicTableViewer() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
+                aria-label="Clear element search"
                 className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-200"
               >
                 <X className="h-3.5 w-3.5" />
@@ -411,6 +412,7 @@ export function PeriodicTableViewer() {
               onClick={() => setIsModalOpen(true)}
               className="text-neutral-400 hover:text-cyan-400 p-1"
               title="Full Modal View"
+              aria-label="Open Full Element Inspector modal"
             >
               <Maximize2 className="h-3.5 w-3.5" />
             </button>
@@ -577,6 +579,7 @@ export function PeriodicTableViewer() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
+                aria-label="Close Element Inspector modal"
                 className="h-8 w-8 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-neutral-100 flex items-center justify-center transition-colors"
               >
                 <X className="h-4 w-4" />

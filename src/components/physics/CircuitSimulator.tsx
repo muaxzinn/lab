@@ -356,6 +356,8 @@ export function CircuitSimulator() {
             return (
               <button
                 key={p.id}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => handleSelectPreset(p.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isActive
@@ -369,6 +371,7 @@ export function CircuitSimulator() {
           })}
 
           <button
+            type="button"
             onClick={handleReset}
             className="p-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700 transition"
             title="Reset Circuit"
@@ -876,6 +879,8 @@ export function CircuitSimulator() {
                       </div>
                     </div>
                     <button
+                      type="button"
+                      aria-label={`Toggle switch ${sw.name} currently ${isClosed ? 'ON' : 'OFF'}`}
                       onClick={() => handleToggleSwitch(sw.id)}
                       className={`px-3 py-1 rounded-lg text-xs font-mono font-medium transition ${
                         isClosed

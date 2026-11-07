@@ -28,6 +28,11 @@
 | 17 | Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 8 (24,505 symbols) | 99.89% overall coverage (24,479/24,505 symbols); 100.00% across all new solvers & UI modules | Verified |
 | 18 | Phase 8 Review & Hardening | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code, Unused Exports หลังแก้ปัญหา Circuit Topology, Polarity และ Universal NOR | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 19 | Phase 8 Review & Hardening | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลหลังเพิ่ม Wheatstone Bridge และ Universal NOR (25,524 symbols) | 99.90% overall coverage (25,498/25,524 symbols); 100.00% across all new solvers & UI modules | Verified |
+| 20 | Phase 9 Audit | 2026-11-07 | `npx --yes license-checker-rseidelsohn --summary` | `license-checker-rseidelsohn` | ตรวจสอบ License ของทุก Dependencies ใน `node_modules` | MIT: 287, Apache-2.0: 22, ISC: 13, BSD: 9, MPL: 2 (100% Permissive Open Source) | Verified |
+| 21 | Phase 9 QA Gate | 2026-11-07 | `npx --yes @axe-core/cli --help` | `@axe-core/cli` | ประเมินเครื่องมือ Accessibility Testing สำหรับ WCAG 2.1 AA | ติดตั้ง CLI พร้อมใช้งานและตรวจสอบกฎเกณฑ์ a11y ในคอมโพเนนต์ | Verified |
+| 22 | Phase 9 QA Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code และ Unused Exports หลังเพิ่ม Integration & Security Test Suites | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
+| 23 | Phase 9 QA Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวม 59 ไฟล์ (26,845 symbols) | 99.90% overall coverage (26,819/26,845 symbols); All test suites 100.00% | Verified |
+| 24 | Phase 9 QA Gate | 2026-11-07 | `npx --yes jscpd src/` | `jscpd` | ตรวจจับ Duplicate Code ในโค้ดทั้งหมด 18,789 บรรทัด | 1.93% duplication rate (362 lines), อยู่ในเกณฑ์มาตรฐาน (< 5.0%) | Verified |
 
 ---
 

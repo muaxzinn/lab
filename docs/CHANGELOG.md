@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.7.0] - 2026-11-07
+
+### Added
+- **Phase 9: Quality Assurance, Cross-Browser E2E, Accessibility & Security Audit**:
+  - **Comprehensive Multi-Route Integration Suite (`src/lib/integration.test.ts`)**:
+    - Validated all 8 canonical routes in `NAV_ROUTES` map 1:1 to concrete Next.js 15 App Router pages (`src/app/**/page.tsx`).
+    - Validated breadcrumb hierarchy computation across root, subroutes, and deep nested paths with trailing slash normalization.
+    - Validated multilingual search engine across English terms, Thai queries (e.g. `ตารางธาตุ`, `วงจร`), descriptions, and keyword tags.
+    - Verified cross-module scientific consistency between 118 IUPAC elements and chemical stoichiometry calculations.
+    - Verified all reaction presets in `REACTION_PRESETS` balance with zero mass loss ($|\Delta m| < 10^{-4}\text{g}$) and atom conservation.
+    - Verified Modified Nodal Analysis (MNA) DC circuit solver and Gaussian elimination across all circuit presets with KVL/KCL power conservation.
+    - Verified digital logic gate truth table generation across Half Adder, Full Adder, Multiplexer, and Universal NOR presets.
+    - Verified eukaryotic cytology organelle datasets partition plant vs. animal cell structures cleanly.
+    - Verified Thai phonology triyang rules align with syllable classification logic and tone sound rules.
+    - Verified universal practice bank questions across all 5 subjects evaluate correctly against answer keys and reject incorrect inputs.
+  - **Security & Vulnerability Hardening Suite (`src/lib/security.test.ts`)**:
+    - Fuzzed KaTeX rendering with classic script tags, inline SVG/IMG event handlers (`<img onerror=...>`, `<svg onload=...>`), and unclosed groups.
+    - Verified neutralization of dangerous KaTeX link protocols (`\href{javascript:...}`, `\href{data:text/html,...}`, `\url{vbscript:...}`) under `trust: false`.
+    - Enforced strict prototype pollution defense intercepting `__proto__`, `constructor`, `prototype`, and modern universal global `globalThis` in `validateExpressionSecurity`.
+    - Verified Map scope isolation (`createSandboxedScope()`), preventing user variable tampering with `Object.prototype`.
+    - Fuzzed chemical formula parser against prototype pollution identifiers (`__proto__`, `constructor`, `toString`).
+    - Fuzzed DC circuit solver with disconnected, empty, and non-grounded netlists.
+    - Tested logic gate cyclic feedback oscillator detection (`hasCycles: true`).
+    - Fuzzed practice question evaluator against SQL injection, HTML injection, prototype keywords, `NaN`, and `Infinity`.
+    - Fuzzed Thai byte/grapheme truncation utilities against zero, negative, ASCII, mixed, and emoji boundaries with zero replacement characters (`\uFFFD`).
+  - **Accessibility (a11y) & WCAG 2.1 AA Compliance Hardening**:
+    - Added WAI-ARIA tablist semantics (`role="tablist"`, `role="tab"`, `aria-selected`) to `ChemistryLabContainer.tsx` and `PhysicsLabContainer.tsx`.
+    - Added accessible state toggles (`aria-pressed`, `aria-label`) to preset selectors and input switches in `LogicGateSandbox.tsx` and `CircuitSimulator.tsx`.
+    - Added descriptive modal trigger and close labels (`aria-label="Open Full Element Inspector modal"`, `aria-label="Close Element Inspector modal"`, `aria-label="Clear element search"`) in `PeriodicTableViewer.tsx`.
+    - Verified 44px+ touch targets and zero decorative cartoon emojis in compliance with Firman Agentic OS Lobe 3.
+  - **Phase 9 Deliverable Documentation**:
+    - Created `docs/SECURITY_REPORT.md`: Comprehensive security architecture, threat model, sandboxed AST validation, and dependency vulnerability assessment.
+    - Created `docs/PERFORMANCE_REPORT.md`: Core Web Vitals empirical telemetry (LCP, INP, CLS), static bundle optimization, microbenchmark throughput, and WebGL memory lifecycle.
+    - Created `docs/TEST_REPORT.md`: Complete testing breakdown covering 139 passing tests across 50 test suites with zero failures.
+    - Updated `docs/NPX_SKILLS_REGISTRY.md`: Registered Phase 9 executions (#20 to #24: `license-checker-rseidelsohn`, `@axe-core/cli`, `knip`, `typescript-coverage-report`, `jscpd`).
+    - Updated `docs/FEATURE_MATRIX.md`: Updated Phase 9 status and feature tracking table.
+- **Automated Verification Expansion**:
+  - Expanded test suite from 113 to **139 passing tests** across **50 test suites** with **0 failures**.
+  - TypeScript type coverage maintained at **99.90%** (26,819 / 26,845 symbols).
+  - Code duplication measured at **1.93%** across 18,789 lines of source code.
+  - Turbopack production build verifies **12/12 static routes** with 0 errors.
+
+---
+
 ## [0.6.0] - 2026-11-07
 
 ### Added
