@@ -11,7 +11,6 @@ import {
   Layers,
   Award,
   Activity,
-  FileCode2,
   CheckCircle2,
   Globe2,
   Languages,
@@ -31,9 +30,14 @@ import { safeTruncateThaiBytes, safeTruncateThaiGraphemes } from "@/lib/utils";
 import { FormulaViewer } from "@/components/FormulaViewer";
 import { VerletSimulationCanvas } from "@/components/VerletSimulationCanvas";
 import { ThaiPhonologyVisualizer } from "@/components/ThaiPhonologyVisualizer";
+import { PeriodicTableViewer } from "@/components/chemistry/PeriodicTableViewer";
+import { CellStructureViewer } from "@/components/biology/CellStructureViewer";
+import { ExerciseEngine } from "@/components/exercises/ExerciseEngine";
 import { KioskContainer } from "@/components/KioskContainer";
 
-type ActiveTab = "overview" | "math" | "physics" | "thai";
+type ActiveTab = "overview" | "math-physics" | "chem-bio" | "thai" | "exercises";
+type MathPhysicsSubTab = "math" | "physics";
+type ChemBioSubTab = "periodic-table" | "cell-structure";
 
 const FEATURE_MODULES = [
   {
@@ -70,11 +74,11 @@ const FEATURE_MODULES = [
   },
   {
     id: "FEAT-05",
-    name: "Interactive Mathematics",
-    thaiName: "คณิตศาสตร์เชิงโต้ตอบ",
-    icon: Calculator,
-    description: "Dynamic equation editor, KaTeX formulas, 2D/3D graphing, and calculus visualizers.",
-    status: "PHASE 5-6 READY",
+    name: "Interactive Periodic Table & Trends",
+    thaiName: "ตารางธาตุและแนวโน้มทางเคมี",
+    icon: Atom,
+    description: "IUPAC 118 elements with electron configuration shells, atomic mass, and electronegativity.",
+    status: "PHASE 7 INTEGRATED",
   },
   {
     id: "FEAT-06",
@@ -86,11 +90,11 @@ const FEATURE_MODULES = [
   },
   {
     id: "FEAT-07",
-    name: "Exercises & Practice",
-    thaiName: "ระบบแบบฝึกหัดและการฝึกฝน",
-    icon: Activity,
-    description: "Multi-format question engine with instant feedback, hints, and step solutions.",
-    status: "SPECIFIED",
+    name: "Cell Structure & Organelle Inspector",
+    thaiName: "โครงสร้างเซลล์และออร์แกเนลล์",
+    icon: Dna,
+    description: "Plant and animal eukaryotic cells with cross-section clipping and biochemical function popovers.",
+    status: "PHASE 7 INTEGRATED",
   },
   {
     id: "FEAT-08",
@@ -109,12 +113,12 @@ const FEATURE_MODULES = [
     status: "SPECIFIED",
   },
   {
-    id: "FEAT-10",
-    name: "Content Management System",
-    thaiName: "ระบบจัดการเนื้อหาและการเผยแพร่",
-    icon: FileCode2,
-    description: "Modular syllabus schema, versioning, preview sandboxes, and asset registry.",
-    status: "SPECIFIED",
+    id: "FEAT-21",
+    name: "Universal Practice & Exercise Engine",
+    thaiName: "ระบบแบบฝึกหัดและการฝึกฝน",
+    icon: Activity,
+    description: "Multi-subject curriculum question engine with instant grading, hint reveal, and KaTeX formulas.",
+    status: "PHASE 7 INTEGRATED",
   },
 ];
 
@@ -132,6 +136,8 @@ const SUBJECTS = [
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
+  const [mathPhysicsSubTab, setMathPhysicsSubTab] = useState<MathPhysicsSubTab>("math");
+  const [chemBioSubTab, setChemBioSubTab] = useState<ChemBioSubTab>("periodic-table");
 
   const sampleThaiGrapheme = "น้ำดื่มสะอาดบริสุทธิ์เพื่อการศึกษา";
   const truncatedGrapheme = safeTruncateThaiGraphemes(sampleThaiGrapheme, 3);
@@ -164,7 +170,7 @@ export default function Home() {
                   className="h-2 w-2 rounded-full"
                   style={{ background: "linear-gradient(135deg, #2ef2a0, #00f0ff)" }}
                 />
-                Phase 5-6: Architecture & Components
+                Phase 7: Scientific & Learning Modules Active
               </span>
             </div>
           </div>
@@ -176,7 +182,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setActiveTab("overview")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
                 activeTab === "overview"
                   ? "bg-neutral-850 text-neutral-100 border border-neutral-700 shadow-sm"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
@@ -188,34 +194,34 @@ export default function Home() {
 
             <button
               type="button"
-              onClick={() => setActiveTab("math")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
-                activeTab === "math"
+              onClick={() => setActiveTab("math-physics")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
+                activeTab === "math-physics"
                   ? "bg-neutral-850 text-neutral-100 border border-cyan-700/60 shadow-sm"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
               }`}
             >
               <Calculator className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Dynamic Math Sandbox</span>
+              <span>Mathematics & Physics</span>
             </button>
 
             <button
               type="button"
-              onClick={() => setActiveTab("physics")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
-                activeTab === "physics"
-                  ? "bg-neutral-850 text-neutral-100 border border-emerald-700/60 shadow-sm"
+              onClick={() => setActiveTab("chem-bio")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
+                activeTab === "chem-bio"
+                  ? "bg-neutral-850 text-neutral-100 border border-orange-700/60 shadow-sm"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
               }`}
             >
-              <Activity className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Symplectic Physics Orbit</span>
+              <FlaskConical className="h-3.5 w-3.5 text-orange-400" />
+              <span>Chemistry & Biology</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("thai")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
                 activeTab === "thai"
                   ? "bg-neutral-850 text-neutral-100 border border-emerald-700/60 shadow-sm"
                   : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
@@ -224,17 +230,103 @@ export default function Home() {
               <Languages className="h-3.5 w-3.5 text-emerald-400" />
               <span>Thai Phonology Engine</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("exercises")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
+                activeTab === "exercises"
+                  ? "bg-neutral-850 text-neutral-100 border border-purple-700/60 shadow-sm"
+                  : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5 text-purple-400" />
+              <span>Exercises & Practice (FEAT-21)</span>
+            </button>
           </div>
         </div>
 
         {/* Main Content Area */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-          {activeTab === "math" && <FormulaViewer />}
+          {/* TAB 1: MATHEMATICS & PHYSICS */}
+          {activeTab === "math-physics" && (
+            <div className="space-y-6">
+              {/* Sub-tab switcher */}
+              <div className="flex items-center gap-2 bg-neutral-900/60 p-1.5 rounded-xl border border-neutral-800 w-fit">
+                <button
+                  type="button"
+                  onClick={() => setMathPhysicsSubTab("math")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all ${
+                    mathPhysicsSubTab === "math"
+                      ? "bg-cyan-950/80 text-cyan-300 border border-cyan-700/80 shadow-sm"
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
+                >
+                  <Calculator className="h-3.5 w-3.5" />
+                  <span>Dynamic Math Sandbox (KaTeX & Mafs)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMathPhysicsSubTab("physics")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all ${
+                    mathPhysicsSubTab === "physics"
+                      ? "bg-emerald-950/80 text-emerald-300 border border-emerald-700/80 shadow-sm"
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
+                >
+                  <Activity className="h-3.5 w-3.5" />
+                  <span>Symplectic Physics Orbit Simulator</span>
+                </button>
+              </div>
 
-          {activeTab === "physics" && <VerletSimulationCanvas />}
+              {mathPhysicsSubTab === "math" && <FormulaViewer />}
+              {mathPhysicsSubTab === "physics" && <VerletSimulationCanvas />}
+            </div>
+          )}
 
+          {/* TAB 2: CHEMISTRY & BIOLOGY */}
+          {activeTab === "chem-bio" && (
+            <div className="space-y-6">
+              {/* Sub-tab switcher */}
+              <div className="flex items-center gap-2 bg-neutral-900/60 p-1.5 rounded-xl border border-neutral-800 w-fit">
+                <button
+                  type="button"
+                  onClick={() => setChemBioSubTab("periodic-table")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all ${
+                    chemBioSubTab === "periodic-table"
+                      ? "bg-orange-950/80 text-orange-300 border border-orange-700/80 shadow-sm"
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
+                >
+                  <Atom className="h-3.5 w-3.5" />
+                  <span>Interactive Periodic Table (FEAT-05)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChemBioSubTab("cell-structure")}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-2 transition-all ${
+                    chemBioSubTab === "cell-structure"
+                      ? "bg-emerald-950/80 text-emerald-300 border border-emerald-700/80 shadow-sm"
+                      : "text-neutral-400 hover:text-neutral-200"
+                  }`}
+                >
+                  <Dna className="h-3.5 w-3.5" />
+                  <span>Cell & Organelle Visualizer (FEAT-07)</span>
+                </button>
+              </div>
+
+              {chemBioSubTab === "periodic-table" && <PeriodicTableViewer />}
+              {chemBioSubTab === "cell-structure" && <CellStructureViewer />}
+            </div>
+          )}
+
+          {/* TAB 3: THAI PHONOLOGY */}
           {activeTab === "thai" && <ThaiPhonologyVisualizer />}
 
+          {/* TAB 4: INTERACTIVE EXERCISES & PRACTICE */}
+          {activeTab === "exercises" && <ExerciseEngine />}
+
+          {/* TAB 5: PLATFORM OVERVIEW */}
           {activeTab === "overview" && (
             <div className="space-y-16">
               {/* Hero Section */}
@@ -308,9 +400,9 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800 space-y-1">
-                    <span className="text-xs font-mono text-emerald-400">npx type-coverage</span>
+                    <span className="text-xs font-mono text-emerald-400">npx typescript-coverage-report</span>
                     <p className="text-[11px] font-sans text-neutral-400">
-                      วัดระดับความสมบูรณ์ของ TypeScript Type Coverage แบบ 100% ตรวจสอบความปลอดภัยเชิงสถิติ
+                      วัดระดับความสมบูรณ์ของ TypeScript Type Coverage ตรวจสอบความปลอดภัยเชิงสถิติ (99.76%+)
                     </p>
                   </div>
                   <div className="p-3 rounded-lg bg-neutral-950 border border-neutral-800 space-y-1">
@@ -410,7 +502,7 @@ export default function Home() {
                     </p>
                   </div>
                   <span className="text-xs font-mono text-emerald-400 px-2.5 py-1 bg-emerald-950/40 border border-emerald-800/60 rounded">
-                    Phase 5 & 6 Active
+                    Phase 7 Active
                   </span>
                 </div>
 
@@ -518,7 +610,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="border-t border-neutral-800 py-8 text-center text-xs text-neutral-500 font-mono">
-          Interactive Learning Platform &bull; Phase 5-6 Architecture &bull; Node v26 &bull; Next.js 15
+          Interactive Learning Platform &bull; Phase 7 Production &bull; Node v26 &bull; Next.js 15
         </footer>
       </div>
     </KioskContainer>
