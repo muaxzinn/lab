@@ -36,3 +36,45 @@ export function getLessonsByDiscipline(discipline: Lesson["discipline"]): Lesson
 export function getLessonById(id: string): Lesson | undefined {
   return LESSONS.find((l) => l.id === id);
 }
+
+/**
+ * Resolves contextually tailored action button text for launching laboratories from a lesson
+ */
+export function getLabActionLabel(lessonId: string, discipline: Lesson["discipline"]): string {
+  if (discipline === "mathematics") {
+    return "เปิดเครื่องมือวาดกราฟคณิตศาสตร์ (Mafs 2D Grapher)";
+  }
+  if (discipline === "cs") {
+    return "เปิดแซนด์บ็อกซ์วงจรตรรกะดิจิทัล (Logic Gate Simulator)";
+  }
+  if (discipline === "thai") {
+    return "เปิดสตูดิอสัทศาสตร์และไตรยางศ์ (Phonology Visualizer)";
+  }
+  if (discipline === "physics") {
+    if (lessonId.includes("circuit") || lessonId.includes("kirchhoff")) {
+      return "เปิดตัวจำลองวงจรไฟฟ้ากระแสตรง (MNA DC Circuit Simulator)";
+    }
+    if (lessonId.includes("projectile") || lessonId.includes("circular")) {
+      return "ทดลองคำนวณวิถีโพรเจกไทล์และวงโคจร (Verlet Orbit Mechanics)";
+    }
+    return "เปิดแบบจำลองระบบสุริยะ 3D (3D Keplerian Solar System)";
+  }
+  if (discipline === "chemistry") {
+    if (lessonId.includes("equilibrium") || lessonId.includes("stoichiometry")) {
+      return "เปิดเครื่องมือดุลสมการเคมี (Gauss-Jordan Balancer)";
+    }
+    return "เปิดโมเลกุลนี้ใน 3D Molecular Lab";
+  }
+  if (discipline === "biology") {
+    if (
+      lessonId.includes("organelle") ||
+      lessonId.includes("membrane") ||
+      lessonId.includes("energetics") ||
+      lessonId.includes("atp")
+    ) {
+      return "เปิดแบบจำลองเซลล์ยูแคริโอต 3D (3D Cytology Explorer)";
+    }
+    return "เปิดเมทริกซ์ออร์แกเนลล์และภาพตัดขวาง 2D (Cell Matrix)";
+  }
+  return "เปิดห้องปฏิบัติการจำลองสำหรับบทเรียนนี้";
+}

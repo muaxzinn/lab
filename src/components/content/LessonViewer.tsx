@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,7 +14,12 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { type Lesson, type LessonStep, getLessonsByDiscipline } from "@/lib/lesson-data";
+import {
+  type Lesson,
+  type LessonStep,
+  getLessonsByDiscipline,
+  getLabActionLabel,
+} from "@/lib/lesson-data";
 import { renderSanitizedLatex } from "@/lib/math-sanitizer";
 
 interface LessonViewerProps {
@@ -42,8 +47,28 @@ export function LessonViewer({
   const [hasRevealedAnswer, setHasRevealedAnswer] = useState<boolean>(false);
   const [isDeepTheoryExpanded, setIsDeepTheoryExpanded] = useState<boolean>(true);
 
+  // Synchronize state when discipline or defaultLessonId props change
+  useEffect(() => {
+    setSelectedLessonId((currentId) => {
+      if (defaultLessonId && disciplineLessons.some((l) => l.id === defaultLessonId)) {
+        return defaultLessonId;
+      }
+      if (!disciplineLessons.some((l) => l.id === currentId)) {
+        return disciplineLessons[0]?.id || "";
+      }
+      return currentId;
+    });
+    setCurrentStepIndex(0);
+    setSelectedAnswerIndex(null);
+    setHasRevealedAnswer(false);
+  }, [defaultLessonId, disciplineLessons]);
+
   const activeLesson = disciplineLessons.find((l) => l.id === selectedLessonId) || disciplineLessons[0];
-  const activeStep: LessonStep | undefined = activeLesson?.steps[currentStepIndex];
+  const safeStepIndex = Math.min(
+    currentStepIndex,
+    Math.max(0, (activeLesson?.steps.length ?? 1) - 1)
+  );
+  const activeStep: LessonStep | undefined = activeLesson?.steps[safeStepIndex];
 
   // Reset step & checkpoint state when changing lessons
   const handleSelectLesson = (lessonId: string) => {
@@ -362,7 +387,7 @@ export function LessonViewer({
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/60 text-cyan-300 text-xs font-mono hover:border-cyan-400 transition"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>เปิดห้องทดลองจำลอง 3D สำหรับบทเรียนนี้</span>
+                <span>{getLabActionLabel(activeLesson.id, activeLesson.discipline)}</span>
               </button>
             </div>
           )}

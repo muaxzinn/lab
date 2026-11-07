@@ -333,7 +333,7 @@ export function CellViewer3D() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2));
     rendererRef.current = renderer;
     container.appendChild(renderer.domElement);
 

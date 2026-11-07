@@ -10,6 +10,7 @@ import {
   LESSONS,
   getLessonsByDiscipline,
   getLessonById,
+  getLabActionLabel,
   type Lesson,
 } from "./lesson-data.ts";
 import { renderSanitizedLatex } from "./math-sanitizer.ts";
@@ -188,6 +189,41 @@ describe("Interactive Curriculum Lessons (FEAT-01)", () => {
     const nonExistent = getLessonById("unknown-lesson");
     assert.equal(nonExistent, undefined);
   });
+
+  it("resolves contextually tailored action button labels across all disciplines", () => {
+    // Mathematics
+    const mathLabel = getLabActionLabel("math-calculus-limits", "mathematics");
+    assert.ok(mathLabel.includes("Mafs 2D Grapher"), "Math must target Mafs 2D Grapher");
+
+    // Computer Science
+    const csLabel = getLabActionLabel("cs-boolean-logic", "cs");
+    assert.ok(csLabel.includes("Logic Gate Simulator"), "CS must target Logic Gate Simulator");
+
+    // Thai Language
+    const thaiLabel = getLabActionLabel("thai-triyang-phonology", "thai");
+    assert.ok(thaiLabel.includes("Phonology Visualizer"), "Thai must target Phonology Visualizer");
+
+    // Physics
+    const orbitLabel = getLabActionLabel("phys-orbits", "physics");
+    assert.ok(orbitLabel.includes("3D Keplerian Solar System"), "Orbits must target Solar System");
+
+    const circuitLabel = getLabActionLabel("phys-kirchhoff", "physics");
+    assert.ok(circuitLabel.includes("MNA DC Circuit Simulator"), "Kirchhoff must target DC Circuit Simulator");
+
+    const projLabel = getLabActionLabel("phys-projectile-circular", "physics");
+    assert.ok(projLabel.includes("Verlet Orbit Mechanics"), "Projectile must target Verlet");
+
+    // Chemistry
+    const molLabel = getLabActionLabel("chem-vsepr", "chemistry");
+    assert.ok(molLabel.includes("3D Molecular Lab"), "VSEPR must target 3D Molecular Lab");
+
+    const eqLabel = getLabActionLabel("chem-equilibrium-stoichiometry", "chemistry");
+    assert.ok(eqLabel.includes("Gauss-Jordan Balancer"), "Equilibrium must target Balancer");
+
+    // Biology
+    const cellLabel = getLabActionLabel("bio-organelles", "biology");
+    assert.ok(cellLabel.includes("3D Cytology Explorer"), "Organelles must target 3D Cytology Explorer");
+  });
 });
 
 describe("Three.js Lifecycle & Disposal Safety (FEAT-04 Clean-up)", () => {
@@ -215,5 +251,56 @@ describe("Three.js Lifecycle & Disposal Safety (FEAT-04 Clean-up)", () => {
     });
 
     assert.equal(scene.children.length, 0);
+  });
+
+  it("thoroughly disposes Points, LineLoop, LineSegments (GridHelper), and invokes dispose methods", () => {
+    const scene = new THREE.Scene();
+
+    let pointsGeomDisposed = false;
+    let pointsMatDisposed = false;
+    let lineGeomDisposed = false;
+    let lineMatDisposed = false;
+    let gridGeomDisposed = false;
+    let gridMatDisposed = false;
+
+    // Points (like Starfield or Cytoplasm Ribosomes)
+    const pointsGeom = new THREE.BufferGeometry();
+    pointsGeom.setAttribute("position", new THREE.BufferAttribute(new Float32Array([0, 0, 0, 1, 1, 1]), 3));
+    pointsGeom.dispose = () => { pointsGeomDisposed = true; };
+    const pointsMat = new THREE.PointsMaterial({ color: 0xffffff });
+    pointsMat.dispose = () => { pointsMatDisposed = true; };
+    const points = new THREE.Points(pointsGeom, pointsMat);
+    scene.add(points);
+
+    // LineLoop (like Keplerian Orbital Trails)
+    const lineGeom = new THREE.BufferGeometry();
+    lineGeom.setAttribute("position", new THREE.BufferAttribute(new Float32Array([0, 0, 0, 2, 0, 0, 0, 2, 0]), 3));
+    lineGeom.dispose = () => { lineGeomDisposed = true; };
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x00ffff });
+    lineMat.dispose = () => { lineMatDisposed = true; };
+    const lineLoop = new THREE.LineLoop(lineGeom, lineMat);
+    scene.add(lineLoop);
+
+    // LineSegments / GridHelper (like Lab Floor Grid)
+    const grid = new THREE.GridHelper(10, 10);
+    grid.geometry.dispose = () => { gridGeomDisposed = true; };
+    if (Array.isArray(grid.material)) {
+      grid.material[0].dispose = () => { gridMatDisposed = true; };
+    } else {
+      grid.material.dispose = () => { gridMatDisposed = true; };
+    }
+    scene.add(grid);
+
+    assert.equal(scene.children.length, 3);
+
+    disposeThreeScene(scene, null);
+
+    assert.equal(scene.children.length, 0);
+    assert.equal(pointsGeomDisposed, true, "Points geometry must be disposed");
+    assert.equal(pointsMatDisposed, true, "Points material must be disposed");
+    assert.equal(lineGeomDisposed, true, "LineLoop geometry must be disposed");
+    assert.equal(lineMatDisposed, true, "LineLoop material must be disposed");
+    assert.equal(gridGeomDisposed, true, "GridHelper geometry must be disposed");
+    assert.equal(gridMatDisposed, true, "GridHelper material must be disposed");
   });
 });

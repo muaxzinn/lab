@@ -9,23 +9,35 @@ export function disposeThreeScene(
   renderer: THREE.WebGLRenderer | null
 ): void {
   if (scene) {
-    scene.traverse((object) => {
-      if (!(object instanceof THREE.Mesh)) return;
+    const geometriesToDispose = new Set<THREE.BufferGeometry>();
+    const materialsToDispose = new Set<THREE.Material>();
 
-      if (object.geometry) {
-        object.geometry.dispose();
+    scene.traverse((object) => {
+      // Traverse all renderable Three.js objects (Mesh, Points, Line, LineLoop, LineSegments, Sprite)
+      const renderable = object as unknown as {
+        geometry?: THREE.BufferGeometry;
+        material?: THREE.Material | THREE.Material[];
+      };
+
+      if (renderable.geometry && typeof renderable.geometry.dispose === "function") {
+        geometriesToDispose.add(renderable.geometry);
       }
 
-      if (object.material) {
-        if (Array.isArray(object.material)) {
-          for (const mat of object.material) {
-            disposeMaterial(mat);
+      if (renderable.material) {
+        if (Array.isArray(renderable.material)) {
+          for (const mat of renderable.material) {
+            if (mat && typeof mat.dispose === "function") {
+              materialsToDispose.add(mat);
+            }
           }
-        } else {
-          disposeMaterial(object.material);
+        } else if (typeof renderable.material.dispose === "function") {
+          materialsToDispose.add(renderable.material);
         }
       }
     });
+
+    geometriesToDispose.forEach((geom) => geom.dispose());
+    materialsToDispose.forEach((mat) => disposeMaterial(mat));
 
     // Clear all children from scene
     while (scene.children.length > 0) {

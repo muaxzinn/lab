@@ -20,6 +20,7 @@ export function SolarSystemViewer3D() {
 
   const speedMultiplierRef = useRef<number>(speedMultiplier);
   const isPausedRef = useRef<boolean>(isPaused);
+  const selectedPlanetIdRef = useRef<string>(selectedPlanetId);
 
   useEffect(() => {
     speedMultiplierRef.current = speedMultiplier;
@@ -28,6 +29,10 @@ export function SolarSystemViewer3D() {
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
+
+  useEffect(() => {
+    selectedPlanetIdRef.current = selectedPlanetId;
+  }, [selectedPlanetId]);
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -40,23 +45,30 @@ export function SolarSystemViewer3D() {
 
   const currentPlanet = PLANETS.find((p) => p.id === selectedPlanetId) || PLANETS[2];
 
-  // Focus camera on selected planet or center
+  // Focus camera on selected planet or center with dynamic orbital world position
   const focusOnPlanet = useCallback((planetId: string) => {
     setSelectedPlanetId(planetId);
     if (!controlsRef.current || !cameraRef.current) return;
 
     if (planetId === "sun") {
       controlsRef.current.target.set(0, 0, 0);
-      cameraRef.current.position.set(0, 15, 25);
+      cameraRef.current.position.set(0, 16, 26);
       controlsRef.current.update();
       return;
     }
 
     const targetPlanet = PLANETS.find((p) => p.id === planetId);
-    if (targetPlanet) {
-      // Zoom toward orbital distance
-      cameraRef.current.position.set(targetPlanet.distance * 0.7, 3, targetPlanet.distance * 0.7);
-      controlsRef.current.target.set(targetPlanet.distance, 0, 0);
+    const entry = planetMeshesRef.current.get(planetId);
+    if (targetPlanet && entry) {
+      const worldPos = new THREE.Vector3();
+      entry.mesh.getWorldPosition(worldPos);
+      const zoomDist = targetPlanet.radius * 3.5 + 2.5;
+      cameraRef.current.position.set(
+        worldPos.x + zoomDist * 0.7,
+        worldPos.y + zoomDist * 0.4,
+        worldPos.z + zoomDist * 0.7
+      );
+      controlsRef.current.target.copy(worldPos);
       controlsRef.current.update();
     }
   }, []);
@@ -81,7 +93,7 @@ export function SolarSystemViewer3D() {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1, 2));
     rendererRef.current = renderer;
     container.appendChild(renderer.domElement);
 
@@ -247,6 +259,18 @@ export function SolarSystemViewer3D() {
 
         // Sun axial rotation
         sunMesh.rotation.y += 0.003;
+
+        // Dynamic Camera Tracking: follow currently selected planet as it revolves around Sun
+        if (selectedPlanetIdRef.current && selectedPlanetIdRef.current !== "sun") {
+          const activeEntry = planetMeshesRef.current.get(selectedPlanetIdRef.current);
+          if (activeEntry && controlsRef.current && cameraRef.current) {
+            const currentPos = new THREE.Vector3();
+            activeEntry.mesh.getWorldPosition(currentPos);
+            const delta = new THREE.Vector3().subVectors(currentPos, controlsRef.current.target);
+            cameraRef.current.position.add(delta);
+            controlsRef.current.target.copy(currentPos);
+          }
+        }
       }
 
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
@@ -264,46 +288,68 @@ export function SolarSystemViewer3D() {
   }, []);
 
   const resetView = () => {
+    setSelectedPlanetId("sun");
     if (!cameraRef.current || !controlsRef.current) return;
     cameraRef.current.position.set(0, 16, 26);
     controlsRef.current.target.set(0, 0, 0);
     controlsRef.current.update();
-    setSelectedPlanetId("earth");
   };
 
   return (
     <div className="space-y-4">
-      {/* Top Planet Navigation Pills */}
+      {/* Top Planet Navigation: Dropdown (Mobile) & Pills (Desktop) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => focusOnPlanet("sun")}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-mono bg-amber-950/40 border border-amber-800/80 text-amber-300 hover:bg-amber-900/60 transition"
+        <div className="flex items-center gap-2">
+          {/* Mobile Celestial Body Dropdown */}
+          <select
+            value={selectedPlanetId}
+            onChange={(e) => focusOnPlanet(e.target.value)}
+            className="sm:hidden px-3 py-1.5 rounded-lg text-xs font-mono bg-neutral-900 border border-neutral-800 text-neutral-200 outline-none focus:border-cyan-500"
+            aria-label="Select celestial body to track"
           >
-            Sun (ศูนย์กลาง)
-          </button>
-          {PLANETS.map((planet) => {
-            const isSelected = planet.id === selectedPlanetId;
-            return (
-              <button
-                key={planet.id}
-                type="button"
-                onClick={() => focusOnPlanet(planet.id)}
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
-                  isSelected
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/60 font-semibold"
-                    : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-200"
-                }`}
-              >
-                <span className="h-2 w-2 rounded-full" style={{ background: planet.color }} />
-                <span>{planet.name}</span>
-                <span className="text-[10px] text-neutral-500 font-sans hidden sm:inline">
-                  ({planet.thaiName})
-                </span>
-              </button>
-            );
-          })}
+            <option value="sun">Sun (ศูนย์กลาง)</option>
+            {PLANETS.map((planet) => (
+              <option key={planet.id} value={planet.id}>
+                {planet.name} ({planet.thaiName})
+              </option>
+            ))}
+          </select>
+
+          {/* Desktop/Tablet Pills */}
+          <div className="hidden sm:flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => focusOnPlanet("sun")}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-mono transition ${
+                selectedPlanetId === "sun"
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/80 font-semibold"
+                  : "bg-amber-950/40 border border-amber-800/80 text-amber-300 hover:bg-amber-900/60"
+              }`}
+            >
+              Sun (ศูนย์กลาง)
+            </button>
+            {PLANETS.map((planet) => {
+              const isSelected = planet.id === selectedPlanetId;
+              return (
+                <button
+                  key={planet.id}
+                  type="button"
+                  onClick={() => focusOnPlanet(planet.id)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 ${
+                    isSelected
+                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/60 font-semibold"
+                      : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-200"
+                  }`}
+                >
+                  <span className="h-2 w-2 rounded-full" style={{ background: planet.color }} />
+                  <span>{planet.name}</span>
+                  <span className="text-[10px] text-neutral-500 font-sans hidden sm:inline">
+                    ({planet.thaiName})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Playback Speed Controllers */}
