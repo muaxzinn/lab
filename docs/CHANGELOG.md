@@ -10,20 +10,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - **Phase 7 (Feature Development — Priority 1 Core Learning & Priority 2 Scientific Modules)**:
   - **Interactive Exercises & Practice Engine (`FEAT-21`)**:
-    - Created `src/components/exercises/ExerciseEngine.tsx`: Practice engine supporting Single Choice, Multiple Select, Fill-in-the-Blank, and Numeric answers with KaTeX rendering, instant auto-grading, step-by-step solution breakdowns, progressive hint reveal, score tallying, and answer streak tracking.
-    - Created `src/lib/exercise-bank.ts`: 15 high-yield curriculum questions across Mathematics, Physics, Chemistry, Biology, and Thai language with LaTeX math equations and 3-byte safe Thai UTF-8 text.
+    - Created `src/components/exercises/ExerciseEngine.tsx`: Practice engine supporting Single Choice, Multiple Select, Fill-in-the-Blank, and Numeric answers with KaTeX rendering, instant auto-grading, step-by-step solution breakdowns, progressive hint reveal, score tallying, answer streak tracking, and non-blocking filter recovery.
+    - Created `src/lib/exercise-bank.ts`: 20 high-yield curriculum questions across Mathematics, Physics, Chemistry, Biology, and Thai language across Easy, Medium, and Hard difficulty tiers with LaTeX math equations, 3-byte safe Thai UTF-8 text, and international/Thai numeral parsing.
   - **Interactive Periodic Table of Elements (`FEAT-05`)**:
     - Created `src/lib/periodic-table-data.ts`: Complete IUPAC standardized dataset of all 118 chemical elements (Hydrogen #1 to Oganesson #118) with atomic mass, electron configurations, electrons per shell, electronegativity (Pauling scale), oxidation states, discovery history, and dual Thai/English scientific summaries.
-    - Created `src/components/chemistry/PeriodicTableViewer.tsx`: Interactive 18-column Periodic Table with Lanthanide/Actinide series, category color coding, Pauling electronegativity heatmap gradient, block filtering (s, p, d, f), search by symbol/name/Thai, SVG Bohr electron shell visualizer with orbital concentric rings, and detailed element modal inspection.
+    - Created `src/components/chemistry/PeriodicTableViewer.tsx`: Interactive 18-column Periodic Table with Lanthanide/Actinide series, category color coding, Pauling electronegativity heatmap gradient, block filtering (s, p, d, f), search by symbol/name/Thai/category, SVG Bohr electron shell visualizer with orbital concentric rings, WCAG 2.1 AA aria-labels, and detailed element modal inspection.
   - **Interactive Cell & Organelle Visualizer (`FEAT-07`)**:
-    - Created `src/components/biology/CellStructureViewer.tsx`: Multi-layered biological cytology explorer with instant switching between Plant Cell (เซลล์พืช) and Animal Cell (เซลล์สัตว์), clickable organelles (Nucleus, Mitochondria, Chloroplast, Vacuole, Rough/Smooth ER, Golgi, Lysosome, Centrosome, Cell Wall, Plasma Membrane), internal cross-section mode, high-yield biology exam notes, comparison matrix, and zero WebGL VRAM leak via high-performance vector SVG.
+    - Created `src/lib/cell-structure-data.ts`: Pure TypeScript cytology dataset and contracts defining plant and animal cell structures, categories, and high-yield examination notes.
+    - Created `src/components/biology/CellStructureViewer.tsx`: Multi-layered biological cytology explorer with instant switching between Plant Cell (เซลล์พืช) and Animal Cell (เซลล์สัตว์), clickable organelles (Nucleus, Mitochondria, Ribosomes, Chloroplast, Vacuole, Rough/Smooth ER, Golgi, Lysosome, Centrosome, Cell Wall, Plasma Membrane), internal cross-section mode, free cytosolic ribosome clusters, high-yield biology exam notes, comparison matrix, and zero WebGL VRAM leak via high-performance vector SVG.
   - **Automated Unit Tests & Quality Assurance**:
     - Created `src/lib/periodic-table.test.ts` (10 unit tests) verifying 118 elements completeness, sequential atomic numbers, Bohr electron shell conservation, and electronegativity trends.
-    - Created `src/components/exercises/exercise-engine.test.ts` (8 unit tests) verifying question bank integrity, single-choice/multi-select set equality, fill-in-blank normalization, and numeric floating-point tolerance boundaries.
-    - Expanded test suite from 45 to 63 passing tests (100% pass rate).
+    - Created `src/components/biology/cell-structure.test.ts` (5 unit tests) verifying organelle structural integrity, bilingual descriptions, and plant vs. animal partitioning.
+    - Created `src/components/exercises/exercise-engine.test.ts` (9 unit tests) verifying question bank integrity, single-choice/multi-select set equality, fill-in-blank normalization, difficulty filters across Easy/Medium/Hard, and numeric floating-point tolerance boundaries with Thai numerals and comma decimals.
+    - Expanded test suite from 45 to 69 passing tests (21 suites, 100% pass rate).
   - **Special Cross-Cutting Phase (`npx` Tools)**:
     - Executed `npx knip`: confirmed 0 dead files, 0 unused exports, 0 unused dependencies.
-    - Executed `npx typescript-coverage-report`: achieved 99.87% overall type coverage across 15,080 symbols (100.00% across all new components and datasets).
+    - Executed `npx typescript-coverage-report`: achieved 99.88% overall type coverage across 15,857 symbols (100.00% across all new components and datasets).
     - Recorded executions in `docs/NPX_SKILLS_REGISTRY.md`.
   - **Homepage Integration (`src/app/page.tsx`)**:
     - Re-architected tab navigation with dedicated tabs for Overview, Mathematics & Physics, Chemistry & Biology, Thai Phonology Engine, and Exercises & Practice Engine with smooth sub-tab switching.

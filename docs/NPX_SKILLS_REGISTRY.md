@@ -16,7 +16,7 @@
 | 5 | Phase 3-4 Audit | 2026-11-07 | `npx --yes license-checker-rseidelsohn --summary` | `license-checker-rseidelsohn` | ตรวจสอบความถูกต้องของ License แบบ Recursive ใน `node_modules` | MIT: 288, Apache-2.0: 22, ISC: 13, BSD: 9, etc. (All permissive) | Verified |
 | 6 | Phase 5-6 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Unused Files, Exports และ Dependencies ทั่วทั้งโปรเจกต์ | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 7 | Phase 7 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code และ Unused Exports หลังพัฒนา Phase 7 (ExerciseEngine, PeriodicTable, CellStructure) | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
-| 8 | Phase 7 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 7 | 99.87% overall coverage (15,061/15,080 symbols); All 3 new components & banks 100.00% | Verified |
+| 8 | Phase 7 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 7 | 99.88% overall coverage (15,838/15,857 symbols); All components & datasets 100.00% | Verified |
 
 ---
 

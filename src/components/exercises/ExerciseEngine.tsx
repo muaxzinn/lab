@@ -46,8 +46,11 @@ export function ExerciseEngine() {
     });
   }, [selectedSubject, selectedDifficulty]);
 
-  // Safe active question
-  const currentQuestion: ExerciseQuestion | undefined = filteredQuestions[currentIdx] ?? filteredQuestions[0];
+  // Safe active index & question
+  const safeIdx = filteredQuestions.length > 0
+    ? Math.min(Math.max(0, currentIdx), filteredQuestions.length - 1)
+    : 0;
+  const currentQuestion: ExerciseQuestion | undefined = filteredQuestions[safeIdx];
 
   // Overall Score Calculation
   const stats = useMemo(() => {
@@ -64,21 +67,21 @@ export function ExerciseEngine() {
     return { answered, correct, percent, total: EXERCISE_BANK.length };
   }, [submittedStates]);
 
-  if (!currentQuestion) {
-    return (
-      <div className="p-8 text-center text-neutral-400 font-mono">
-        No questions match the current filter criteria.
-      </div>
-    );
-  }
+  const activeAnswer = currentQuestion ? userAnswers[currentQuestion.id] : undefined;
+  const submission = currentQuestion ? submittedStates[currentQuestion.id] : undefined;
+  const activeHintsCount = currentQuestion ? (revealedHints[currentQuestion.id] ?? 0) : 0;
 
-  const activeAnswer = userAnswers[currentQuestion.id];
-  const submission = submittedStates[currentQuestion.id];
-  const activeHintsCount = revealedHints[currentQuestion.id] ?? 0;
+  // Validation: answer cannot be empty or zero-length selection
+  const isAnswerEmpty = useMemo(() => {
+    if (activeAnswer === undefined || activeAnswer === null) return true;
+    if (typeof activeAnswer === "string") return activeAnswer.trim() === "";
+    if (Array.isArray(activeAnswer)) return activeAnswer.length === 0;
+    return false;
+  }, [activeAnswer]);
 
   // Handlers
   const handleSelectOption = (optId: string) => {
-    if (submission) return; // Locked once submitted until reset
+    if (!currentQuestion || submission) return; // Locked once submitted until reset
 
     if (currentQuestion.type === "single-choice") {
       setUserAnswers((prev) => ({ ...prev, [currentQuestion.id]: optId }));
@@ -91,7 +94,7 @@ export function ExerciseEngine() {
   };
 
   const handleTextOrNumberChange = (val: string) => {
-    if (submission) return;
+    if (!currentQuestion || submission) return;
     setUserAnswers((prev) => ({ ...prev, [currentQuestion.id]: val }));
   };
 
@@ -260,67 +263,96 @@ export function ExerciseEngine() {
         </div>
 
         {/* Question Palette / Navigation Jump Bar */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-neutral-850">
-          <span className="text-xs font-mono text-neutral-500 whitespace-nowrap pr-1">
-            Questions ({filteredQuestions.length}):
-          </span>
-          {filteredQuestions.map((q, idx) => {
-            const isCurrent = idx === currentIdx;
-            const res = submittedStates[q.id];
-            const hasAnswered = !!res;
+        {filteredQuestions.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-neutral-850">
+            <span className="text-xs font-mono text-neutral-500 whitespace-nowrap pr-1">
+              Questions ({filteredQuestions.length}):
+            </span>
+            {filteredQuestions.map((q, idx) => {
+              const isCurrent = idx === safeIdx;
+              const res = submittedStates[q.id];
+              const hasAnswered = !!res;
 
-            return (
-              <button
-                key={q.id}
-                type="button"
-                onClick={() => setCurrentIdx(idx)}
-                className={`h-7 w-7 rounded-md text-xs font-mono flex items-center justify-center transition-all border ${
-                  isCurrent
-                    ? "ring-2 ring-cyan-400 font-bold bg-neutral-800 text-cyan-300 border-neutral-600"
-                    : hasAnswered
-                    ? res.isCorrect
-                      ? "bg-emerald-950/60 border-emerald-700/80 text-emerald-300"
-                      : "bg-rose-950/60 border-rose-700/80 text-rose-300"
-                    : "bg-neutral-950 border-neutral-850 text-neutral-400 hover:bg-neutral-900"
-                }`}
-              >
-                {idx + 1}
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={q.id}
+                  type="button"
+                  aria-label={`Jump to question ${idx + 1}`}
+                  onClick={() => setCurrentIdx(idx)}
+                  className={`h-7 w-7 rounded-md text-xs font-mono flex items-center justify-center transition-all border ${
+                    isCurrent
+                      ? "ring-2 ring-cyan-400 font-bold bg-neutral-800 text-cyan-300 border-neutral-600"
+                      : hasAnswered
+                      ? res.isCorrect
+                        ? "bg-emerald-950/60 border-emerald-700/80 text-emerald-300"
+                        : "bg-rose-950/60 border-rose-700/80 text-rose-300"
+                      : "bg-neutral-950 border-neutral-850 text-neutral-400 hover:bg-neutral-900"
+                  }`}
+                >
+                  {idx + 1}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Main Question Card Stage */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 sm:p-8 space-y-6">
-        {/* Question Header & Badges */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 pb-4">
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-xs font-mono px-2.5 py-0.5 rounded-full border ${
-                SUBJECT_METADATA[currentQuestion.subject].badge
-              }`}
-            >
-              {SUBJECT_METADATA[currentQuestion.subject].thaiName} ({SUBJECT_METADATA[currentQuestion.subject].name})
-            </span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-950 border border-neutral-800 text-neutral-300 uppercase">
-              {currentQuestion.difficulty}
-            </span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-950 border border-neutral-800 text-neutral-400">
-              {currentQuestion.type === "single-choice"
-                ? "Multiple Choice (1 ข้อ)"
-                : currentQuestion.type === "multiple-select"
-                ? "Multiple Select (หลายข้อ)"
-                : currentQuestion.type === "fill-in-blank"
-                ? "Fill-in-the-Blank"
-                : "Numeric Answer"}
+      {/* Main Question Card Stage or Empty State */}
+      {!currentQuestion ? (
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-12 text-center space-y-4">
+          <div className="h-12 w-12 rounded-xl bg-neutral-800 border border-neutral-700 mx-auto flex items-center justify-center text-neutral-400">
+            <HelpCircle className="h-6 w-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-heading font-semibold text-neutral-200">
+              ไม่พบโจทย์ที่ตรงกับเงื่อนไขการกรอง
+            </h3>
+            <p className="text-xs text-neutral-400 font-sans">
+              ไม่มีข้อสอบในหมวดหมู่วิชาหรือระดับความยากที่เลือกในขณะนี้
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedSubject("all");
+              setSelectedDifficulty("all");
+              setCurrentIdx(0);
+            }}
+            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-neutral-950 font-mono text-xs font-semibold transition-colors"
+          >
+            Clear Filters (แสดงโจทย์ทั้งหมด)
+          </button>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 sm:p-8 space-y-6">
+          {/* Question Header & Badges */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 pb-4">
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-xs font-mono px-2.5 py-0.5 rounded-full border ${
+                  SUBJECT_METADATA[currentQuestion.subject].badge
+                }`}
+              >
+                {SUBJECT_METADATA[currentQuestion.subject].thaiName} ({SUBJECT_METADATA[currentQuestion.subject].name})
+              </span>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-950 border border-neutral-800 text-neutral-300 uppercase">
+                {currentQuestion.difficulty}
+              </span>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-950 border border-neutral-800 text-neutral-400">
+                {currentQuestion.type === "single-choice"
+                  ? "Multiple Choice (1 ข้อ)"
+                  : currentQuestion.type === "multiple-select"
+                  ? "Multiple Select (หลายข้อ)"
+                  : currentQuestion.type === "fill-in-blank"
+                  ? "Fill-in-the-Blank"
+                  : "Numeric Answer"}
+              </span>
+            </div>
+
+            <span className="text-xs font-mono text-neutral-400">
+              Question {safeIdx + 1} of {filteredQuestions.length}
             </span>
           </div>
-
-          <span className="text-xs font-mono text-neutral-400">
-            Question {currentIdx + 1} of {filteredQuestions.length}
-          </span>
-        </div>
 
         {/* Question Title & Prompt */}
         <div className="space-y-3">
@@ -500,7 +532,7 @@ export function ExerciseEngine() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={activeAnswer === undefined || activeAnswer === ""}
+                disabled={isAnswerEmpty}
                 className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:hover:bg-cyan-600 text-neutral-950 font-heading font-semibold text-xs tracking-wide transition-all shadow-md shadow-cyan-950 flex items-center gap-2"
               >
                 <Check className="h-4 w-4" />
@@ -537,20 +569,20 @@ export function ExerciseEngine() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              disabled={currentIdx === 0}
-              onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
+              disabled={safeIdx === 0}
+              onClick={() => setCurrentIdx(Math.max(0, safeIdx - 1))}
               className="p-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 disabled:opacity-40 text-neutral-300 transition-colors"
               title="Previous Question"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-xs font-mono text-neutral-500 px-1">
-              {currentIdx + 1} / {filteredQuestions.length}
+              {safeIdx + 1} / {filteredQuestions.length}
             </span>
             <button
               type="button"
-              disabled={currentIdx >= filteredQuestions.length - 1}
-              onClick={() => setCurrentIdx((i) => Math.min(filteredQuestions.length - 1, i + 1))}
+              disabled={safeIdx >= filteredQuestions.length - 1}
+              onClick={() => setCurrentIdx(Math.min(filteredQuestions.length - 1, safeIdx + 1))}
               className="p-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 disabled:opacity-40 text-neutral-300 transition-colors"
               title="Next Question"
             >
@@ -576,7 +608,7 @@ export function ExerciseEngine() {
 
         {/* Submission Feedback & Step-by-Step Explanation */}
         {submission && (
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4 pt-2" aria-live="polite">
             {/* Feedback Banner */}
             <div
               className={`p-4 rounded-xl border flex items-center gap-3 ${
@@ -634,6 +666,7 @@ export function ExerciseEngine() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

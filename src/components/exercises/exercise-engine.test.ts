@@ -5,6 +5,7 @@ import {
   getQuestionsBySubject,
   getQuestionsByDifficulty,
   evaluateAnswer,
+  parseNumericInput,
 } from '../../lib/exercise-bank.ts';
 
 describe('Universal Practice & Exercise Engine (FEAT-21)', () => {
@@ -131,12 +132,52 @@ describe('Universal Practice & Exercise Engine (FEAT-21)', () => {
 
       // Non-numeric garbage string
       assert.strictEqual(evaluateAnswer(q, 'not-a-number').isCorrect, false);
+
+      // Scientific notation (4.5e2 == 450)
+      assert.strictEqual(evaluateAnswer(q, '4.5e2').isCorrect, true);
+
+      // Comma decimal format ("450,05")
+      assert.strictEqual(evaluateAnswer(q, '450,05').isCorrect, true);
+
+      // Thai numerals ("๔๕๐")
+      assert.strictEqual(evaluateAnswer(q, '๔๕๐').isCorrect, true);
+
+      // Rejects invalid trailing unit suffix ("450J")
+      assert.strictEqual(evaluateAnswer(q, '450J').isCorrect, false);
+
+      // Rejects invalid unit text ("12m/s")
+      assert.strictEqual(evaluateAnswer(q, '12m/s').isCorrect, false);
     });
 
-    it('handles null and undefined answers safely', () => {
+    it('validates standalone parseNumericInput helper across edge cases', () => {
+      assert.strictEqual(parseNumericInput(450), 450);
+      assert.strictEqual(parseNumericInput('450'), 450);
+      assert.strictEqual(parseNumericInput('  12.5  '), 12.5);
+      assert.strictEqual(parseNumericInput('12,5'), 12.5);
+      assert.strictEqual(parseNumericInput('1,000.5'), 1000.5);
+      assert.strictEqual(parseNumericInput('1.000,5'), 1000.5);
+      assert.strictEqual(parseNumericInput('๔๕๐'), 450);
+      assert.strictEqual(parseNumericInput('4.5e2'), 450);
+      assert.strictEqual(parseNumericInput('-15.3'), -15.3);
+
+      // Invalid / Malicious inputs
+      assert.strictEqual(parseNumericInput('450J'), null);
+      assert.strictEqual(parseNumericInput('12abc'), null);
+      assert.strictEqual(parseNumericInput(''), null);
+      assert.strictEqual(parseNumericInput('   '), null);
+      assert.strictEqual(parseNumericInput(null), null);
+      assert.strictEqual(parseNumericInput(undefined), null);
+      assert.strictEqual(parseNumericInput(Infinity), null);
+      assert.strictEqual(parseNumericInput(NaN), null);
+    });
+
+    it('handles null, undefined, empty string, and empty array answers safely', () => {
       const q = EXERCISE_BANK[0];
       assert.strictEqual(evaluateAnswer(q, null).isCorrect, false);
       assert.strictEqual(evaluateAnswer(q, undefined).isCorrect, false);
+      assert.strictEqual(evaluateAnswer(q, '').isCorrect, false);
+      assert.strictEqual(evaluateAnswer(q, '   ').isCorrect, false);
+      assert.strictEqual(evaluateAnswer(q, []).isCorrect, false);
     });
   });
 
@@ -154,6 +195,14 @@ describe('Universal Practice & Exercise Engine (FEAT-21)', () => {
       const easyQuestions = getQuestionsByDifficulty('easy');
       assert.ok(easyQuestions.length > 0);
       assert.ok(easyQuestions.every((q) => q.difficulty === 'easy'));
+
+      const mediumQuestions = getQuestionsByDifficulty('medium');
+      assert.ok(mediumQuestions.length > 0);
+      assert.ok(mediumQuestions.every((q) => q.difficulty === 'medium'));
+
+      const hardQuestions = getQuestionsByDifficulty('hard');
+      assert.ok(hardQuestions.length >= 5, 'Should have at least 5 hard questions spanning all subjects');
+      assert.ok(hardQuestions.every((q) => q.difficulty === 'hard'));
 
       const allQuestions = getQuestionsByDifficulty('all');
       assert.strictEqual(allQuestions.length, EXERCISE_BANK.length);

@@ -42,7 +42,9 @@ export function PeriodicTableViewer() {
         el.symbol.toLowerCase().includes(q) ||
         el.name.toLowerCase().includes(q) ||
         el.thaiName.toLowerCase().includes(q) ||
-        el.atomicNumber.toString() === q;
+        el.atomicNumber.toString() === q ||
+        el.category.toLowerCase().includes(q) ||
+        el.categoryThai.includes(q);
 
       const matchesCat = selectedCategory === "all" || el.category === selectedCategory;
       const matchesBlock = selectedBlock === "all" || el.block === selectedBlock;
@@ -315,6 +317,7 @@ export function PeriodicTableViewer() {
                 <button
                   key={el.atomicNumber}
                   type="button"
+                  aria-label={`${el.name} (${el.symbol}), atomic number ${el.atomicNumber}, ${el.categoryThai}`}
                   onClick={() => setSelectedElement(el)}
                   style={{
                     gridColumn: pos.gridColumn,

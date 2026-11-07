@@ -480,6 +480,147 @@ export const EXERCISE_BANK: ExerciseQuestion[] = [
       ],
     },
   },
+
+  // 6. Hard Difficulty Questions (High-Yield Advanced Mastery)
+  {
+    id: 'math-04',
+    subject: 'math',
+    type: 'numeric',
+    difficulty: 'hard',
+    title: 'Calculus: Integration by Parts & Exponential Product',
+    prompt: 'จงคำนวณหาค่าของอินทิกรัลจำกัดเขตต่อไปนี้ โดยตอบเป็นทศนิยม 2 ตำแหน่ง:',
+    latexPrompt: '\\int_{0}^{1} x e^{x} \\, dx',
+    correctAnswer: 1,
+    tolerance: 0.05,
+    hints: [
+      'ใช้วิธีอินทิเกรตทีละส่วน (Integration by parts): ∫ u dv = uv - ∫ v du',
+      'กำหนดให้ u = x และ dv = e^x dx',
+      'จะได้ du = dx และ v = e^x',
+    ],
+    explanation: {
+      overview: 'ใช้สูตร Integration by parts กับผลคูณพหุนามและเอกซ์โพเนนเชียล',
+      steps: [
+        '∫ x e^x dx = x e^x - ∫ e^x dx = x e^x - e^x = e^x(x - 1)',
+        'แทนค่าขอบบน x = 1: e^1(1 - 1) = e(0) = 0',
+        'แทนค่าขอบล่าง x = 0: e^0(0 - 1) = 1(-1) = -1',
+        'ผลลัพธ์: ขอบบน - ขอบล่าง = 0 - (-1) = 1.0',
+      ],
+      latexFormula: "\\int_{0}^{1} x e^{x} \\, dx = \\left[ e^x(x - 1) \\right]_{0}^{1} = 0 - (-1) = 1",
+    },
+  },
+  {
+    id: 'phys-04',
+    subject: 'physics',
+    type: 'single-choice',
+    difficulty: 'hard',
+    title: 'Relativistic Mechanics: Mass-Energy Equivalence & Gamma Factor',
+    prompt: 'อนุภาคหนึ่งมีความเร็ว 0.8c (เมื่อ c คือความเร็วแสงในสุญญากาศ) แฟกเตอร์ลอเรนซ์ (Lorentz factor, γ) ของอนุภาคนี้มีค่าเท่าใด:',
+    latexPrompt: '\\gamma = \\frac{1}{\\sqrt{1 - v^2/c^2}}',
+    options: [
+      { id: 'opt-gamma-167', text: '1.67 (หรือ 5/3)', latex: '\\gamma = \\frac{5}{3} \\approx 1.67' },
+      { id: 'opt-gamma-125', text: '1.25 (หรือ 5/4)', latex: '\\gamma = \\frac{5}{4} = 1.25' },
+      { id: 'opt-gamma-200', text: '2.00', latex: '\\gamma = 2.00' },
+      { id: 'opt-gamma-060', text: '0.60', latex: '\\gamma = 0.60' },
+    ],
+    correctAnswer: 'opt-gamma-167',
+    hints: [
+      'แทนค่า v/c = 0.8 ลงในเทอมใต้ราก',
+      '1 - (0.8)^2 = 1 - 0.64 = 0.36',
+      'รากที่สองของ 0.36 คือ 0.6',
+    ],
+    explanation: {
+      overview: 'แฟกเตอร์ลอเรนซ์ (Lorentz Factor, γ) ในทฤษฎีสัมพัทธภาพพิเศษของไอน์สไตน์',
+      steps: [
+        'v = 0.8c ดังนั้น v^2 / c^2 = 0.64',
+        '1 - v^2 / c^2 = 1 - 0.64 = 0.36',
+        '√(0.36) = 0.6 = 3/5',
+        'γ = 1 / 0.6 = 5/3 ≈ 1.67',
+      ],
+      latexFormula: "\\gamma = \\frac{1}{\\sqrt{1 - 0.8^2}} = \\frac{1}{\\sqrt{0.36}} = \\frac{5}{3} \\approx 1.67",
+    },
+  },
+  {
+    id: 'chem-04',
+    subject: 'chemistry',
+    type: 'numeric',
+    difficulty: 'hard',
+    title: 'Buffer Chemistry: Henderson-Hasselbalch Equation',
+    prompt: 'สารละลายบัฟเฟอร์เตรียมจากกรดแอซีติก 0.1 M และโซเดียมแอซีเตต 0.1 M กำหนดให้ Ka ของกรดแอซีติก = 1.8 x 10^-5 (pKa = 4.74) จงคำนวณหาค่า pH ของสารละลายบัฟเฟอร์นี้:',
+    latexPrompt: '\\mathrm{pH} = \\mathrm{p}K_a + \\log\\left(\\frac{[\\mathrm{A}^-]}{[\\mathrm{HA}]}\\right)',
+    correctAnswer: 4.74,
+    tolerance: 0.05,
+    hints: [
+      'ใช้สมการเฮนเดอร์สัน-ฮัสเซลบัลค์ (Henderson-Hasselbalch)',
+      'เนื่องจากความเข้มข้นของคู่เบส [A-] เท่ากับความเข้มข้นของกรด [HA] พอดี เทอมอัตราส่วนจึงเท่ากับ 1',
+      'log(1) = 0',
+    ],
+    explanation: {
+      overview: 'เมื่อความเข้มข้นของกรดอ่อนและเกลือของคู่เบสเท่ากัน ค่า pH ของบัฟเฟอร์จะเท่ากับ pKa ของกรดอ่อนนั้น',
+      steps: [
+        '[A-] = 0.1 M และ [HA] = 0.1 M',
+        'อัตราส่วน [A-] / [HA] = 0.1 / 0.1 = 1',
+        'log(1) = 0',
+        'pH = pKa + log(1) = 4.74 + 0 = 4.74',
+      ],
+      latexFormula: "\\mathrm{pH} = 4.74 + \\log(1) = 4.74",
+    },
+  },
+  {
+    id: 'bio-04',
+    subject: 'biology',
+    type: 'numeric',
+    difficulty: 'hard',
+    title: 'Population Genetics: Hardy-Weinberg Carrier Frequency',
+    prompt: 'ในประชากรที่อยู่ในสมดุลฮาร์ดี-ไวน์เบิร์ก พบผู้ป่วยโรคทางพันธุกรรมลักษณะด้อยบนออโตโซม (q^2) จำนวน 4 ใน 10,000 คน (0.04%) จงคำนวณหาความถี่ของบุคคลที่เป็นพาหะ (Heterozygous carrier: 2pq) ในหน่วยเปอร์เซ็นต์ (%):',
+    latexPrompt: 'p^2 + 2pq + q^2 = 1, \\quad p + q = 1',
+    correctAnswer: 3.92,
+    tolerance: 0.1,
+    hints: [
+      'หาค่า q จาก q^2 = 0.0004 -> q = √(0.0004) = 0.02',
+      'หาค่า p จาก p = 1 - q = 1 - 0.02 = 0.98',
+      'คำนวณพาหะ: 2pq = 2 * (0.98) * (0.02)',
+      'คูณ 100 เพื่อแปลงเป็นหน่วยเปอร์เซ็นต์',
+    ],
+    explanation: {
+      overview: 'กฎสมดุลฮาร์ดี-ไวน์เบิร์ก (Hardy-Weinberg Equilibrium) สำหรับประชากรขนาดใหญ่',
+      steps: [
+        'q^2 = 4 / 10,000 = 0.0004',
+        'q = √(0.0004) = 0.02 (ความถี่ของแอลลีลด้อย)',
+        'p = 1 - q = 1 - 0.02 = 0.98 (ความถี่ของแอลลีลเด่น)',
+        'ความถี่พาหะ 2pq = 2 * (0.98) * (0.02) = 0.0392',
+        'คิดเป็นเปอร์เซ็นต์ = 0.0392 * 100 = 3.92%',
+      ],
+      latexFormula: "2pq = 2(0.98)(0.02) = 0.0392 = 3.92\\%",
+    },
+  },
+  {
+    id: 'thai-04',
+    subject: 'thai',
+    type: 'single-choice',
+    difficulty: 'hard',
+    title: 'Thai Prosody: Chanthalak Metrical Syllable Classification (คำครุ คำลหุ)',
+    prompt: 'คำในข้อใดต่อไปนี้มีลักษณะเป็น "คำลหุ" (สระเสียงสั้นในแม่ ก กา ไม่มีตัวสะกด) ทุกพยางค์:',
+    options: [
+      { id: 'opt-lahu-pure', text: 'กะ, ทิ, ปุ, ระ' },
+      { id: 'opt-garu1', text: 'บท, มัก, ลัด, นก (มีตัวสะกด เป็นคำครุทั้งหมด)' },
+      { id: 'opt-garu2', text: 'กา, ขา, ตา, มา (สระเสียงยาว เป็นคำครุ)' },
+      { id: 'opt-mixed', text: 'อำ, ไอ, ใอ, เอา (สระเกิน มีเสียงพยัญชนะท้าย จัดเป็นคำครุ)' },
+    ],
+    correctAnswer: 'opt-lahu-pure',
+    hints: [
+      'คำลหุ คือพยางค์ที่ออกเสียงเบา: ต้องเป็นสระเสียงสั้นในแม่ ก กา และไม่มีตัวสะกดเด็ดขาด (ใช้สัญลักษณ์ ุ)',
+      'หากมีตัวสะกด ไม่ว่าสระจะสั้นหรือยาว จะกลายเป็น "คำครุ" ทันที',
+      'สระ อำ ไอ ใอ เอา มีเสียงตัวสะกด ม, ย, ว แฝงอยู่ จึงจัดเป็นคำครุ',
+    ],
+    explanation: {
+      overview: 'หลักฉันทลักษณ์ไทยในการแต่งคำประพันธ์ประเภท "ฉันท์" กำหนดครุ-ลหุอย่างเคร่งครัด',
+      steps: [
+        'คำลหุ: สระสั้น ไม่มีตัวสะกด เช่น กะ (อะ), ทิ (อิ), ปุ (อุ), ระ (อะ)',
+        'คำครุ: 1. มีตัวสะกดทุกแม่ 2. สระเสียงยาวในแม่ ก กา 3. สระ อำ ไอ ใอ เอา',
+        'ดังนั้น "กะ, ทิ, ปุ, ระ" จึงเป็นคำลหุทุกพยางค์',
+      ],
+    },
+  },
 ];
 
 /**
@@ -501,11 +642,73 @@ export interface EvaluationResult {
   feedback: string;
 }
 
+/**
+ * Robust numeric parser supporting international standard notations:
+ * - Thai numerals (๐-๙ -> 0-9)
+ * - European/Thai comma decimals (e.g. "12,5" -> 12.5)
+ * - Standard thousands separators (e.g. "1,000.5" -> 1000.5)
+ * - Scientific notation (e.g. "4.5e2" -> 450)
+ * - Rejects non-numeric text suffixes (e.g. "450J", "12m/s")
+ */
+export function parseNumericInput(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) ? raw : null;
+  }
+
+  if (typeof raw !== 'string') return null;
+
+  // Trim whitespace
+  let s = raw.trim();
+  if (!s) return null;
+
+  // Convert Thai numerals (๐-๙) to Arabic (0-9)
+  const thaiNumerals = '๐๑๒๓๔๕๖๗๘๙';
+  s = s.replace(/[๐-๙]/g, (ch) => String(thaiNumerals.indexOf(ch)));
+
+  // Normalize commas and periods
+  if (s.includes(',') && s.includes('.')) {
+    const lastComma = s.lastIndexOf(',');
+    const lastDot = s.lastIndexOf('.');
+    if (lastComma > lastDot) {
+      // European format: 1.234,56 -> remove dots, replace comma with dot
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else {
+      // US/Standard format: 1,234.56 -> remove commas
+      s = s.replace(/,/g, '');
+    }
+  } else if (s.includes(',')) {
+    // Only commas present: check if it's thousands separator or decimal comma
+    // Standard thousands separator e.g. 1,000 or 12,000,000
+    if (/^[-+]?\d{1,3}(,\d{3})+$/.test(s)) {
+      s = s.replace(/,/g, '');
+    } else {
+      // Single comma used as decimal point (e.g. "12,5" -> "12.5")
+      s = s.replace(',', '.');
+    }
+  }
+
+  // Strict regex: must strictly match signed integer or float, optionally with scientific notation
+  const strictFloatPattern = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
+  if (!strictFloatPattern.test(s)) {
+    return null;
+  }
+
+  const parsed = Number(s);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export function evaluateAnswer(
   question: ExerciseQuestion,
   userAnswer: string | string[] | number | null | undefined
 ): EvaluationResult {
-  if (userAnswer === null || userAnswer === undefined || userAnswer === '') {
+  if (
+    userAnswer === null ||
+    userAnswer === undefined ||
+    userAnswer === '' ||
+    (typeof userAnswer === 'string' && userAnswer.trim() === '') ||
+    (Array.isArray(userAnswer) && userAnswer.length === 0)
+  ) {
     return {
       isCorrect: false,
       score: 0,
@@ -567,12 +770,12 @@ export function evaluateAnswer(
 
   // 4. Numeric
   if (question.type === 'numeric') {
-    const numUser = typeof userAnswer === 'number' ? userAnswer : parseFloat(String(userAnswer));
-    if (isNaN(numUser)) {
+    const numUser = parseNumericInput(userAnswer);
+    if (numUser === null) {
       return {
         isCorrect: false,
         score: 0,
-        feedback: 'กรุณาใส่ตัวเลขที่ถูกต้อง',
+        feedback: 'กรุณาใส่ตัวเลขที่ถูกต้อง (เช่น 450, 12.5 หรือ 3e2)',
       };
     }
     const numCorrect = Number(question.correctAnswer);
