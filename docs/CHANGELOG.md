@@ -21,29 +21,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     - Verified Thai phonology triyang rules align with syllable classification logic and tone sound rules.
     - Verified universal practice bank questions across all 5 subjects evaluate correctly against answer keys and reject incorrect inputs.
   - **Security & Vulnerability Hardening Suite (`src/lib/security.test.ts`)**:
+    - Created `escapeHtml` and `unescapeHtml` string utilities in `src/lib/utils.ts` for safe HTML entity neutralization.
     - Fuzzed KaTeX rendering with classic script tags, inline SVG/IMG event handlers (`<img onerror=...>`, `<svg onload=...>`), and unclosed groups.
     - Verified neutralization of dangerous KaTeX link protocols (`\href{javascript:...}`, `\href{data:text/html,...}`, `\url{vbscript:...}`) under `trust: false`.
-    - Enforced strict prototype pollution defense intercepting `__proto__`, `constructor`, `prototype`, and modern universal global `globalThis` in `validateExpressionSecurity`.
+    - Enforced strict prototype pollution and code execution defenses in `validateExpressionSecurity` by intercepting `__proto__`, `constructor`, `prototype`, `globalThis`, `require`, `self`, `top`, `parent`, `fetch`, `localStorage`, `sessionStorage`, `XMLHttpRequest`, `WebSocket`, and `indexedDB`.
     - Verified Map scope isolation (`createSandboxedScope()`), preventing user variable tampering with `Object.prototype`.
     - Fuzzed chemical formula parser against prototype pollution identifiers (`__proto__`, `constructor`, `toString`).
     - Fuzzed DC circuit solver with disconnected, empty, and non-grounded netlists.
     - Tested logic gate cyclic feedback oscillator detection (`hasCycles: true`).
     - Fuzzed practice question evaluator against SQL injection, HTML injection, prototype keywords, `NaN`, and `Infinity`.
     - Fuzzed Thai byte/grapheme truncation utilities against zero, negative, ASCII, mixed, and emoji boundaries with zero replacement characters (`\uFFFD`).
-  - **Accessibility (a11y) & WCAG 2.1 AA Compliance Hardening**:
-    - Added WAI-ARIA tablist semantics (`role="tablist"`, `role="tab"`, `aria-selected`) to `ChemistryLabContainer.tsx` and `PhysicsLabContainer.tsx`.
-    - Added accessible state toggles (`aria-pressed`, `aria-label`) to preset selectors and input switches in `LogicGateSandbox.tsx` and `CircuitSimulator.tsx`.
-    - Added descriptive modal trigger and close labels (`aria-label="Open Full Element Inspector modal"`, `aria-label="Close Element Inspector modal"`, `aria-label="Clear element search"`) in `PeriodicTableViewer.tsx`.
+    - Verified complete HTML entity escaping roundtrip without character corruption across multilingual Thai and scientific equations.
+  - **Accessibility (a11y) & WCAG 2.1 AA Compliance Hardening across all 8 Workbenches**:
+    - Added direct skip-to-content bypass link (`#main-content`) targeting `<main id="main-content" tabIndex={-1}>` in `KioskShell.tsx` per WCAG Success Criterion 2.4.1.
+    - Added WAI-ARIA tablist semantics (`role="tablist"`, `role="tab"`, `aria-selected`) to `CellStructureViewer.tsx`, `ChemistryLabContainer.tsx`, and `PhysicsLabContainer.tsx`.
+    - Added accessible organelle quick selector buttons in `CellStructureViewer.tsx` for screen reader users.
+    - Added descriptive input labels, slider labels, and `role="img"` graphics in `ThaiPhonologyVisualizer.tsx`, `FormulaViewer.tsx`, and `VerletSimulationCanvas.tsx`.
+    - Added `role="radiogroup"`, `role="radio"`, `role="checkbox"`, and `role="status"` `aria-live="polite"` feedback regions in `ExerciseEngine.tsx`.
+    - Added `role="alert"` `aria-live="polite"` live error region in `ChemicalReactionViewer.tsx`.
+    - Added `role="dialog"`, `aria-modal="true"`, and `Escape` key close listeners to `PeriodicTableViewer.tsx` modal and `AppHeader.tsx` search modal.
+    - Added keyboard interaction (`role="button"`, `tabIndex={0}`, `onKeyDown` for Enter/Space) to interactive SVG circuit switches and digital logic inputs.
     - Verified 44px+ touch targets and zero decorative cartoon emojis in compliance with Firman Agentic OS Lobe 3.
   - **Phase 9 Deliverable Documentation**:
     - Created `docs/SECURITY_REPORT.md`: Comprehensive security architecture, threat model, sandboxed AST validation, and dependency vulnerability assessment.
     - Created `docs/PERFORMANCE_REPORT.md`: Core Web Vitals empirical telemetry (LCP, INP, CLS), static bundle optimization, microbenchmark throughput, and WebGL memory lifecycle.
-    - Created `docs/TEST_REPORT.md`: Complete testing breakdown covering 139 passing tests across 50 test suites with zero failures.
+    - Created `docs/TEST_REPORT.md`: Complete testing breakdown covering 147 passing tests across 52 test suites with zero failures.
     - Updated `docs/NPX_SKILLS_REGISTRY.md`: Registered Phase 9 executions (#20 to #24: `license-checker-rseidelsohn`, `@axe-core/cli`, `knip`, `typescript-coverage-report`, `jscpd`).
     - Updated `docs/FEATURE_MATRIX.md`: Updated Phase 9 status and feature tracking table.
 - **Automated Verification Expansion**:
-  - Expanded test suite from 113 to **139 passing tests** across **50 test suites** with **0 failures**.
-  - TypeScript type coverage maintained at **99.90%** (26,819 / 26,845 symbols).
+  - Expanded test suite from 113 to **147 passing tests** across **52 test suites** with **0 failures**.
+  - TypeScript type coverage maintained at **99.90%** (27,316 / 27,342 symbols).
   - Code duplication measured at **1.93%** across 18,789 lines of source code.
   - Turbopack production build verifies **12/12 static routes** with 0 errors.
 

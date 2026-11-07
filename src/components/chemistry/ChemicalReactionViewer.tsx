@@ -172,7 +172,7 @@ export function ChemicalReactionViewer() {
             />
           </div>
           {balanceResult.error && (
-            <div className="flex items-center gap-2 text-xs text-rose-400 font-mono pt-1">
+            <div role="alert" aria-live="polite" className="flex items-center gap-2 text-xs text-rose-400 font-mono pt-1">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
               <span>{balanceResult.error}</span>
             </div>

@@ -324,8 +324,18 @@ export function LogicGateSandbox() {
                     <g
                       key={node.id}
                       transform={`translate(${node.x}, ${node.y})`}
-                      className="cursor-pointer"
+                      className="cursor-pointer focus:outline-none"
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={nodeVal}
+                      aria-label={`Toggle input ${node.label}`}
                       onClick={() => handleToggleInput(node.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          handleToggleInput(node.id);
+                        }
+                      }}
                     >
                       <rect
                         x="-30"

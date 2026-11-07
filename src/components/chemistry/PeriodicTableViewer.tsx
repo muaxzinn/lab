@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Atom,
   Search,
@@ -30,6 +30,18 @@ export function PeriodicTableViewer() {
   const [selectedBlock, setSelectedBlock] = useState<ElementBlock | "all">("all");
   const [colorMode, setColorMode] = useState<ColorMode>("category");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen]);
 
   // Filtered elements for highlighting/dimming
   const activeElementsSet = useMemo(() => {
@@ -318,6 +330,7 @@ export function PeriodicTableViewer() {
                 <button
                   key={el.atomicNumber}
                   type="button"
+                  aria-pressed={isSelected}
                   aria-label={`${el.name} (${el.symbol}), atomic number ${el.atomicNumber}, ${el.categoryThai}`}
                   onClick={() => setSelectedElement(el)}
                   style={{
@@ -559,8 +572,17 @@ export function PeriodicTableViewer() {
 
       {/* Comprehensive Modal Inspector */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-md">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-6 shadow-2xl space-y-6">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Element details for ${selectedElement.name} (${selectedElement.symbol})`}
+          onClick={() => setIsModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/80 backdrop-blur-md"
+        >
+          <div
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-neutral-800 bg-neutral-900 p-6 shadow-2xl space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-xl bg-neutral-800 border border-neutral-700 flex items-center justify-center text-cyan-400">

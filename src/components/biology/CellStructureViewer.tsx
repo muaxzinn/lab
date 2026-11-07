@@ -54,9 +54,11 @@ export function CellStructureViewer() {
 
           {/* Cell Type Toggle & Comparison */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-neutral-950 p-1 rounded-xl border border-neutral-800">
+            <div role="tablist" aria-label="Cell Type Selector" className="flex items-center bg-neutral-950 p-1 rounded-xl border border-neutral-800">
               <button
                 type="button"
+                role="tab"
+                aria-selected={cellType === "plant"}
                 onClick={() => {
                   setCellType("plant");
                   setSelectedOrganelle(ORGANELLES[0]);
@@ -71,6 +73,8 @@ export function CellStructureViewer() {
               </button>
               <button
                 type="button"
+                role="tab"
+                aria-selected={cellType === "animal"}
                 onClick={() => {
                   setCellType("animal");
                   setSelectedOrganelle(ORGANELLES[0]);
@@ -88,6 +92,8 @@ export function CellStructureViewer() {
             <button
               type="button"
               onClick={() => setShowComparison(!showComparison)}
+              aria-pressed={showComparison}
+              aria-label="Toggle Plant vs Animal Comparison Table"
               className={`p-2 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-colors ${
                 showComparison
                   ? "bg-purple-950/80 text-purple-300 border-purple-700"
@@ -627,8 +633,32 @@ export function CellStructureViewer() {
           </div>
 
           <span className="text-[11px] font-sans text-neutral-500 pt-2 text-center">
-            Click any organelle in the cell diagram above to inspect details
+            Click any organelle in the cell diagram above or use the quick selectors below to inspect details
           </span>
+
+          {/* Accessible Organelle Quick Selectors for WCAG Keyboard & Screen Reader Users */}
+          <div role="group" aria-label="Organelle Quick Selectors" className="flex flex-wrap gap-1.5 pt-2 justify-center max-w-[480px]">
+            {activeOrganelles.map((org) => {
+              const isSelected = selectedOrganelle.id === org.id;
+              return (
+                <button
+                  key={org.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`Inspect ${org.name} (${org.thaiName})`}
+                  onClick={() => setSelectedOrganelle(org)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all flex items-center gap-1.5 ${
+                    isSelected
+                      ? "bg-neutral-800 text-neutral-100 border border-emerald-500/80 shadow-sm"
+                      : "bg-neutral-900/80 text-neutral-400 hover:text-neutral-200 border border-neutral-800"
+                  }`}
+                >
+                  <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: org.color }} />
+                  <span>{org.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Organelle Inspector Drawer (lg:col-span-5) */}

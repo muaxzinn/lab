@@ -91,9 +91,34 @@ export function validateExpressionSecurity(expr: string): void {
 }
 ```
 - **Map Scopes**: `createSandboxedScope()` converts variable dictionaries into JavaScript `Map` instances (`scope = new Map<string, number>()`). Unlike plain objects (`{}`), `Map` keys do not inherit from `Object.prototype`, completely neutralizing prototype poisoning vectors.
-- **Validation Gate**: In Phase 9 hardening, `globalThis` was added to `FORBIDDEN_IDENTIFIERS` to block modern ECMAScript universal global traversal.
+- **Validation Gate**: In Phase 9 hardening, `globalThis`, `require`, `self`, `top`, `parent`, `fetch`, `localStorage`, `sessionStorage`, `XMLHttpRequest`, `WebSocket`, and `indexedDB` were added to `FORBIDDEN_IDENTIFIERS` to block modern ECMAScript universal global traversal and external I/O exfiltration.
 
-### 3.3 Cyclic Logic Gate Loop Mitigation (`src/lib/logic-gate-engine.ts`)
+### 3.3 HTML Entity Escaping & Content Neutralization (`src/lib/utils.ts`)
+```typescript
+export function escapeHtml(str: string): string {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function unescapeHtml(str: string): string {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+```
+- **Context-Free Neutralization**: Any user-provided string interpolated into SVG labels, tooltips, or dynamic formula text is passed through `escapeHtml()` to ensure malicious HTML characters cannot form executable DOM nodes.
+- **Multilingual Preservation**: Standard 3-byte Thai UTF-8 characters (`0xE0`), Greek letters ($\lambda, \pi$), and math symbols ($\Delta m, \pm$) are preserved without byte fragmentation or unintended corruption.
+
+### 3.4 Cyclic Logic Gate Loop Mitigation (`src/lib/logic-gate-engine.ts`)
 ```typescript
 // Iterative signal propagation with hard convergence limit (max 32 iterations)
 let iteration = 0;
@@ -115,19 +140,24 @@ if (iteration >= MAX_ITERATIONS) {
 
 ## 4. Automated Security Test Matrix (`src/lib/security.test.ts`)
 
-The dedicated automated security test suite executes 11 comprehensive suites:
+The dedicated automated security test suite executes 16 comprehensive tests across 4 suites:
 
 1. **XSS Script Tag Neutralization**: `<script>`, `<img src=x onerror=alert(1)>`, `<svg onload=...>`, `<iframe src=...>` are proven unexecutable.
 2. **KaTeX Malicious Protocol Interception**: `\href{javascript:alert(1)}`, `\href{data:text/html,...}`, `\url{vbscript:...}` verified neutralized.
 3. **KaTeX Deep Nesting DoS Resilience**: 100-level deeply nested `{...}` braces rendered without process crash.
 4. **Prototype Pollution Immunity**: `__proto__`, `constructor.prototype`, `Object.prototype` verified unpolluted (`undefined`).
-5. **Universal Global Protection**: `eval`, `Function`, `process`, `globalThis`, `window`, `document` verified blocked.
+5. **Universal Global Protection**: `eval`, `Function`, `process`, `globalThis`, `window`, `document`, `require`, `self`, `top`, `parent`, `fetch`, `localStorage` verified blocked.
 6. **Map Scope Isolation**: `scope.get('toString')`, `scope.get('__proto__')` verified `undefined`.
 7. **Chemical Formula Attack Hardening**: Attack vectors `__proto__`, `constructor`, `toString` cleanly rejected with `Invalid chemical formula`.
 8. **Floating Netlist Resilience**: Disconnected and ungrounded electrical circuits handled gracefully without uncaught matrix solver exceptions.
 9. **Circular Wire Dependency Guard**: Circular logic gate feedback correctly flagged with `hasCycles: true`.
 10. **Universal Practice Bank Injection Immunity**: SQL injection, HTML injection, prototype keywords, `NaN`, `Infinity` safely graded with valid Boolean results.
 11. **Thai Multibyte Boundary Fuzzing**: Zero-length, negative length, mixed ASCII/Thai, and emojis verified with 0 corrupted bytes or replacement characters (`\uFFFD`).
+12. **HTML Entity Escaping**: `&`, `<`, `>`, `"`, `'` safely escaped to `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&#39;`.
+13. **Injection Payload Escaping**: Malicious script and image tags neutralized into plain text representation.
+14. **Entity Unescaping Roundtrip**: Verification that unescaping reconstructs original string data cleanly.
+15. **Multilingual Thai & Math Symbol Safety**: Unicode characters and symbols preserved accurately through escaping cycles.
+16. **Nullish & Boundary Resistance**: Handling of empty string, `null`, `undefined`, and numeric inputs without uncaught exceptions.
 
 ---
 

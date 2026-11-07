@@ -92,6 +92,8 @@ import {
   safeTruncateThaiBytes,
   safeTruncateThaiGraphemes,
   safeTruncateThai,
+  escapeHtml,
+  unescapeHtml,
 } from './utils.ts';
 
 describe('Cross-Platform Integration Suite (Phase 9 QA)', () => {
@@ -553,6 +555,96 @@ describe('Cross-Platform Integration Suite (Phase 9 QA)', () => {
 
       const universalByte = safeTruncateThai('ABCDEF', 3, 'bytes', '');
       assert.strictEqual(universalByte, 'ABC');
+    });
+  });
+
+  describe('4. Accessibility Landmarks, WCAG 2.1 AA & Security Integration', () => {
+    it('verifies KioskShell layout exposes bypass blocks skip-link and main content landmark', () => {
+      const kioskShellPath = path.resolve(process.cwd(), 'src/components/layout/KioskShell.tsx');
+      assert.ok(fs.existsSync(kioskShellPath), 'KioskShell.tsx must exist');
+
+      const content = fs.readFileSync(kioskShellPath, 'utf-8');
+      assert.ok(
+        content.includes('href="#main-content"'),
+        'KioskShell must provide a bypass block skip link targeting #main-content'
+      );
+      assert.ok(
+        content.includes('id="main-content"'),
+        'KioskShell must declare the main landmark with id="main-content"'
+      );
+      assert.ok(
+        content.includes('tabIndex={-1}'),
+        'Main content element must have tabIndex={-1} for keyboard focus management'
+      );
+    });
+
+    it('verifies all interactive workbenches contain WCAG accessibility markup', () => {
+      // 1. CellStructureViewer contains role="tablist", role="tab", aria-pressed, and organelle selectors
+      const cellViewerPath = path.resolve(process.cwd(), 'src/components/biology/CellStructureViewer.tsx');
+      const cellContent = fs.readFileSync(cellViewerPath, 'utf-8');
+      assert.ok(cellContent.includes('role="tablist"'), 'Cell viewer must have tablist');
+      assert.ok(cellContent.includes('role="tab"'), 'Cell viewer must have tab buttons');
+      assert.ok(cellContent.includes('aria-selected='), 'Cell viewer must have aria-selected');
+      assert.ok(cellContent.includes('Organelle Quick Selectors'), 'Cell viewer must have accessible quick selectors');
+
+      // 2. ThaiPhonologyVisualizer contains aria-label on input and role="img" on pitch contour
+      const thaiViewerPath = path.resolve(process.cwd(), 'src/components/ThaiPhonologyVisualizer.tsx');
+      const thaiContent = fs.readFileSync(thaiViewerPath, 'utf-8');
+      assert.ok(thaiContent.includes('aria-label="พิมพ์คำหรือพยางค์ภาษาไทย'), 'Thai input must have descriptive aria-label');
+      assert.ok(thaiContent.includes('role="img"'), 'Tone contour SVG must have role="img"');
+
+      // 3. ExerciseEngine contains radiogroup, role="radio", role="checkbox", and aria-live status
+      const exercisePath = path.resolve(process.cwd(), 'src/components/exercises/ExerciseEngine.tsx');
+      const exerciseContent = fs.readFileSync(exercisePath, 'utf-8');
+      assert.ok(exerciseContent.includes('role="radiogroup"'), 'Exercise engine must have role="radiogroup"');
+      assert.ok(exerciseContent.includes('role="radio"'), 'Single-choice options must have role="radio"');
+      assert.ok(exerciseContent.includes('role="checkbox"'), 'Multi-choice options must have role="checkbox"');
+      assert.ok(exerciseContent.includes('aria-live="polite"'), 'Submission feedback must have aria-live="polite"');
+
+      // 4. CircuitSimulator contains keyboard accessible switch
+      const circuitPath = path.resolve(process.cwd(), 'src/components/physics/CircuitSimulator.tsx');
+      const circuitContent = fs.readFileSync(circuitPath, 'utf-8');
+      assert.ok(circuitContent.includes('aria-pressed={isClosed}'), 'Circuit switch must have aria-pressed');
+      assert.ok(circuitContent.includes('onKeyDown='), 'Circuit switch must support keyboard enter/space');
+
+      // 5. LogicGateSandbox contains keyboard accessible inputs
+      const logicPath = path.resolve(process.cwd(), 'src/components/cs/LogicGateSandbox.tsx');
+      const logicContent = fs.readFileSync(logicPath, 'utf-8');
+      assert.ok(logicContent.includes('aria-pressed={nodeVal}'), 'Logic gate inputs must have aria-pressed');
+
+      // 6. PeriodicTableViewer contains modal dialog role and aria-pressed
+      const periodicPath = path.resolve(process.cwd(), 'src/components/chemistry/PeriodicTableViewer.tsx');
+      const periodicContent = fs.readFileSync(periodicPath, 'utf-8');
+      assert.ok(periodicContent.includes('role="dialog"'), 'Periodic table modal must declare role="dialog"');
+      assert.ok(periodicContent.includes('aria-modal="true"'), 'Periodic table modal must be aria-modal="true"');
+      assert.ok(periodicContent.includes('aria-pressed={isSelected}'), 'Element buttons must have aria-pressed');
+
+      // 7. ChemicalReactionViewer contains alert role for error
+      const chemPath = path.resolve(process.cwd(), 'src/components/chemistry/ChemicalReactionViewer.tsx');
+      const chemContent = fs.readFileSync(chemPath, 'utf-8');
+      assert.ok(chemContent.includes('role="alert"'), 'Reaction balancer error must declare role="alert"');
+
+      // 8. VerletSimulationCanvas contains radiogroup and slider labels
+      const verletPath = path.resolve(process.cwd(), 'src/components/VerletSimulationCanvas.tsx');
+      const verletContent = fs.readFileSync(verletPath, 'utf-8');
+      assert.ok(verletContent.includes('role="radiogroup"'), 'Verlet canvas must have role="radiogroup"');
+      assert.ok(verletContent.includes('aria-label="Central Mass (M)"'), 'Sliders must have aria-label');
+    });
+
+    it('validates cross-module integration with HTML entity escaping and sanitization', () => {
+      // User inputs from practice bank or chemical inputs sanitized
+      const dangerousInputs = [
+        '<script>alert("xss")</script>',
+        'CH4 + O2 -> CO2 + <img src=x onerror=alert(1)>',
+        '2 * x + "<script>pwn</script>"',
+      ];
+
+      for (const input of dangerousInputs) {
+        const escaped = escapeHtml(input);
+        assert.ok(!escaped.includes('<script>'));
+        assert.ok(!escaped.includes('<img'));
+        assert.strictEqual(unescapeHtml(escaped), input);
+      }
     });
   });
 });

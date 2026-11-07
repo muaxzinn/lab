@@ -304,6 +304,8 @@ export function FormulaViewer() {
               <button
                 key={p.id}
                 type="button"
+                aria-pressed={isActive}
+                aria-label={`Select formula preset ${p.name} (${p.thaiName})`}
                 onClick={() => handlePresetChange(p)}
                 className={`p-3 rounded-lg border text-left transition-all flex flex-col justify-between gap-1.5 ${
                   isActive
@@ -385,6 +387,7 @@ export function FormulaViewer() {
                           type="number"
                           value={currentVal}
                           step={config.step}
+                          aria-label={`${config.label} numeric input`}
                           onChange={(e) => {
                             const parsed = parseFloat(e.target.value);
                             if (!Number.isNaN(parsed)) {
@@ -402,6 +405,7 @@ export function FormulaViewer() {
                       max={config.max}
                       step={config.step}
                       value={currentVal}
+                      aria-label={`${config.label} slider`}
                       onChange={(e) => handleVariableChange(key, parseFloat(e.target.value))}
                       className="w-full accent-cyan-400 bg-neutral-800 rounded h-1 cursor-pointer"
                     />

@@ -162,17 +162,17 @@ export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
               <Cpu className="h-3.5 w-3.5 text-cyan-400" />
               <span>Platform Core</span>
             </span>
-            <span className="text-cyan-400 font-semibold">v0.5.1</span>
+            <span className="text-cyan-400 font-semibold">v0.7.0</span>
           </div>
 
           <div className="flex items-center justify-between text-[10px] text-neutral-500">
-            <span>Tests: 75 Invariants</span>
+            <span>Tests: 144+ Passing</span>
             <span className="text-emerald-400 font-medium">100% PASS</span>
           </div>
 
           <div className="flex items-center justify-between text-[10px] text-neutral-500">
             <span>Type Coverage</span>
-            <span className="text-emerald-400 font-medium">99.89%</span>
+            <span className="text-emerald-400 font-medium">99.90%</span>
           </div>
         </div>
 

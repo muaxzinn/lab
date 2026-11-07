@@ -95,3 +95,30 @@ export function safeTruncateThai(
   }
   return safeTruncateThaiGraphemes(str, maxLength, suffix);
 }
+
+/**
+ * Escapes characters with special meaning in HTML to prevent XSS and entity confusion.
+ * Safely converts &, <, >, ", ' to their corresponding HTML entities.
+ */
+export function escapeHtml(str: string): string {
+  if (!str || typeof str !== "string") return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Unescapes standard HTML entities back to raw characters.
+ */
+export function unescapeHtml(str: string): string {
+  if (!str || typeof str !== "string") return "";
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}

@@ -267,7 +267,7 @@ export default function Home() {
               className="h-2 w-2 rounded-full"
               style={{ background: "linear-gradient(135deg, #2ef2a0, #00f0ff)" }}
             />
-            <span>v0.5.1 Multi-Route Architecture Active</span>
+            <span>v0.7.0 Multi-Route Architecture Active</span>
           </div>
         </div>
 
@@ -689,7 +689,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-800 py-8 text-center text-xs text-neutral-500 font-mono">
-        Interactive Learning Platform &bull; v0.5.1 Multi-Route Modular Architecture &bull; Next.js 15 &bull; Turbopack
+        Interactive Learning Platform &bull; v0.7.0 Multi-Route Modular Architecture &bull; Next.js 15 &bull; Turbopack
       </footer>
     </div>
   );

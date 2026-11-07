@@ -58,8 +58,18 @@ function renderSwitch(
   return (
     <g
       transform={`translate(${x}, ${y})`}
-      className="cursor-pointer"
+      className="cursor-pointer focus:outline-none"
+      role="button"
+      tabIndex={0}
+      aria-pressed={isClosed}
+      aria-label={`Toggle switch ${label}`}
       onClick={() => sw && onToggle(sw.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (sw) onToggle(sw.id);
+        }
+      }}
     >
       <rect x="-30" y="-20" width="60" height="40" fill="#0a0a0a" stroke="#262626" rx="6" />
       <circle cx="-16" cy="0" r="4" fill="#a3a3a3" />

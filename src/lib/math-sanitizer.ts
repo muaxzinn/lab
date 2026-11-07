@@ -60,6 +60,16 @@ const FORBIDDEN_IDENTIFIERS = [
   'window',
   'document',
   'import',
+  'require',
+  'self',
+  'top',
+  'parent',
+  'fetch',
+  'localStorage',
+  'sessionStorage',
+  'XMLHttpRequest',
+  'WebSocket',
+  'indexedDB',
 ];
 
 /**

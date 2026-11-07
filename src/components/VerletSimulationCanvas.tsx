@@ -378,6 +378,8 @@ export function VerletSimulationCanvas() {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            aria-pressed={isRunning}
+            aria-label={isRunning ? "Pause simulation" : "Resume simulation"}
             onClick={() => setIsRunning(!isRunning)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-colors ${
               isRunning
@@ -411,9 +413,11 @@ export function VerletSimulationCanvas() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg bg-neutral-950/80 border border-neutral-800">
         <div className="flex items-center gap-2 text-xs font-mono">
           <span className="text-neutral-400">Integrator Mode:</span>
-          <div className="inline-flex rounded-md p-0.5 bg-neutral-900 border border-neutral-800">
+          <div role="radiogroup" aria-label="Numerical Integrator Mode" className="inline-flex rounded-md p-0.5 bg-neutral-900 border border-neutral-800">
             <button
               type="button"
+              role="radio"
+              aria-checked={integrator === "verlet"}
               onClick={() => handleToggleIntegrator("verlet")}
               className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
                 integrator === "verlet"
@@ -425,6 +429,8 @@ export function VerletSimulationCanvas() {
             </button>
             <button
               type="button"
+              role="radio"
+              aria-checked={integrator === "euler"}
               onClick={() => handleToggleIntegrator("euler")}
               className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
                 integrator === "euler"
@@ -575,6 +581,7 @@ export function VerletSimulationCanvas() {
                 max={3000}
                 step={50}
                 value={centralMass}
+                aria-label="Central Mass (M)"
                 onChange={(e) => setCentralMass(parseFloat(e.target.value))}
                 className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-pointer"
               />
@@ -591,6 +598,7 @@ export function VerletSimulationCanvas() {
                 max={5.0}
                 step={0.1}
                 value={planetMass}
+                aria-label="Planet Mass (m)"
                 onChange={(e) => setPlanetMass(parseFloat(e.target.value))}
                 className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-pointer"
               />
@@ -607,6 +615,7 @@ export function VerletSimulationCanvas() {
                 max={0.05}
                 step={0.005}
                 value={timeStep}
+                aria-label="Time Step (Δt)"
                 onChange={(e) => setTimeStep(parseFloat(e.target.value))}
                 className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-pointer"
               />
@@ -623,6 +632,7 @@ export function VerletSimulationCanvas() {
                 max={6}
                 step={1}
                 value={speedMultiplier}
+                aria-label="Simulation Speed"
                 onChange={(e) => setSpeedMultiplier(parseInt(e.target.value, 10))}
                 className="w-full accent-emerald-400 bg-neutral-800 h-1 rounded cursor-pointer"
               />

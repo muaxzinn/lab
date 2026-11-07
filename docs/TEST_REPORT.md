@@ -3,7 +3,7 @@
 > **Specification**: Interactive Learning Platform & Educational Feature Development  
 > **Milestone**: Phase 9 (Quality Assurance, Cross-Browser E2E, Accessibility & Security Audit)  
 > **Release Version**: 0.7.0  
-> **Test Status**: PASSED (139 / 139 Passing Tests across 50 Suites, 0 Failures, 0 Skipped)
+> **Test Status**: PASSED (147 / 147 Passing Tests across 52 Suites, 0 Failures, 0 Skipped)
 
 ---
 
@@ -14,12 +14,12 @@ This Comprehensive Test Report consolidates the results of all automated unit, i
 The testing framework utilizes Node.js native test runner (`node:test` + `node:assert/strict`), achieving deterministic, parallelized, sub-second execution across all mathematical, physical, chemical, biological, linguistic, and computer science engines.
 
 ### Key Results Summary
-- **Total Tests Executed**: 139 tests
-- **Passing Tests**: 139 (100.0%)
+- **Total Tests Executed**: 147 tests
+- **Passing Tests**: 147 (100.0%)
 - **Failing Tests**: 0
-- **Test Suites**: 50 suites
-- **Execution Duration**: ~580 ms
-- **TypeScript Type Coverage**: 99.90% (26,819 / 26,845 symbols covered)
+- **Test Suites**: 52 suites
+- **Execution Duration**: ~600 ms
+- **TypeScript Type Coverage**: 99.90% (27,316 / 27,342 symbols covered)
 - **Dead Code (Knip)**: 0 dead files, 0 unused exports, 0 unused dependencies
 - **Code Duplication (jscpd)**: 1.93% (362 / 18,789 lines)
 - **License Compliance**: 100% permissive (MIT, Apache-2.0, ISC, BSD)
@@ -40,8 +40,8 @@ The testing framework utilizes Node.js native test runner (`node:test` + `node:a
 ▶ Math Sanitization & Security Boundary (1 suite, 5 tests) — PASS
 ▶ WebGL Memory Lifecycle & Context Guards (1 suite, 3 tests) — PASS
 ▶ Web Worker Transferable Protocols (1 suite, 1 test) — PASS
-▶ Cross-Platform Integration Suite (Phase 9 QA) (3 suites, 10 tests) — PASS
-▶ Security & Vulnerability Hardening Suite (Phase 9 QA) (3 suites, 11 tests) — PASS
+▶ Cross-Platform Integration Suite (Phase 9 QA) (4 suites, 13 tests) — PASS
+▶ Security & Vulnerability Hardening Suite (Phase 9 QA) (4 suites, 16 tests) — PASS
 ▶ Thai Phonology Engine & Triyang Rules (4 suites, 21 tests) — PASS
 ▶ Thai UTF-8 Safe Truncation Utilities (3 suites, 9 tests) — PASS
 ```
@@ -59,11 +59,11 @@ The testing framework utilizes Node.js native test runner (`node:test` + `node:a
 | `src/lib/logic-gate-engine.test.ts` | Boolean primitives, signal propagation, automated truth tables | 4 | 11 | PASS | 5 ms |
 | `src/lib/periodic-table.test.ts` | 118 elements data integrity, category/period/block filters | 1 | 7 | PASS | 2 ms |
 | `src/lib/sanitizer-and-lifecycle.test.ts` | KaTeX XSS filtering, WebGL disposal, Web Worker transferables | 3 | 9 | PASS | 6 ms |
-| `src/lib/integration.test.ts` | Cross-module platform consistency, multi-route alignment, curriculum | 3 | 10 | PASS | 18 ms |
-| `src/lib/security.test.ts` | XSS attack payloads, prototype pollution, boundary fuzzing | 3 | 11 | PASS | 15 ms |
+| `src/lib/integration.test.ts` | Cross-module platform consistency, multi-route alignment, WCAG landmarks, entity escaping | 4 | 13 | PASS | 22 ms |
+| `src/lib/security.test.ts` | XSS attack payloads, prototype pollution, boundary fuzzing, HTML entity escaping | 4 | 16 | PASS | 15 ms |
 | `src/lib/thai-phonology.test.ts` | Triyang rules, 8 spelling sections, tone rules, syllable deconstruct | 4 | 21 | PASS | 6 ms |
 | `src/lib/utils.test.ts` | 3-byte UTF-8 truncation, grapheme clusters, suffix formatting | 3 | 9 | PASS | 13 ms |
-| **Total** | | **50** | **139** | **PASS** | **~580 ms** |
+| **Total** | | **52** | **147** | **PASS** | **~600 ms** |
 
 ---
 
@@ -95,14 +95,17 @@ The testing framework utilizes Node.js native test runner (`node:test` + `node:a
 
 ## 4. Accessibility (a11y) & WCAG 2.1 AA Audit Summary
 
-- **Keyboard Navigation**:
-  - Full keyboard traversal (`Tab`, `Shift+Tab`) across all 8 routes and interactive controls.
-  - Shortcut `Cmd/Ctrl + K` opens the Quick Navigation Search modal; `Escape` closes it.
-  - Focus trapping inside modal dialogues.
-- **ARIA Semantics**:
+- **Keyboard Navigation & Bypass Blocks**:
+  - Direct skip-to-content bypass link (`#main-content`) targeting `<main id="main-content" tabIndex={-1}>` conforming to WCAG 2.1 AA Success Criterion 2.4.1.
+  - Full keyboard traversal (`Tab`, `Shift+Tab`, `Enter`, `Space`) across all 8 routes and interactive controls.
+  - Shortcut `Cmd/Ctrl + K` opens the Quick Navigation Search modal; `Escape` closes all modals (Search modal and Periodic Table Element modal).
+  - Keyboard-accessible SVG circuit switches and digital logic inputs via `role="button"`, `tabIndex={0}`, and `onKeyDown`.
+- **ARIA Semantics & Live Regions**:
   - Semantic landmark roles applied: `<header role="banner">`, `<nav aria-label="...">`, `<div role="tablist">`, `<button role="tab" aria-selected="...">`, `<div role="dialog" aria-modal="true">`.
-  - All 118 element buttons have descriptive `aria-label` including atomic number and category.
-  - Interactive switches in circuits and logic sandboxes announce active state (`aria-pressed`, `aria-label`).
+  - Live feedback regions (`aria-live="polite"`, `role="status"`, `role="alert"`) for practice exam submissions and chemical equation syntax validation.
+  - Accessible radio groups and checkboxes (`role="radiogroup"`, `role="radio"`, `role="checkbox"`, `aria-checked`) across single-choice and multi-select exercise components.
+  - All 118 element buttons have descriptive `aria-label` including atomic number and category, plus `aria-pressed` selection states.
+  - Dedicated accessible organelle quick selector buttons in `CellStructureViewer` for screen reader users.
 - **Touch Targets**:
   - All interactive buttons and touch controls meet or exceed the WCAG 2.1 AA requirement of $\ge 44 \times 44\text{px}$ (or adequate spacing buffers).
 - **Color Contrast**:
@@ -118,9 +121,9 @@ The testing framework utilizes Node.js native test runner (`node:test` + `node:a
 |---|---|---|---|:---:|
 | **TypeScript Compilation** | `pnpm typecheck` (`tsc --noEmit`) | 0 type errors | 0 errors | PASS |
 | **ESLint Static Analysis** | `pnpm lint` (`eslint`) | 0 errors, 0 warnings | 0 problems | PASS |
-| **Automated Tests** | `pnpm test` (`node --test`) | > 113 passing tests, 0 failures | **139 pass, 0 fail** | PASS |
+| **Automated Tests** | `pnpm test` (`node --test`) | > 113 passing tests, 0 failures | **147 pass, 0 fail (52 suites)** | PASS |
 | **Next.js Production Build** | `pnpm build` (`next build --turbopack`) | 12/12 static routes, 0 build errors | 12/12 routes static | PASS |
 | **Dead Code Detection** | `npx knip` | 0 dead files, 0 unused exports | 0 issues found | PASS |
-| **Type Safety Coverage** | `npx typescript-coverage-report` | $\ge 95.00\%$ | **99.90%** (26,819/26,845) | PASS |
+| **Type Safety Coverage** | `npx typescript-coverage-report` | $\ge 95.00\%$ | **99.90%** (27,316/27,342) | PASS |
 | **Code Duplication** | `npx jscpd src/` | $\le 5.00\%$ | **1.93%** | PASS |
 | **License Compliance** | `npx license-checker-rseidelsohn` | 100% permissive licenses | 100% permissive | PASS |

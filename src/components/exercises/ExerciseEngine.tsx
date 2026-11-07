@@ -379,7 +379,7 @@ export function ExerciseEngine() {
         <div className="space-y-3 pt-2">
           {/* 1. SINGLE CHOICE */}
           {currentQuestion.type === "single-choice" && currentQuestion.options && (
-            <div className="grid grid-cols-1 gap-2.5">
+            <div role="radiogroup" aria-label="ตัวเลือกคำตอบ (Answer options)" className="grid grid-cols-1 gap-2.5">
               {currentQuestion.options.map((opt) => {
                 const isSelected = activeAnswer === opt.id;
                 const isCorrectOpt = submission && opt.id === currentQuestion.correctAnswer;
@@ -389,6 +389,8 @@ export function ExerciseEngine() {
                   <button
                     key={opt.id}
                     type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     disabled={!!submission}
                     onClick={() => handleSelectOption(opt.id)}
                     className={`w-full p-4 rounded-xl text-left transition-all border flex items-center justify-between gap-4 ${
@@ -430,7 +432,7 @@ export function ExerciseEngine() {
 
           {/* 2. MULTIPLE SELECT */}
           {currentQuestion.type === "multiple-select" && currentQuestion.options && (
-            <div className="grid grid-cols-1 gap-2.5">
+            <div role="group" aria-label="ตัวเลือกคำตอบหลายข้อ (Multiple choice options)" className="grid grid-cols-1 gap-2.5">
               {currentQuestion.options.map((opt) => {
                 const currentList = Array.isArray(activeAnswer) ? activeAnswer : [];
                 const isSelected = currentList.includes(opt.id);
@@ -443,6 +445,8 @@ export function ExerciseEngine() {
                   <button
                     key={opt.id}
                     type="button"
+                    role="checkbox"
+                    aria-checked={isSelected}
                     disabled={!!submission}
                     onClick={() => handleSelectOption(opt.id)}
                     className={`w-full p-4 rounded-xl text-left transition-all border flex items-center justify-between gap-4 ${
@@ -573,6 +577,7 @@ export function ExerciseEngine() {
               onClick={() => setCurrentIdx(Math.max(0, safeIdx - 1))}
               className="p-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 disabled:opacity-40 text-neutral-300 transition-colors"
               title="Previous Question"
+              aria-label="Previous Question"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -585,6 +590,7 @@ export function ExerciseEngine() {
               onClick={() => setCurrentIdx(Math.min(filteredQuestions.length - 1, safeIdx + 1))}
               className="p-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 disabled:opacity-40 text-neutral-300 transition-colors"
               title="Next Question"
+              aria-label="Next Question"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -608,7 +614,7 @@ export function ExerciseEngine() {
 
         {/* Submission Feedback & Step-by-Step Explanation */}
         {submission && (
-          <div className="space-y-4 pt-2" aria-live="polite">
+          <div className="space-y-4 pt-2" role="status" aria-live="polite">
             {/* Feedback Banner */}
             <div
               className={`p-4 rounded-xl border flex items-center gap-3 ${

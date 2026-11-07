@@ -96,7 +96,12 @@ function ToneContourSvg({ tone }: { tone: ToneSound }) {
         <span className="text-neutral-400 font-sans">{current.label}</span>
       </div>
 
-      <svg viewBox="0 0 100 100" className="w-full h-14 overflow-visible">
+      <svg
+        viewBox="0 0 100 100"
+        role="img"
+        aria-label={`เส้นแสดงระดับเสียงวรรณยุกต์: ${current.label}`}
+        className="w-full h-14 overflow-visible"
+      >
         {/* Background pitch guide lines */}
         <line x1="10" y1="20" x2="90" y2="20" stroke="#1e293b" strokeDasharray="3 3" />
         <line x1="10" y1="50" x2="90" y2="50" stroke="#1e293b" strokeDasharray="3 3" />
@@ -176,6 +181,7 @@ export function ThaiPhonologyVisualizer() {
             <input
               type="text"
               value={inputSyllable}
+              aria-label="พิมพ์คำหรือพยางค์ภาษาไทย (Enter Thai word or syllable)"
               onChange={(e) => setInputSyllable(e.target.value)}
               placeholder="พิมพ์คำหรือพยางค์ภาษาไทย..."
               maxLength={15}
@@ -202,6 +208,8 @@ export function ThaiPhonologyVisualizer() {
               <button
                 key={p.syllable}
                 type="button"
+                aria-pressed={inputSyllable === p.syllable}
+                aria-label={`เลือกพยางค์ ${p.syllable} (${p.category})`}
                 onClick={() => setInputSyllable(p.syllable)}
                 className={`px-2.5 py-1 rounded text-xs font-mono transition-colors flex items-center gap-1.5 ${
                   inputSyllable === p.syllable
