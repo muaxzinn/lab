@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120" />
+      <stop offset="50%" stop-color="#070b16" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="orbitGrad1_512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#2ef2a0" />
+    </linearGradient>
+    <linearGradient id="orbitGrad2_512" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <radialGradient id="nucleusGrad512" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2ef2a0" />
+      <stop offset="70%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </radialGradient>
+    <filter id="glow512" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad512)" stroke="#1e293b" stroke-width="4" />
+
+  <!-- Outer Orbit 1 (Tilted 30deg) -->
+  <ellipse cx="256" cy="256" rx="170" ry="64" fill="none" stroke="url(#orbitGrad1_512)" stroke-width="6" stroke-dasharray="32 12" transform="rotate(-30 256 256)" opacity="0.85" />
+  
+  <!-- Outer Orbit 2 (Tilted -30deg) -->
+  <ellipse cx="256" cy="256" rx="170" ry="64" fill="none" stroke="url(#orbitGrad2_512)" stroke-width="6" stroke-dasharray="32 12" transform="rotate(30 256 256)" opacity="0.85" />
+  
+  <!-- Outer Orbit 3 (Horizontal) -->
+  <ellipse cx="256" cy="256" rx="176" ry="58" fill="none" stroke="url(#orbitGrad1_512)" stroke-width="5" opacity="0.6" />
+
+  <!-- Quantum Particle Nodes -->
+  <circle cx="112" cy="173" r="11" fill="#00f0ff" filter="url(#glow512)" />
+  <circle cx="400" cy="339" r="11" fill="#2ef2a0" filter="url(#glow512)" />
+  <circle cx="373" cy="186" r="9" fill="#38bdf8" filter="url(#glow512)" />
+  <circle cx="139" cy="326" r="9" fill="#818cf8" filter="url(#glow512)" />
+
+  <!-- Core Nucleus with Multi-Ring Aura -->
+  <circle cx="256" cy="256" r="54" fill="none" stroke="#00f0ff" stroke-width="2" opacity="0.4" stroke-dasharray="8 6" />
+  <circle cx="256" cy="256" r="38" fill="url(#nucleusGrad512)" filter="url(#glow512)" />
+  <circle cx="256" cy="256" r="16" fill="#ffffff" opacity="0.9" />
+</svg>

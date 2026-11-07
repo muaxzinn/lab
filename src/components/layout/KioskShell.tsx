@@ -5,6 +5,7 @@ import { KioskContainer } from "@/components/KioskContainer";
 import { AppHeader } from "./AppHeader";
 import { AppSidebar } from "./AppSidebar";
 import { AppNavbar } from "./AppNavbar";
+import { OfflineStatusBanner } from "./OfflineStatusBanner";
 
 interface KioskShellProps {
   children: React.ReactNode;
@@ -38,6 +39,9 @@ export function KioskShell({ children }: KioskShellProps) {
               isMobileMenuOpen={isMobileMenuOpen}
               onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)}
             />
+
+            {/* Offline Detection Banner */}
+            <OfflineStatusBanner />
 
             {/* Content Area with bottom padding for mobile navbar */}
             <main id="main-content" tabIndex={-1} className="flex-1 pb-20 lg:pb-10 outline-none">

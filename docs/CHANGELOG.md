@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.0] - 2026-11-07
+
+### Added
+- **Phase 10: Production Optimization, PWA & Service Worker Offline Caching**:
+  - **Native Web App Manifest (`src/app/manifest.ts` & `public/manifest.json`)**:
+    - Configured native Next.js 15 App Router manifest and static JSON mirror with standalone display mode, theme color `#070b16`, background color `#070b16`, orientation `any`, name `Interactive Learning Platform`, short name `InteractiveLab`, and `th-TH` language.
+    - Designed and generated high-resolution vector SVG icons in `public/icons/`: `icon-192.svg` (192x192), `icon-512.svg` (512x512), and `icon-maskable.svg` (512x512 with safe-zone inset) featuring dark aesthetics and Mint/Cyan quantum orbit geometry.
+  - **Lightweight Offline Service Worker (`public/sw.js`)**:
+    - Precached all 8 core educational routes (`/`, `/math`, `/physics`, `/chemistry`, `/biology`, `/cs`, `/thai`, `/practice`), manifests, offline fallback, and PWA icons in `interactive-lab-v1` cache.
+    - Implemented Network-First caching strategy for navigation requests with automatic cache update and graceful fallback to `/offline.html` or cached shell.
+    - Implemented Stale-While-Revalidate caching strategy for static chunks, styles, fonts, and vector assets.
+    - Implemented version migration with automated obsolete cache cleanup in `activate` event, `self.skipWaiting()`, and `self.clients.claim()`.
+  - **Self-Contained Offline Fallback Screen (`public/offline.html`)**:
+    - Standalone HTML5 offline page styled in `#070b16` with zero external network dependencies.
+    - Lists all cached workbenches available offline (Math, Physics, Chemistry, Biology, CS, Thai, Practice).
+    - Includes reload retry button (`window.location.reload()`) and strictly adheres to the Anti-Emoji Mandate (100% SVG iconography).
+  - **Client Offline Status Detection Banner (`src/components/layout/OfflineStatusBanner.tsx`)**:
+    - Detects network connectivity via `navigator.onLine` and `online`/`offline` window events.
+    - Displays accessible alert banner (`role="alert"`, `aria-live="polite"`) with Lucide `WifiOff` icon and bilingual notices when offline.
+    - Displays transient reconnection badge (`role="status"`) with Lucide `Wifi` icon for 3.5 seconds when network connectivity is restored.
+    - Automatically registers `/sw.js` in browser environment with update event listeners.
+    - Seamlessly integrated into `src/components/layout/KioskShell.tsx`.
+  - **Automated PWA Unit Test Suite (`src/pwa/pwa.test.ts`)**:
+    - Added 14 unit tests across 5 test suites validating manifest metadata, public json mirroring, offline fallback HTML self-containment, anti-emoji verification, Service Worker precache routes, and SVG icon vector integrity.
+    - Expanded test suite to **161 passing tests** across **58 test suites** with **0 failures**.
+- **Phase 11: Release Packaging & Complete Project Documentation Suite**:
+  - **Section 10 Complete Documentation**:
+    - Created `docs/SOURCE_TRACKING.md`: Complete tracking table of adapted open-source packages, upstream versions, licenses, and custom modification records.
+    - Created `docs/INSTALLATION_GUIDE.md`: Step-by-step setup, prerequisites (Node v26, pnpm 12), development workflow, production build, and environment flags.
+    - Created `docs/USER_GUIDE.md`: End-user walkthrough for students and teachers across all 8 educational workbenches.
+    - Created `docs/DEVELOPER_GUIDE.md`: Comprehensive developer architecture manual detailing directory structure, adding new simulation presets, coding standards, a11y rules, and NPX skill workflow.
+    - Updated `docs/FEATURE_MATRIX.md`: Transitioned all implemented features to `COMPLETED` status.
+    - Updated `docs/NPX_SKILLS_REGISTRY.md`: Registered Phase 10 & 11 tool executions (#25 to #28).
+  - **Production Release v1.0.0 Packaging**:
+    - Bumped `package.json` version to `1.0.0`.
+    - Turbopack production build prerendered 100% static routes (13/13 routes).
+    - Verified 0 Knip dead-code issues, 99.84% TypeScript type coverage (100.00% across all production components), and 1.86% code duplication.
+
+---
+
 ## [0.7.0] - 2026-11-07
 
 ### Added

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sarabun, Prompt, JetBrains_Mono } from "next/font/google";
 import { KioskShell } from "@/components/layout/KioskShell";
 import "./globals.css";
@@ -23,10 +23,33 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#070b16",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   title: "Interactive Learning Platform | แพลตฟอร์มการเรียนรู้แบบโต้ตอบ",
   description:
     "Production-grade interactive learning platform with scientific simulations, virtual laboratory, and mathematical visualization.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "InteractiveLab",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/icons/icon-512.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/icons/icon-192.svg", sizes: "192x192", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
