@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Calculator, Sparkles, Activity } from "lucide-react";
-import { FormulaViewer } from "@/components/FormulaViewer";
+import { MathLabContainer } from "@/components/math/MathLabContainer";
 
 export const metadata: Metadata = {
   title: "Interactive Mathematics | Mafs 2D & Formula Sandbox",
   description:
-    "Interactive 2D Cartesian function plotting with Mafs, LaTeX formula typesetting with KaTeX, and Math.js AST variable evaluation.",
+    "Interactive 2D Cartesian function plotting with Mafs, LaTeX formula typesetting with KaTeX, and deep calculus curriculum lessons.",
 };
 
 export default function MathPage() {
@@ -23,11 +23,11 @@ export default function MathPage() {
                 Mathematics & Dynamic Modeling
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800/80 text-cyan-300">
-                FEAT-01 & FEAT-04
+                FEAT-01 & Mafs 2D
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
-              ห้องปฏิบัติการคณิตศาสตร์: กราฟฟังก์ชัน 2 มิติด้วย Mafs, แสดงสมการ LaTeX ด้วย KaTeX และประเมินค่าตัวแปร
+              ห้องปฏิบัติการคณิตศาสตร์: กราฟฟังก์ชัน 2 มิติด้วย Mafs, แสดงสมการ LaTeX ด้วย KaTeX และบทเรียนแคลคูลัสแบบโต้ตอบ
             </p>
           </div>
         </div>
@@ -45,7 +45,7 @@ export default function MathPage() {
       </div>
 
       {/* Main Interactive Mathematics Sandbox */}
-      <FormulaViewer />
+      <MathLabContainer />
     </div>
   );
 }

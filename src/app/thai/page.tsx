@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Languages, Sparkles, Activity } from "lucide-react";
-import { ThaiPhonologyVisualizer } from "@/components/ThaiPhonologyVisualizer";
+import { ThaiStudioContainer } from "@/components/thai/ThaiStudioContainer";
 
 export const metadata: Metadata = {
   title: "Thai Language Studio | Phonology Engine & Triyang Rules",
   description:
-    "Interactive Thai syllable deconstructor with Triyang 3-consonant class analysis, 8 spelling sections, dead/live tones, and dynamic SVG pitch contour trajectory plots.",
+    "Interactive Thai syllable deconstructor with Triyang 3-consonant class analysis, 8 spelling sections, dead/live tones, dynamic SVG pitch contour plots, and morphology lessons.",
 };
 
 export default function ThaiPage() {
@@ -23,11 +23,11 @@ export default function ThaiPage() {
                 Thai Language Studio & Phonology
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800/80 text-emerald-300">
-                Linguistics Engine
+                Linguistics & FEAT-01
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
-              สตูดิอสัทศาสตร์ภาษาไทย: ถอดรหัสโครงสร้างพยางค์, วิเคราะห์อักษร 3 หมู่ (ไตรยางศ์), มาตราตัวสะกด 8 แม่ และเส้นเสียงวรรณยุกต์แบบ SVG
+              สตูดิอสัทศาสตร์ภาษาไทย: ถอดรหัสโครงสร้างพยางค์, วิเคราะห์อักษร 3 หมู่ (ไตรยางศ์), มาตราตัวสะกด 8 แม่ และบทเรียนคำสมาส-คำสนธิ
             </p>
           </div>
         </div>
@@ -44,8 +44,8 @@ export default function ThaiPage() {
         </div>
       </div>
 
-      {/* Main Interactive Thai Phonology Visualizer */}
-      <ThaiPhonologyVisualizer />
+      {/* Main Interactive Thai Phonology Suite */}
+      <ThaiStudioContainer />
     </div>
   );
 }

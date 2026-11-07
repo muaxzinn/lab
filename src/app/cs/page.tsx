@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Binary, Cpu, Sparkles } from "lucide-react";
-import { LogicGateSandbox } from "@/components/cs/LogicGateSandbox";
+import { CSLabContainer } from "@/components/cs/CSLabContainer";
 
 export const metadata: Metadata = {
   title: "Computer Science Laboratory | Logic Gates & Boolean Digital Sandbox",
   description:
-    "Interactive digital logic circuit simulator featuring AND, OR, NOT, XOR, NAND, NOR gates, live signal propagation, and automated truth table generation.",
+    "Interactive digital logic circuit simulator featuring AND, OR, NOT, XOR, NAND, NOR gates, live signal propagation, automated truth tables, and curriculum lessons.",
 };
 
 export default function ComputerSciencePage() {
@@ -23,11 +23,11 @@ export default function ComputerSciencePage() {
                 Computer Science Laboratory & Digital Logic
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800/80 text-cyan-300">
-                FEAT-19 Digital Sandbox
+                FEAT-19 & FEAT-01
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
-              ห้องปฏิบัติการวิทยาการคอมพิวเตอร์: แซนด์บ็อกซ์เกตตรรกะดิจิทัล วงจรบวกเลขฐานสอง และการสร้างตารางค่าความจริงอัตโนมัติ
+              ห้องปฏิบัติการวิทยาการคอมพิวเตอร์: แซนด์บ็อกซ์เกตตรรกะดิจิทัล วงจรบวกเลขฐานสอง ตารางค่าความจริง และบทเรียนตรรกศาสตร์
             </p>
           </div>
         </div>
@@ -45,7 +45,7 @@ export default function ComputerSciencePage() {
       </div>
 
       {/* Main Interactive Logic Gate Sandbox */}
-      <LogicGateSandbox />
+      <CSLabContainer />
     </div>
   );
 }

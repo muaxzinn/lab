@@ -25,8 +25,11 @@
 
 html,
 body {
-  height: 100%;
-  overscroll-behavior: none;
+  min-height: 100%;
+  height: auto;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: none;
   -webkit-touch-callout: none;
 }
 

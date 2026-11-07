@@ -24,7 +24,7 @@ export function KioskShell({ children }: KioskShellProps) {
         ข้ามไปยังเนื้อหาหลัก (Skip to main content)
       </a>
 
-      <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col [overscroll-behavior:none] selection:bg-neutral-800 selection:text-neutral-200">
+      <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col [overscroll-behavior-y:none] selection:bg-neutral-800 selection:text-neutral-200">
         <div className="flex flex-1 min-h-screen">
           {/* Desktop Persistent Sidebar + Mobile Drawer */}
           <AppSidebar
@@ -33,7 +33,7 @@ export function KioskShell({ children }: KioskShellProps) {
           />
 
           {/* Main App Canvas */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 flex flex-col min-w-0 min-h-screen">
             {/* Top Unified Header */}
             <AppHeader
               isMobileMenuOpen={isMobileMenuOpen}
@@ -44,7 +44,7 @@ export function KioskShell({ children }: KioskShellProps) {
             <OfflineStatusBanner />
 
             {/* Content Area with bottom padding for mobile navbar */}
-            <main id="main-content" tabIndex={-1} className="flex-1 pb-20 lg:pb-10 outline-none">
+            <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 pb-20 lg:pb-10 outline-none">
               {children}
             </main>
           </div>

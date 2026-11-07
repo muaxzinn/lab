@@ -130,7 +130,7 @@ export function KioskContainer({ children, showTopBar = true }: KioskContainerPr
     <div
       className={`relative min-h-screen transition-all select-none ${
         isKioskLocked
-          ? "overflow-x-hidden touch-pan-x touch-pan-y [overscroll-behavior:none]"
+          ? "[overscroll-behavior-y:none]"
           : ""
       }`}
     >

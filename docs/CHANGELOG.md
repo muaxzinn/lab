@@ -5,6 +5,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.0] - 2026-11-07
+
+### Added
+- **Open Source 3D WebGL Integration (`three` & OrbitControls)**:
+  - **Interactive 3D Molecular Laboratory (`src/components/3d/MolecularViewer3D.tsx`)**:
+    - Real Three.js WebGL canvas with smooth OrbitControls (rotate, zoom, pan) and auto-rotation toggle.
+    - Dual rendering modes: Ball-and-Stick vs. Space-Filling (Van der Waals radii).
+    - CPK standard color coding (White H, Charcoal C, Red O, Blue N, Orange P).
+    - Raycasting click interaction to inspect individual atomic coordinates, covalent and vdW radii.
+    - Curated 3D datasets for 8+ landmark molecules in `src/lib/molecular-data-3d.ts` (Water, Methane, Ethanol, Benzene, Glucose, Caffeine, Aspirin, and B-DNA Double Helix segment).
+    - Robust unmount memory disposal via `disposeThreeScene` eliminating GPU context leaks.
+    - Integrated as a dedicated tab in `src/app/chemistry/page.tsx` (`ChemistryLabContainer.tsx`).
+  - **Heliocentric 3D Solar System Engine (`src/components/3d/SolarSystemViewer3D.tsx`)**:
+    - Glowing Sun with PointLight and coronal atmosphere.
+    - 8 planets (Mercury through Neptune) plus Earth's Moon and Saturn's rings with Keplerian orbital ellipse trails.
+    - Speed multiplier controls (1x, 5x, 10x, 50x) and pause/resume simulation toggles.
+    - Planet tracking and camera zoom focus with astronomical ephemeris cards.
+    - Integrated as a dedicated tab in `src/app/physics/page.tsx` (`PhysicsLabContainer.tsx`).
+  - **3D Cutaway Eukaryotic Cytology Explorer (`src/components/3d/CellViewer3D.tsx`)**:
+    - 3D cutaway eukaryotic cell model exposing internal organelles.
+    - Mode toggle between Animal Cell and Plant Cell (with rigid cell wall and chloroplasts).
+    - 3D organelles: Nucleus, Nucleolus, Mitochondria, RER, SER, Golgi Apparatus, Lysosomes, and Ribosomes.
+    - Click-to-inspect raycasting with organelle function, membrane counts, and exam invariants.
+    - Integrated as a dedicated tab in `src/app/biology/page.tsx` (`BiologyLabContainer.tsx`).
+- **Deep Step-by-Step Interactive Curriculum Lessons (`FEAT-01`)**:
+  - **Curriculum Dataset (`src/lib/lesson-data.ts`)**:
+    - In-depth, multi-step lessons across 6 core disciplines:
+      - **Physics**: Newtonian Dynamics ($F=ma$, momentum derivatives), Keplerian Orbits & Harmonic Periods.
+      - **Chemistry**: Quantum Orbitals & Electron Configuration (Aufbau, Hund, Pauli), VSEPR Molecular Geometry & Steric Numbers.
+      - **Biology**: Eukaryotic Endomembrane Secretory Superhighway, Endosymbiotic Theory, DNA Replication & Central Dogma.
+      - **Mathematics**: Differential Calculus & Limits ($\epsilon$-$\delta$), Riemann Integration & Fundamental Theorem of Calculus.
+      - **Computer Science**: Boolean Logic & Universal Gates, Binary Half/Full Adders, Big-O Algorithmic Complexity.
+      - **Thai Language**: Triyang Consonant Classes, Live vs. Dead Syllables (คำเป็น-คำตาย), Kam Samas & Kam Sondhi Morphology.
+  - **Interactive Lesson Component (`src/components/content/LessonViewer.tsx`)**:
+    - Step-by-step progress tracking with responsive dot navigation.
+    - Mathematical formulation rendering via secure KaTeX with detailed symbol legends.
+    - Expandable deep theoretical analysis with real-world engineering and scientific applications.
+    - Interactive Concept Checkpoints with instantaneous answer verification and conceptual explanations.
+    - Mounted into all subject workspaces: `/physics`, `/chemistry`, `/biology`, `/math`, `/cs`, and `/thai`.
+- **Clean & Decluttered Studio Hub UI Redesign (Apple / Linear Grade)**:
+  - **Spacious Studio Hub (`src/components/home/StudioHub.tsx` & `src/app/page.tsx`)**:
+    - Stripped redundant HUD telemetry clutter, status boxes, and badge noise.
+    - Added category filter pills: ทั้งหมด, วิทยาศาสตร์กายภาพ, ชีววิทยาและเคมี, คณิตศาสตร์และคอมพิวเตอร์, ภาษาศาสตร์และการฝึกฝน.
+    - Redesigned subject studio cards with subtle gradients, crisp Lucide SVG vector icons, key technology tags (`3D WebGL`, `Verlet Physics`, `Interactive Lessons`), and direct laboratory access actions.
+- **Fluid Vertical Scrolling & Viewport Fix**:
+  - Updated `src/app/globals.css`: changed `html, body` height constraints to `min-height: 100%; height: auto; overflow-y: auto; scroll-behavior: smooth; overscroll-behavior-y: none;`.
+  - Updated `src/components/layout/KioskShell.tsx`: configured `<main id="main-content">` and parent containers with `min-h-screen overflow-y-auto`.
+  - Updated `src/components/KioskContainer.tsx`: removed `overflow-x-hidden touch-pan-x touch-pan-y` constraints blocking wheel/touch scrolling.
+- **Automated Unit Testing & Quality Verification**:
+  - Added `src/lib/three-and-lessons.test.ts` validating 3D molecular coordinates, CPK colors, lesson structural integrity, and Three.js scene disposal.
+  - Added `src/lib/astronomy-data.test.ts` validating OpenLyceum Keplerian orbits, semi-major axes, sidereal periods, and planetary rings.
+  - Test suite expanded to **178 tests** across **63 suites** with **100% pass rate**.
+  - Verified 0 Knip issues, 0 ESLint warnings, 0 TypeScript errors, and successful Turbopack production build.
+
+---
+
 ## [1.0.0] - 2026-11-07
 
 ### Added
