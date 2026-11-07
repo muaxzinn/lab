@@ -34,7 +34,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Created `src/components/layout/layout.test.ts` (6 unit tests) verifying route completeness, uniqueness, path formatting, breadcrumb hierarchy, and search filtering.
   - Expanded test suite from 69 to 75 unit tests (22 suites, 100% pass rate).
   - Production build prerendered 100% static pages (11/11 routes), dropping home page JS size from 420 kB down to 0 kB initial page JS.
-  - Achieved 99.89% overall TypeScript coverage (17,578/17,597 symbols) via `npx typescript-coverage-report` (100.00% across all new routes and app shell components).
+  - Achieved 99.89% overall TypeScript coverage (17,774/17,793 symbols) via `npx typescript-coverage-report` (100.00% across all new routes and app shell components).
+  - Hardened Kiosk containment: added `contextmenu` suppression when locked (Lobe 3 Kiosk Lockdown rule), WebKit/Safari fullscreen vendor prefix fallback, `.no-scrollbar` cross-browser utility in `globals.css`, and 44px+ minimum tap targets on mobile `AppNavbar`.
+  - Upgraded `AppHeader` quick navigation search modal: added keyboard `Enter` selection on top search matches and multi-tier subroute prefix resolution in `getNavRouteByPath` and `getBreadcrumbs`.
   - Verified 0 dead code issues via `npx knip`.
 
 ---

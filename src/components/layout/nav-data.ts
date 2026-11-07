@@ -109,7 +109,16 @@ export interface BreadcrumbItem {
 
 export function getNavRouteByPath(pathname: string): NavRoute | undefined {
   const normalized = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
-  return NAV_ROUTES.find((r) => r.path === normalized);
+  // First exact match
+  const exact = NAV_ROUTES.find((r) => r.path === normalized);
+  if (exact) return exact;
+
+  // Prefix match for nested subroutes (e.g. /math/calculus matches /math)
+  if (normalized !== "/" && normalized.length > 1) {
+    return NAV_ROUTES.find((r) => r.path !== "/" && normalized.startsWith(`${r.path}/`));
+  }
+
+  return undefined;
 }
 
 export function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
@@ -127,22 +136,32 @@ export function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
     ];
   }
 
-  const currentRoute = getNavRouteByPath(normalized);
-
-  return [
+  const items: BreadcrumbItem[] = [
     {
       label: homeRoute.label,
       thaiLabel: homeRoute.thaiLabel,
       path: "/",
       isCurrent: false,
     },
-    {
-      label: currentRoute ? currentRoute.label : normalized.replace("/", ""),
-      thaiLabel: currentRoute ? currentRoute.thaiLabel : normalized.replace("/", ""),
-      path: normalized,
-      isCurrent: true,
-    },
   ];
+
+  const segments = normalized.split("/").filter(Boolean);
+  let accumulatedPath = "";
+
+  for (let i = 0; i < segments.length; i++) {
+    accumulatedPath += `/${segments[i]}`;
+    const isCurrent = i === segments.length - 1;
+    const matchedRoute = NAV_ROUTES.find((r) => r.path === accumulatedPath);
+
+    items.push({
+      label: matchedRoute ? matchedRoute.label : segments[i],
+      thaiLabel: matchedRoute ? matchedRoute.thaiLabel : segments[i],
+      path: accumulatedPath,
+      isCurrent,
+    });
+  }
+
+  return items;
 }
 
 export function searchNavRoutes(query: string): NavRoute[] {

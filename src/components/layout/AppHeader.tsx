@@ -32,14 +32,19 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
   const currentRoute = useMemo(() => getNavRouteByPath(pathname), [pathname]);
   const searchResults = useMemo(() => searchNavRoutes(searchQuery), [searchQuery]);
 
-  // Track Fullscreen state
+  // Track Fullscreen state with WebKit vendor prefix support
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(document.fullscreenElement !== null);
+      const doc = document as Document & { webkitFullscreenElement?: Element };
+      setIsFullscreen(Boolean(doc.fullscreenElement || doc.webkitFullscreenElement));
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   // Keyboard shortcut: Cmd/Ctrl + K to open search modal
@@ -57,13 +62,30 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Toggle Fullscreen
+  // Toggle Fullscreen with WebKit vendor prefix support
   const toggleFullscreen = useCallback(async () => {
     try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      } else if (document.exitFullscreen) {
-        await document.exitFullscreen();
+      const doc = document as Document & {
+        webkitFullscreenElement?: Element;
+        webkitExitFullscreen?: () => Promise<void>;
+      };
+      const docEl = document.documentElement as HTMLElement & {
+        webkitRequestFullscreen?: () => Promise<void>;
+      };
+
+      const isFs = Boolean(doc.fullscreenElement || doc.webkitFullscreenElement);
+      if (!isFs) {
+        if (docEl.requestFullscreen) {
+          await docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          await docEl.webkitRequestFullscreen();
+        }
+      } else {
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
+        }
       }
     } catch {
       // User cancelled or browser rejected
@@ -203,6 +225,12 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchResults.length > 0) {
+                    e.preventDefault();
+                    handleSelectRoute(searchResults[0]);
+                  }
+                }}
                 placeholder="ค้นหาห้องทดลอง วิชา หรือสมการ (e.g. math, vercel, periodic, cell)..."
                 autoFocus
                 className="w-full bg-transparent text-sm text-neutral-100 placeholder-neutral-500 outline-none font-sans"

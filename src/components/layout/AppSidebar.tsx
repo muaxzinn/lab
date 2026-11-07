@@ -33,7 +33,7 @@ export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
   }, []);
 
   const sidebarContent = (
-    <div className="flex h-full flex-col justify-between bg-neutral-950 border-r border-neutral-800 p-4">
+    <div className="flex h-full flex-col justify-between bg-neutral-950 border-r border-neutral-800 p-4 overflow-y-auto no-scrollbar">
       {/* Brand & Platform Header */}
       <div className="space-y-6">
         <div className="flex items-center justify-between pb-4 border-b border-neutral-800/80">
@@ -166,13 +166,13 @@ export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
           </div>
 
           <div className="flex items-center justify-between text-[10px] text-neutral-500">
-            <span>Tests: 69 Invariants</span>
+            <span>Tests: 75 Invariants</span>
             <span className="text-emerald-400 font-medium">100% PASS</span>
           </div>
 
           <div className="flex items-center justify-between text-[10px] text-neutral-500">
             <span>Type Coverage</span>
-            <span className="text-emerald-400 font-medium">99.88%</span>
+            <span className="text-emerald-400 font-medium">99.89%</span>
           </div>
         </div>
 

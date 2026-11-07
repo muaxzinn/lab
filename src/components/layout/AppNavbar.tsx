@@ -25,7 +25,7 @@ export function AppNavbar() {
             <Link
               key={route.path}
               href={route.path}
-              className={`relative flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-xl text-center transition-all ${
+              className={`relative flex flex-col items-center justify-center min-w-[56px] min-h-[44px] py-1 px-2 rounded-xl text-center transition-all ${
                 isActive
                   ? "text-cyan-300 font-semibold"
                   : "text-neutral-400 hover:text-neutral-200"

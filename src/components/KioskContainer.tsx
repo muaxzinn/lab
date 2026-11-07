@@ -48,14 +48,19 @@ export function KioskContainer({ children, showTopBar = true }: KioskContainerPr
     setIsStandalone(isPWA);
   }, []);
 
-  // Track Fullscreen state
+  // Track Fullscreen state with WebKit vendor prefix support
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(document.fullscreenElement !== null);
+      const doc = document as Document & { webkitFullscreenElement?: Element };
+      setIsFullscreen(Boolean(doc.fullscreenElement || doc.webkitFullscreenElement));
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+    };
   }, []);
 
   // Popstate Navigation Trapping (Kiosk Lockdown)
@@ -77,14 +82,43 @@ export function KioskContainer({ children, showTopBar = true }: KioskContainerPr
     };
   }, [isKioskLocked]);
 
-  // Toggle Fullscreen API
+  // Disable context menu (right click / long press) when locked per Lobe 3 Kiosk Lockdown
+  useEffect(() => {
+    if (!isKioskLocked) return;
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("contextmenu", handleContextMenu);
+    return () => {
+      window.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, [isKioskLocked]);
+
+  // Toggle Fullscreen API with WebKit vendor prefix support
   const toggleFullscreen = useCallback(async () => {
     try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
+      const doc = document as Document & {
+        webkitFullscreenElement?: Element;
+        webkitExitFullscreen?: () => Promise<void>;
+      };
+      const docEl = document.documentElement as HTMLElement & {
+        webkitRequestFullscreen?: () => Promise<void>;
+      };
+
+      const isFs = Boolean(doc.fullscreenElement || doc.webkitFullscreenElement);
+      if (!isFs) {
+        if (docEl.requestFullscreen) {
+          await docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          await docEl.webkitRequestFullscreen();
+        }
       } else {
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
         }
       }
     } catch {

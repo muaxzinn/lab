@@ -278,7 +278,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
             <Check className="h-3.5 w-3.5 text-emerald-400" />
-            99.88% TypeScript Coverage
+            99.89% TypeScript Coverage
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
             <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -421,8 +421,8 @@ export default function Home() {
 
           <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1">
             <span className="text-[11px] font-mono text-neutral-500 uppercase">Type Coverage</span>
-            <p className="text-xl font-heading font-bold text-cyan-400">99.88%</p>
-            <p className="text-[10px] text-neutral-400 font-sans">15,857 Symbols</p>
+            <p className="text-xl font-heading font-bold text-cyan-400">99.89%</p>
+            <p className="text-[10px] text-neutral-400 font-sans">17,793 Symbols</p>
           </div>
 
           <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1">
@@ -470,7 +470,7 @@ export default function Home() {
           <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1.5">
             <span className="text-xs font-mono text-cyan-400 font-semibold">npx typescript-coverage</span>
             <p className="text-xs font-sans text-neutral-400">
-              วัดระดับความสมบูรณ์ของ TypeScript Type Coverage สถิติ 99.88%+
+              วัดระดับความสมบูรณ์ของ TypeScript Type Coverage สถิติ 99.89%+
             </p>
           </div>
           <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 space-y-1.5">

@@ -37,7 +37,7 @@ describe("Layout & Navigation Architecture (App Router Multi-Route)", () => {
     }
   });
 
-  it("resolves route metadata by path with trailing slash normalization", () => {
+  it("resolves route metadata by path with trailing slash normalization and subroute fallback", () => {
     const mathRoute = getNavRouteByPath("/math");
     assert.ok(mathRoute);
     assert.equal(mathRoute.label, "Mathematics");
@@ -48,11 +48,16 @@ describe("Layout & Navigation Architecture (App Router Multi-Route)", () => {
     assert.equal(physicsTrailing.label, "Physics Laboratory");
     assert.equal(physicsTrailing.badge, "Verlet");
 
+    // Subroute prefix match
+    const mathSubroute = getNavRouteByPath("/math/calculus");
+    assert.ok(mathSubroute);
+    assert.equal(mathSubroute.label, "Mathematics");
+
     const nonExistent = getNavRouteByPath("/non-existent");
     assert.equal(nonExistent, undefined);
   });
 
-  it("computes breadcrumb hierarchy accurately for root and nested modules", () => {
+  it("computes breadcrumb hierarchy accurately for root, single-tier, and multi-tier nested modules", () => {
     const homeCrumbs = getBreadcrumbs("/");
     assert.equal(homeCrumbs.length, 1);
     assert.equal(homeCrumbs[0].label, "Platform Portal");
@@ -68,6 +73,18 @@ describe("Layout & Navigation Architecture (App Router Multi-Route)", () => {
     const thaiCrumbs = getBreadcrumbs("/thai/");
     assert.equal(thaiCrumbs.length, 2);
     assert.equal(thaiCrumbs[1].label, "Thai Phonology Studio");
+
+    // Multi-tier subroute breadcrumb hierarchy
+    const nestedCrumbs = getBreadcrumbs("/math/calculus");
+    assert.equal(nestedCrumbs.length, 3);
+    assert.equal(nestedCrumbs[0].label, "Platform Portal");
+    assert.equal(nestedCrumbs[0].isCurrent, false);
+    assert.equal(nestedCrumbs[1].label, "Mathematics");
+    assert.equal(nestedCrumbs[1].path, "/math");
+    assert.equal(nestedCrumbs[1].isCurrent, false);
+    assert.equal(nestedCrumbs[2].label, "calculus");
+    assert.equal(nestedCrumbs[2].path, "/math/calculus");
+    assert.equal(nestedCrumbs[2].isCurrent, true);
   });
 
   it("filters routes via multi-criteria search (English, Thai, and keywords)", () => {
