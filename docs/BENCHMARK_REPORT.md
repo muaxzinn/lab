@@ -47,20 +47,22 @@ This report documents the empirical benchmark results executed by the platform's
 
 ### 2.2 Empirical Results
 
-| Integrator | Order | Symplectic | Time (ms) | Throughput (Steps/sec) | Max Energy Error ($\Delta E/E_0$) | Final Energy Error | Orbital Radius Drift ($\|r - 1.0\|$) | Architectural Verdict |
-|---|---|---|---|---|---|---|---|---|
-| **Explicit Euler** | 1st | NO | 0.56 ms | 17,792,296 | $4.7754 \times 10^{-1}$ | $4.7754 \times 10^{-1}$ | $9.6029 \times 10^{-1}$ | **REJECTED** (Unstable; planet escapes orbit) |
-| **Semi-Implicit Euler** | 1st | YES | 0.82 ms | 12,238,030 | $1.0000 \times 10^{-4}$ | $6.9311 \times 10^{-6}$ | $2.5556 \times 10^{-3}$ | **ACCEPTABLE** for simple educational toys |
-| **Velocity Verlet** | 2nd | YES | 5.81 ms | 1,721,319 | $2.4996 \times 10^{-9}$ | $1.7264 \times 10^{-10}$ | $3.4527 \times 10^{-6}$ | **SELECTED STANDARD** for physical orbits |
-| **Runge-Kutta 4 (RK4)** | 4th | NO | 0.84 ms | 11,920,727 | $2.7779 \times 10^{-10}$ | $2.7779 \times 10^{-10}$ | $3.0035 \times 10^{-10}$ | **SELECTED STANDARD** for stiff ODEs |
+| Integrator | Order | Symplectic | Time (ms) | Throughput (Steps/sec) | Max Energy Error ($\Delta E/E_0$) | Final Energy Error | Max Orbital Drift ($\max \|r - 1.0\|$) | Final Orbital Drift | Architectural Verdict |
+|---|---|---|---|---|---|---|---|---|---|
+| **Explicit Euler** | 1st | NO | 0.67 ms | 15,034,768 | $4.7754 \times 10^{-1}$ | $4.7754 \times 10^{-1}$ | $9.6029 \times 10^{-1}$ | $9.6029 \times 10^{-1}$ | **REJECTED** (Unstable; planet escapes orbit) |
+| **Semi-Implicit Euler** | 1st | YES | 5.65 ms | 1,769,050 | $1.0000 \times 10^{-4}$ | $6.9311 \times 10^{-6}$ | $5.0501 \times 10^{-3}$ | $2.5556 \times 10^{-3}$ | **ACCEPTABLE** for simple educational toys |
+| **Velocity Verlet** | 2nd | YES | 0.76 ms | 13,132,701 | $2.4996 \times 10^{-9}$ | $1.7264 \times 10^{-10}$ | $4.9999 \times 10^{-5}$ | $3.4527 \times 10^{-6}$ | **SELECTED STANDARD** for physical orbits |
+| **Runge-Kutta 4 (RK4)** | 4th | NO | 0.77 ms | 12,996,870 | $2.7779 \times 10^{-10}$ | $2.7779 \times 10^{-10}$ | $5.8310 \times 10^{-10}$ | $3.0035 \times 10^{-10}$ | **SELECTED STANDARD** for stiff ODEs |
 
 ### 2.3 Rigid-Body Engine Benchmark: Matter.js
 
 - **Scenario**: 50 dynamic rigid bodies (25 circles with restitution $e=0.7$, 25 rectangles with friction $\mu=0.2$) falling inside a 4-walled static boundary box under continuous gravitational acceleration ($g = 0.001$).
 - **Steps Simulated**: 1,000 frames (equivalent to 16.6 seconds of physics at 60 FPS).
-- **Execution Duration**: **38.83 ms** total computation time.
-- **Throughput**: **25,751 steps/sec** (capable of running 429 simultaneous 60 FPS simulations in real time).
-- **Heap Memory Delta**: **0.000 MB** (Clean-up verification: `World.clear` and `Engine.clear` release 100% of allocated collision pairs).
+- **Execution Duration**: **38.70 ms** total computation time.
+- **Throughput**: **25,837 steps/sec** (capable of running 430 simultaneous 60 FPS simulations in real time).
+- **Active Collision Pairs**: 50 active pairs before world teardown.
+- **Clean-up Verification**: `World.clear(engine.world, false)` and `Engine.clear(engine)` verified with **0 bodies remaining** (`cleanedUp: true`).
+- **Heap Memory Delta**: **0.000 MB** (zero persistent memory retention post-cleanup).
 
 ---
 
@@ -99,29 +101,36 @@ To eliminate UI clipping and database string truncation bugs without corrupting 
 
 ### 4.1 KaTeX LaTeX Rendering Throughput (2,000 renders/formula, `trust: false`)
 
-| Mathematical Formula | Complexity | Total Duration (2,000 renders) | Renders / Second | Latency / Formula | Rendered HTML Length |
-|---|---|---|---|---|---|
-| **Quadratic Formula** | Rational fractions + radicals | 67.22 ms | 29,754 | 0.0336 ms | 3,836 bytes |
-| **Einstein Field Equations** | Tensors + Greek sub/superscripts | 78.77 ms | 25,391 | 0.0394 ms | 4,572 bytes |
-| **Schrödinger Equation** | Differential operators + bold vectors | 65.78 ms | 30,405 | 0.0329 ms | 3,182 bytes |
-| **Maxwell Gauss Law** | Nabla vector operator + Greek symbols | 41.94 ms | 47,683 | 0.0210 ms | 2,474 bytes |
-| **Euler Identity** | Exponential + irrational symbols | 27.64 ms | 72,363 | 0.0138 ms | 1,536 bytes |
+| Mathematical Formula | Complexity | Total Duration (2,000 renders) | Renders / Second | Latency / Formula | Rendered HTML Length | XSS Sanitized |
+|---|---|---|---|---|---|---|
+| **Quadratic Formula** | Rational fractions + radicals | 68.06 ms | 29,384 | 0.0340 ms | 3,836 bytes | **YES** |
+| **Einstein Field Equations** | Tensors + Greek sub/superscripts | 79.97 ms | 25,010 | 0.0400 ms | 4,572 bytes | **YES** |
+| **Schrödinger Equation** | Differential operators + bold vectors | 66.07 ms | 30,272 | 0.0330 ms | 3,182 bytes | **YES** |
+| **Maxwell Gauss Law** | Nabla vector operator + Greek symbols | 42.07 ms | 47,540 | 0.0210 ms | 2,474 bytes | **YES** |
+| **Euler Identity** | Exponential + irrational symbols | 27.55 ms | 72,591 | 0.0138 ms | 1,536 bytes | **YES** |
+| **Malicious XSS Vector** | `\href{javascript:alert(1)}` | 22.31 ms | 89,633 | 0.0112 ms | 622 bytes | **YES** (Zero `<a>` tags) |
 
-**Conclusion**: KaTeX executes pure AST transformation in synchronous CPU memory without requiring DOM instantiation. Average rendering latency is **0.028 ms per equation**, enabling hundreds of formulas on a single educational page with zero noticeable frame delay.
+**Conclusion**: KaTeX executes pure AST transformation in synchronous CPU memory without requiring DOM instantiation. Average rendering latency is **0.025 ms per equation**, enabling hundreds of formulas on a single educational page with zero noticeable frame delay. Furthermore, with `trust: false`, malicious href javascript protocols are neutralized into non-executable error text.
 
-### 4.2 Math Expression Evaluation Throughput (50,000 points)
+### 4.2 Math Expression Evaluation Throughput (50,000 points, Sandboxed Map Scope)
 
-Expression evaluated: $f(x) = \sin(x) e^{-0.1 x} + \sqrt{x^2 + 1}$
+Evaluated across two distinct mathematical regimes:
+1. **Damped Harmonic Oscillator** (Transcendental): $f(x) = \sin(x) e^{-0.1 x} + \sqrt{x^2 + 1}$
+2. **Polynomial Kinetic Potential** (Algebraic): $f(x) = 0.5 \cdot 9.8 x^2 - 3.2 x + 1.5$
 
-| Evaluation Mode | Evaluated Points | Duration (ms) | Ops / Second | Speedup vs Uncompiled | Numerical Sample Value |
-|---|---|---|---|---|---|
-| **Uncompiled `math.evaluate`** | 2,000 (extrapolated) | 18.76 ms | 106,610 | **1.0x** (Baseline) | `9.846213` |
-| **Pre-compiled `code.evaluate`** | 50,000 | 19.24 ms | 2,598,927 | **24.4x** | `9.849600` |
-| **Native JavaScript Function** | 50,000 | 0.85 ms | 58,835,089 | **551.9x** | `9.849600` |
+| Expression | Evaluation Mode | Evaluated Points | Duration (ms) | Ops / Second | Speedup vs Uncompiled | Numerical Sample Value |
+|---|---|---|---|---|---|---|
+| **Damped Harmonic Oscillator** | **Uncompiled `safeEvaluateMath`** | 2,000 | 20.17 ms | 99,135 | **1.0x** (Baseline) | `9.846213` |
+| **Damped Harmonic Oscillator** | **Pre-compiled `safeCompileMath`** | 50,000 | 13.08 ms | 3,823,215 | **38.6x** | `9.849600` |
+| **Damped Harmonic Oscillator** | **Native JavaScript Function** | 50,000 | 0.70 ms | 71,869,232 | **725.0x** | `9.849600` |
+| **Polynomial Kinetic Potential** | **Uncompiled `safeEvaluateMath`** | 2,000 | 10.82 ms | 184,792 | **1.0x** (Baseline) | `459.026123` |
+| **Polynomial Kinetic Potential** | **Pre-compiled `safeCompileMath`** | 50,000 | 5.51 ms | 9,077,430 | **49.1x** | `459.481040` |
+| **Polynomial Kinetic Potential** | **Native JavaScript Function** | 50,000 | 0.53 ms | 94,629,761 | **512.1x** | `459.481040` |
 
 **Conclusion**:
-- User-authored equations in practice exercises or graphing tools must be compiled once via `math.compile()`. Compiling the AST takes < 0.1 ms and yields an immediate **24.4x evaluation speedup**, capable of updating 60 FPS interactive graphs with 50,000 data points smoothly.
-- Hardcoded physics and mathematics models should always use native JavaScript routines for maximum speed (> 58M ops/sec).
+- User-authored equations in practice exercises or graphing tools must be compiled once via `safeCompileMath()`. Compiling the AST takes < 0.1 ms and yields an immediate **38x to 49x evaluation speedup**, capable of updating 60 FPS interactive graphs with 50,000 data points in 5–13 ms.
+- Hardcoded physics and mathematics models should always use native JavaScript routines for maximum speed (> 70M–94M ops/sec).
+- Scope isolation using `Map` protects against prototype pollution while maintaining native typed-function execution efficiency.
 
 ---
 

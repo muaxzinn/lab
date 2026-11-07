@@ -2,10 +2,15 @@
  * Dynamic Math Formula Parsing & Evaluation Throughput Benchmark
  * Measures KaTeX LaTeX rendering throughput and Math.js expression compilation / evaluation
  * compared to native JavaScript math routines.
+ * Enforces sanitization and AST sandboxing.
  */
 
-import katex from 'katex';
-import { compile, evaluate } from 'mathjs';
+import {
+  renderSanitizedLatex,
+  safeEvaluateMath,
+  safeCompileMath,
+  createSandboxedScope,
+} from '../lib/math-sanitizer.ts';
 
 export interface KatexBenchmarkResult {
   formulaName: string;
@@ -15,9 +20,11 @@ export interface KatexBenchmarkResult {
   rendersPerSec: number;
   avgRenderMs: number;
   htmlLength: number;
+  sanitized: boolean;
 }
 
 export interface MathEvalBenchmarkResult {
+  expressionName: string;
   expression: string;
   iterations: number;
   mode: 'uncompiled-eval' | 'precompiled-eval' | 'native-js';
@@ -48,6 +55,10 @@ export const LATEX_FORMULAS = [
     name: 'Euler Identity',
     latex: 'e^{i\\pi} + 1 = 0',
   },
+  {
+    name: 'Malicious XSS Vector (Neutralized)',
+    latex: '\\href{javascript:alert(1)}{Harmful Link}',
+  },
 ];
 
 export const MATH_EXPRESSIONS = [
@@ -64,7 +75,7 @@ export const MATH_EXPRESSIONS = [
 ];
 
 /**
- * Benchmark KaTeX LaTeX rendering throughput
+ * Benchmark KaTeX LaTeX rendering throughput with enforced sanitization
  */
 export function benchmarkKatexRendering(iterations = 2000): KatexBenchmarkResult[] {
   const results: KatexBenchmarkResult[] = [];
@@ -72,21 +83,13 @@ export function benchmarkKatexRendering(iterations = 2000): KatexBenchmarkResult
   for (const item of LATEX_FORMULAS) {
     // Warmup
     for (let i = 0; i < 50; i++) {
-      katex.renderToString(item.latex, {
-        displayMode: true,
-        throwOnError: false,
-        trust: false, // Security sanitization enforced
-      });
+      renderSanitizedLatex(item.latex, { displayMode: true });
     }
 
     const start = performance.now();
     let lastHtml = '';
     for (let i = 0; i < iterations; i++) {
-      lastHtml = katex.renderToString(item.latex, {
-        displayMode: true,
-        throwOnError: false,
-        trust: false,
-      });
+      lastHtml = renderSanitizedLatex(item.latex, { displayMode: true });
     }
     const durationMs = performance.now() - start;
 
@@ -98,6 +101,7 @@ export function benchmarkKatexRendering(iterations = 2000): KatexBenchmarkResult
       rendersPerSec: Math.round((iterations / durationMs) * 1000),
       avgRenderMs: durationMs / iterations,
       htmlLength: lastHtml.length,
+      sanitized: !lastHtml.includes('href="') && !lastHtml.includes('<script') && !lastHtml.includes('<a '),
     });
   }
 
@@ -105,77 +109,83 @@ export function benchmarkKatexRendering(iterations = 2000): KatexBenchmarkResult
 }
 
 /**
- * Benchmark Math.js parsing, compilation, and evaluation
+ * Benchmark Math.js parsing, compilation, and evaluation across all test expressions
  */
 export function benchmarkMathEvaluation(points = 50000): MathEvalBenchmarkResult[] {
   const results: MathEvalBenchmarkResult[] = [];
-  const testTarget = MATH_EXPRESSIONS[0]; // Damped Harmonic Oscillator
 
-  // 1. Uncompiled math.evaluate on every point (AST parsed and evaluated repeatedly)
-  // For uncompiled, running 50,000 would take several seconds; run 2,000 and extrapolate or run directly
-  const uncompiledIterations = Math.min(points, 2000);
-  const startUncompiled = performance.now();
-  let uncompiledSample = 0;
-  for (let i = 0; i < uncompiledIterations; i++) {
-    const x = (i / uncompiledIterations) * 10;
-    uncompiledSample = evaluate(testTarget.expr, { x });
+  for (const testTarget of MATH_EXPRESSIONS) {
+    // 1. Uncompiled math evaluation on points
+    const uncompiledIterations = Math.min(points, 2000);
+    const startUncompiled = performance.now();
+    let uncompiledSample = 0;
+    const scope = createSandboxedScope({ x: 0 });
+
+    for (let i = 0; i < uncompiledIterations; i++) {
+      const x = (i / uncompiledIterations) * 10;
+      scope.set('x', x);
+      uncompiledSample = safeEvaluateMath(testTarget.expr, scope);
+    }
+    const uncompiledDurationMs = performance.now() - startUncompiled;
+    const uncompiledOpsPerSec = Math.round((uncompiledIterations / uncompiledDurationMs) * 1000);
+
+    results.push({
+      expressionName: testTarget.name,
+      expression: testTarget.expr,
+      iterations: uncompiledIterations,
+      mode: 'uncompiled-eval',
+      durationMs: uncompiledDurationMs,
+      opsPerSec: uncompiledOpsPerSec,
+      speedupVsUncompiled: 1.0,
+      sampleValue: uncompiledSample,
+    });
+
+    // 2. Pre-compiled Math.js AST evaluation
+    const compiledCode = safeCompileMath(testTarget.expr);
+    const precompiledScope = createSandboxedScope({ x: 0 });
+
+    const startPrecompiled = performance.now();
+    let precompiledSample = 0;
+    for (let i = 0; i < points; i++) {
+      const x = (i / points) * 10;
+      precompiledScope.set('x', x);
+      precompiledSample = compiledCode.evaluate(precompiledScope);
+    }
+    const precompiledDurationMs = performance.now() - startPrecompiled;
+    const precompiledOpsPerSec = Math.round((points / precompiledDurationMs) * 1000);
+
+    results.push({
+      expressionName: testTarget.name,
+      expression: testTarget.expr,
+      iterations: points,
+      mode: 'precompiled-eval',
+      durationMs: precompiledDurationMs,
+      opsPerSec: precompiledOpsPerSec,
+      speedupVsUncompiled: precompiledOpsPerSec / uncompiledOpsPerSec,
+      sampleValue: precompiledSample,
+    });
+
+    // 3. Native JavaScript function execution
+    const startNative = performance.now();
+    let nativeSample = 0;
+    for (let i = 0; i < points; i++) {
+      const x = (i / points) * 10;
+      nativeSample = testTarget.nativeFn(x);
+    }
+    const nativeDurationMs = performance.now() - startNative;
+    const nativeOpsPerSec = Math.round((points / nativeDurationMs) * 1000);
+
+    results.push({
+      expressionName: testTarget.name,
+      expression: testTarget.expr,
+      iterations: points,
+      mode: 'native-js',
+      durationMs: nativeDurationMs,
+      opsPerSec: nativeOpsPerSec,
+      speedupVsUncompiled: nativeOpsPerSec / uncompiledOpsPerSec,
+      sampleValue: nativeSample,
+    });
   }
-  const uncompiledDurationMs = performance.now() - startUncompiled;
-  const uncompiledOpsPerSec = Math.round((uncompiledIterations / uncompiledDurationMs) * 1000);
-
-  results.push({
-    expression: testTarget.expr,
-    iterations: uncompiledIterations,
-    mode: 'uncompiled-eval',
-    durationMs: uncompiledDurationMs,
-    opsPerSec: uncompiledOpsPerSec,
-    speedupVsUncompiled: 1.0,
-    sampleValue: uncompiledSample,
-  });
-
-  // 2. Pre-compiled Math.js code.evaluate (AST parsed once, compiled into bytecode/JS execution tree)
-  const compileStart = performance.now();
-  const compiledCode = compile(testTarget.expr);
-  const compileDurationMs = performance.now() - compileStart;
-
-  const startPrecompiled = performance.now();
-  let precompiledSample = 0;
-  for (let i = 0; i < points; i++) {
-    const x = (i / points) * 10;
-    precompiledSample = compiledCode.evaluate({ x });
-  }
-  const precompiledDurationMs = performance.now() - startPrecompiled;
-  const precompiledOpsPerSec = Math.round((points / precompiledDurationMs) * 1000);
-
-  results.push({
-    expression: `${testTarget.expr} [Compile: ${compileDurationMs.toFixed(3)}ms]`,
-    iterations: points,
-    mode: 'precompiled-eval',
-    durationMs: precompiledDurationMs,
-    opsPerSec: precompiledOpsPerSec,
-    speedupVsUncompiled: precompiledOpsPerSec / uncompiledOpsPerSec,
-    sampleValue: precompiledSample,
-  });
-
-  // 3. Native JavaScript function execution
-  const startNative = performance.now();
-  let nativeSample = 0;
-  for (let i = 0; i < points; i++) {
-    const x = (i / points) * 10;
-    nativeSample = testTarget.nativeFn(x);
-  }
-  const nativeDurationMs = performance.now() - startNative;
-  const nativeOpsPerSec = Math.round((points / nativeDurationMs) * 1000);
-
-  results.push({
-    expression: testTarget.expr,
-    iterations: points,
-    mode: 'native-js',
-    durationMs: nativeDurationMs,
-    opsPerSec: nativeOpsPerSec,
-    speedupVsUncompiled: nativeOpsPerSec / uncompiledOpsPerSec,
-    sampleValue: nativeSample,
-  });
 
   return results;
 }

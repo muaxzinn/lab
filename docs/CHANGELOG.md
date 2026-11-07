@@ -12,10 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Created `docs/TECHNICAL_AUDIT.md`:
     - Evaluated dependency tree, bundle sizes, and transitive footprints; rejected heavy monolithic runtimes (Monaco Editor ~5 MB, MathJax ~350 KB).
     - Established Client vs. SSR chunk isolation protocol for Next.js 15 App Router using `dynamic()` with `ssr: false` and custom element lifecycle guards.
-    - Formalized GPU/WebGL memory disposal architecture for Three.js (BufferGeometry, texture map recursive disposal, renderer context destruction) to eliminate VRAM leakage across simulation routes.
-    - Formalized WebGL context loss recovery pattern (`webglcontextlost` / `webglcontextrestored`) and DPR clamping (`Math.min(devicePixelRatio, 2.0)`).
-    - Designed zero-copy Web Worker communication protocols for numerical physics and ODE solvers using Transferable `ArrayBuffer` objects and typed discriminated-union message contracts.
-    - Established defense-in-depth security boundaries: KaTeX sanitization (`trust: false`, strict macros, recursion limits), Math.js AST prototype pollution mitigation, and Web Worker execution sandboxes.
+    - Formalized and implemented GPU/WebGL memory disposal architecture (`src/lib/webgl-lifecycle.ts`) covering meshes, lines, points, sprites, texture map recursive disposal, and renderer context destruction to eliminate VRAM leakage across simulation routes.
+    - Formalized and implemented WebGL context loss recovery pattern (`webglcontextlost` / `webglcontextrestored`) and DPR clamping (`Math.min(devicePixelRatio, 2.0)`).
+    - Designed and implemented zero-copy Web Worker communication protocols (`src/lib/worker-protocol.ts`) for numerical physics and ODE solvers using Transferable `ArrayBuffer` objects and typed discriminated-union message contracts.
+    - Established and implemented defense-in-depth security boundaries (`src/lib/math-sanitizer.ts`): KaTeX sanitization (`trust: false`, strict macros, recursion limits, XSS vector neutralization) and Math.js prototype-safe AST execution using sandboxed `Map` scopes.
   - Created `docs/LICENSE_AUDIT.md`:
     - Formalized commercial compliance and IP clearance for all 32 candidate technologies.
     - Established strict Clean-Room Rebuild boundary for **PhET Interactive Simulations** (GPL-3.0 + trademark/royalties) and **Paul Falstad CircuitJS1** (GPL-2.0 copyleft), guaranteeing 0% copyleft contamination.
@@ -23,23 +23,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Phase 4 (Benchmark & Empirical Testing)**:
   - Installed core verified mathematical and physical simulation dependencies: `katex` (v0.19.1), `mathjs` (v15.2.0), `matter-js` (v0.20.0), `mafs` (v0.21.0), and typed definition packages.
   - Implemented empirical benchmark harnesses under `src/benchmarks/`:
-    - `src/benchmarks/physics-integrators.ts`: Numerical comparison of Explicit Euler vs. Semi-Implicit Euler vs. Velocity Verlet vs. Runge-Kutta 4 across 10,000 steps of 2-body Keplerian orbits, plus Matter.js rigid-body collision solver benchmark.
+    - `src/benchmarks/physics-integrators.ts`: Numerical comparison of Explicit Euler vs. Semi-Implicit Euler vs. Velocity Verlet vs. Runge-Kutta 4 across 10,000 steps of 2-body Keplerian orbits, tracking both max orbital drift and final orbital drift, plus Matter.js rigid-body collision solver benchmark with clean-up verification.
     - `src/benchmarks/thai-truncation.ts`: Heavy-load throughput measurement (100,000 iterations) of `safeTruncateThaiBytes` vs. `safeTruncateThaiGraphemes` across diverse Thai text payloads.
-    - `src/benchmarks/math-eval.ts`: KaTeX LaTeX parsing/rendering latency across differential and tensor equations, and Math.js uncompiled vs. pre-compiled vs. native JavaScript evaluation across 50,000 data points.
+    - `src/benchmarks/math-eval.ts`: KaTeX LaTeX parsing/rendering latency across differential, tensor, and neutralized XSS equations, and Math.js uncompiled vs. pre-compiled vs. native JavaScript evaluation across 50,000 data points on multiple expressions (transcendental and polynomial).
     - `src/benchmarks/run-benchmarks.ts`: Master empirical benchmark runner with structured console telemetry and formatted markdown tables.
-    - `src/benchmarks/benchmarks.test.ts`: Automated regression test suite verifying physical invariants, numerical bounds, and throughput thresholds.
+    - `src/benchmarks/benchmarks.test.ts`: Automated regression test suite verifying physical invariants, numerical bounds, Matter.js cleanup, and throughput thresholds.
+    - `src/lib/sanitizer-and-lifecycle.test.ts`: Unit tests validating KaTeX XSS neutralization, Math.js AST sandboxed Map scopes, WebGL recursive disposal, and Worker transferable buffers.
   - Added `"benchmark": "node src/benchmarks/run-benchmarks.ts"` script to `package.json`.
   - Generated `docs/BENCHMARK_REPORT.md` capturing bare-metal empirical metrics:
-    - Proved Velocity Verlet ($2.4996 \times 10^{-9}$ max energy error) and RK4 ($2.7779 \times 10^{-10}$ error) stability vs. catastrophic Explicit Euler divergence (47.7% energy increase).
-    - Measured Matter.js throughput at 25,751 steps/sec with 50 interacting rigid bodies and 0.000 MB memory leak.
+    - Proved Velocity Verlet ($2.4996 \times 10^{-9}$ max energy error) and RK4 ($2.7779 \times 10^{-10}$ error) stability vs. catastrophic Explicit Euler divergence (47.7% energy increase, 96% radius drift).
+    - Measured Matter.js throughput at 25,837 steps/sec with 50 interacting rigid bodies and confirmed 100% collision/body cleanup (0 bodies leaked).
     - Measured Thai byte-safe truncation at 2.8M to 4.1M ops/sec with zero allocations.
-    - Measured KaTeX formula generation at 25,000 to 72,000 renders/sec (0.013–0.039 ms per equation).
-    - Demonstrated 24.4x evaluation speedup for pre-compiled Math.js AST (2.6M ops/sec) and 551.9x for native JS (58.8M ops/sec).
+    - Measured KaTeX formula generation at 25,000 to 72,000 renders/sec (0.013–0.040 ms per equation) with 0 active XSS links generated.
+    - Demonstrated 38x to 49x evaluation speedup for pre-compiled Math.js AST (3.8M–9.0M ops/sec) and 512x–725x for native JS (71M–94M ops/sec).
   - Advanced all 24 features in `docs/FEATURE_MATRIX.md` to `SELECTED` status.
 
 ---
 
-
+## [0.2.0] - 2026-11-07
 
 ### Added
 - **Phase 1 (Requirement Analysis & Deep Specification) & Phase 2 (Open Source Discovery & Cataloging)**:

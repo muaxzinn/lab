@@ -94,63 +94,102 @@ In interactive learning platforms with multiple simulations (astronomy, molecula
 
 ### 4.1 Disposal Lifecycle Specification
 
-Every 3D/WebGL simulation must implement an exhaustive teardown routine when its React component unmounts:
+Every 3D/WebGL simulation must implement an exhaustive teardown routine when its React component unmounts (implemented and tested in `src/lib/webgl-lifecycle.ts`):
 
 ```typescript
+export interface WebGLDisposable {
+  dispose?: () => void;
+}
+
+export interface WebGLObject3DLike {
+  geometry?: WebGLDisposable;
+  material?: WebGLDisposable | WebGLDisposable[];
+  children?: WebGLObject3DLike[];
+  traverse?: (callback: (obj: WebGLObject3DLike) => void) => void;
+  clear?: () => void;
+}
+
+export interface WebGLRendererLike {
+  dispose: () => void;
+  forceContextLoss?: () => void;
+  domElement?: HTMLCanvasElement;
+}
+
 export interface WebGLDisposalTarget {
-  scene: THREE.Scene;
-  renderer: THREE.WebGLRenderer;
+  scene: WebGLObject3DLike;
+  renderer: WebGLRendererLike;
   animationFrameId?: number;
 }
 
 export function disposeThreeScene(target: WebGLDisposalTarget): void {
   // 1. Cancel active animation loop
-  if (target.animationFrameId !== undefined) {
+  if (target.animationFrameId !== undefined && typeof cancelAnimationFrame === 'function') {
     cancelAnimationFrame(target.animationFrameId);
   }
 
-  // 2. Recursive traversal of scene graph
-  target.scene.traverse((object: THREE.Object3D) => {
-    if (!(object instanceof THREE.Mesh)) return;
-
-    // Dispose BufferGeometry
-    if (object.geometry) {
-      object.geometry.dispose();
-    }
-
-    // Dispose Materials and associated Textures
-    if (object.material) {
-      if (Array.isArray(object.material)) {
-        object.material.forEach((mat) => disposeMaterial(mat));
-      } else {
-        disposeMaterial(object.material);
+  // 2. Recursive traversal of scene graph (Meshes, Lines, Points, Sprites)
+  if (typeof target.scene.traverse === 'function') {
+    target.scene.traverse((object: WebGLObject3DLike) => {
+      // Dispose BufferGeometry
+      if (object.geometry && typeof object.geometry.dispose === 'function') {
+        object.geometry.dispose();
       }
-    }
-  });
+
+      // Dispose Materials and associated texture maps
+      if (object.material) {
+        if (Array.isArray(object.material)) {
+          object.material.forEach((mat) => disposeMaterialTextures(mat));
+        } else {
+          disposeMaterialTextures(object.material);
+        }
+      }
+    });
+  }
 
   // 3. Clear scene hierarchy
-  target.scene.clear();
+  if (typeof target.scene.clear === 'function') {
+    target.scene.clear();
+  }
 
   // 4. Dispose WebGLRenderer and release WebGL context
-  target.renderer.dispose();
-  target.renderer.forceContextLoss();
-  
-  const domElement = target.renderer.domElement;
-  if (domElement && domElement.parentNode) {
-    domElement.parentNode.removeChild(domElement);
+  if (target.renderer) {
+    if (typeof target.renderer.dispose === 'function') {
+      target.renderer.dispose();
+    }
+    if (typeof target.renderer.forceContextLoss === 'function') {
+      target.renderer.forceContextLoss();
+    }
+
+    const domElement = target.renderer.domElement;
+    if (domElement && domElement.parentNode) {
+      domElement.parentNode.removeChild(domElement);
+    }
   }
 }
 
-function disposeMaterial(material: THREE.Material): void {
-  // Dispose all possible texture maps to release VRAM
+export function disposeMaterialTextures(material: WebGLDisposable): void {
   const mat = material as unknown as Record<string, unknown>;
+  if (!mat || typeof mat !== 'object') return;
+
   for (const key of Object.keys(mat)) {
-    const value = mat[key];
-    if (value && typeof value === 'object' && 'isTexture' in value && typeof (value as THREE.Texture).dispose === 'function') {
-      (value as THREE.Texture).dispose();
+    const prop = mat[key];
+    if (
+      prop &&
+      typeof prop === 'object' &&
+      'dispose' in prop &&
+      typeof (prop as { dispose: () => void }).dispose === 'function'
+    ) {
+      try {
+        (prop as { dispose: () => void }).dispose();
+      } catch {
+        // Ignore errors during texture release
+      }
     }
   }
-  material.dispose();
+
+  if (typeof material.dispose === 'function') {
+    material.dispose();
+  }
 }
 ```
 
@@ -218,7 +257,7 @@ Heavy scientific calculations (Wasm Rapier physics, 10,000-step Runge-Kutta 4 or
 
 ### 5.2 Zero-Copy Memory Transfer Protocol
 
-Instead of serializing JSON objects (which incurs heavy serialization and deserialization garbage collection penalties), simulation steps transfer binary buffers directly using the Transferable Objects specification:
+Instead of serializing JSON objects (which incurs heavy serialization and deserialization garbage collection penalties), simulation steps transfer binary buffers directly using the Transferable Objects specification (implemented and tested in `src/lib/worker-protocol.ts`):
 
 ```typescript
 export interface SimulationFrameBuffer {
@@ -228,22 +267,22 @@ export interface SimulationFrameBuffer {
   energiesBuffer: ArrayBuffer;   // Float64Array (kinetic, potential, total)
 }
 
-// In Worker:
-export function dispatchSimulationFrame(
+export function createSimulationFrame(
   stepCount: number,
   timeElapsed: number,
   positions: Float64Array,
   energies: Float64Array
-): void {
-  const frame: SimulationFrameBuffer = {
+): SimulationFrameBuffer {
+  return {
     stepCount,
     timeElapsed,
     positionsBuffer: positions.buffer,
     energiesBuffer: energies.buffer,
   };
+}
 
-  // Zero-copy transfer: ownership transferred, zero GC overhead on main thread
-  self.postMessage(frame, [frame.positionsBuffer, frame.energiesBuffer]);
+export function getTransferables(frame: SimulationFrameBuffer): Transferable[] {
+  return [frame.positionsBuffer, frame.energiesBuffer];
 }
 ```
 
@@ -273,18 +312,30 @@ Educational platforms accept dynamic mathematical equations, user-authored pract
 ### 6.1 KaTeX Math Sanitization
 
 While KaTeX is generally safe because it generates HTML/MathML rather than executing scripts, malicious LaTeX expressions can attempt XSS via `\url`, `\href`, or malicious image inclusions (`\includegraphics`).
-- **Enforced Security Configuration**:
+- **Enforced Security Configuration** (implemented and tested in `src/lib/math-sanitizer.ts`):
   ```typescript
   import katex from 'katex';
 
-  export function renderSanitizedLatex(latex: string, displayMode = false): string {
+  export interface LatexSanitizeOptions {
+    displayMode?: boolean;
+    maxExpand?: number;
+    maxSize?: number;
+  }
+
+  export function renderSanitizedLatex(
+    latex: string,
+    options: LatexSanitizeOptions = {}
+  ): string {
+    const { displayMode = false, maxExpand = 1000, maxSize = 500 } = options;
+    if (!latex || typeof latex !== 'string') return '';
+
     return katex.renderToString(latex, {
       displayMode,
       throwOnError: false,
       trust: false, // Disables \url, \href, \html, and unsafe macros
       strict: 'warn',
-      maxExpand: 1000, // Prevents macro expansion denial-of-service (Billion Laughs style)
-      maxSize: 500,    // Limits font size multipliers to prevent UI breakage
+      maxExpand,    // Prevents macro expansion denial-of-service (Billion Laughs style)
+      maxSize,      // Limits font size multipliers to prevent UI breakage
     });
   }
   ```
@@ -294,9 +345,10 @@ While KaTeX is generally safe because it generates HTML/MathML rather than execu
 `mathjs` provides `math.evaluate()`, which supports user-defined functions and expressions. Unrestricted evaluation can allow prototype pollution or prototype walking:
 - **Security Guardrails**:
   1. Never expose raw JavaScript globals to `evaluate()`.
-  2. Isolate evaluation scope in an empty object: `const scope = Object.create(null);`.
-  3. Pre-compile expressions using `math.compile(cleanExpr)` to validate syntax ahead of runtime.
-  4. Block constructor and prototype access by sanitizing AST identifiers (`__proto__`, `constructor`, `prototype`).
+  2. Isolate evaluation scope using ECMAScript `Map`: `const scope = new Map<string, number>();`.  
+     *(Note: Using `Object.create(null)` causes Math.js typed-functions to fail with `TypeError: Cannot read properties of null (reading 'isComplex')`. `Map` is officially supported, type-safe, and inherently immune to prototype descriptor tampering).*
+  3. Pre-compile expressions using `safeCompileMath(cleanExpr)` to validate syntax ahead of runtime and yield 20–50x evaluation speedup.
+  4. Block constructor and prototype access by sanitizing AST identifiers (`__proto__`, `constructor`, `prototype`, `Function`, `eval`, `process`, `import`).
 
 ### 6.3 Code Execution Sandboxing for Computer Science Modules
 

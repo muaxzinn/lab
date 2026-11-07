@@ -29,7 +29,8 @@ export function runMasterBenchmarks() {
       'Steps/sec': i.opsPerSec.toLocaleString(),
       'Max Energy Err': i.maxEnergyError.toExponential(4),
       'Final Energy Err': i.finalEnergyError.toExponential(4),
-      'Orbital Drift': i.orbitalDrift.toExponential(4),
+      'Max Orbit Drift': i.maxOrbitalDrift.toExponential(4),
+      'Final Orbit Drift': i.finalOrbitalDrift.toExponential(4),
       Symplectic: i.isSymplectic ? 'YES' : 'NO',
     }))
   );
@@ -40,6 +41,9 @@ export function runMasterBenchmarks() {
   console.log(`Steps Simulated: ${physicsResults.rigidBodyEngine.steps}`);
   console.log(`Total Duration: ${physicsResults.rigidBodyEngine.durationMs.toFixed(2)} ms`);
   console.log(`Throughput: ${physicsResults.rigidBodyEngine.stepsPerSecond.toLocaleString()} steps/sec`);
+  console.log(`Active Collision Pairs: ${physicsResults.rigidBodyEngine.activePairsBeforeClear}`);
+  console.log(`Bodies After Clear: ${physicsResults.rigidBodyEngine.bodiesRemainingAfterClear}`);
+  console.log(`Cleanup Status: ${physicsResults.rigidBodyEngine.cleanedUp ? 'PASS (0 bodies leaked)' : 'FAIL'}`);
   console.log(`Memory Delta: ${physicsResults.rigidBodyEngine.memoryUsageMb.toFixed(3)} MB`);
 
   // 2. Thai UTF-8 Truncation Benchmark
@@ -82,12 +86,14 @@ export function runMasterBenchmarks() {
       'Renders/sec': k.rendersPerSec.toLocaleString(),
       'Avg Render (ms)': k.avgRenderMs.toFixed(4),
       'HTML Output Size': `${k.htmlLength} bytes`,
+      'XSS Sanitized': k.sanitized ? 'YES' : 'NO',
     }))
   );
 
-  console.log('\n--- Math Expression Evaluation Throughput (Damped Harmonic Oscillator) ---');
+  console.log('\n--- Math Expression Evaluation Throughput (50,000 points, Sandboxed Map Scope) ---');
   console.table(
     mathResults.mathEvalResults.map((m) => ({
+      Expression: m.expressionName,
       Mode: m.mode,
       Iterations: m.iterations.toLocaleString(),
       'Duration (ms)': m.durationMs.toFixed(2),

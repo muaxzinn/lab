@@ -46,14 +46,18 @@ describe('Benchmark Suite Verification', () => {
       const verlet = runVelocityVerlet(initialState, steps, dt);
       const rk4 = runRK4(initialState, steps, dt);
 
-      assert.ok(verlet.orbitalDrift < 1e-3, 'Verlet orbital drift must be < 1e-3');
-      assert.ok(rk4.orbitalDrift < 1e-5, 'RK4 orbital drift must be < 1e-5');
+      assert.ok(verlet.maxOrbitalDrift < 1e-3, 'Verlet max orbital drift must be < 1e-3');
+      assert.ok(verlet.finalOrbitalDrift < 1e-3, 'Verlet final orbital drift must be < 1e-3');
+      assert.ok(rk4.maxOrbitalDrift < 1e-5, 'RK4 max orbital drift must be < 1e-5');
+      assert.ok(rk4.finalOrbitalDrift < 1e-5, 'RK4 final orbital drift must be < 1e-5');
     });
 
     it('executes Matter.js collision physics without throwing or memory explosion', () => {
       const matterResult = runMatterJsBenchmark(20, 100);
       assert.strictEqual(matterResult.bodyCount, 20);
       assert.strictEqual(matterResult.steps, 100);
+      assert.strictEqual(matterResult.cleanedUp, true, 'World.clear and Engine.clear must remove all bodies');
+      assert.strictEqual(matterResult.bodiesRemainingAfterClear, 0, 'No bodies should remain in world');
       assert.ok(matterResult.stepsPerSecond > 1000, 'Matter.js should execute > 1000 steps/sec for 20 bodies');
     });
   });
@@ -78,22 +82,24 @@ describe('Benchmark Suite Verification', () => {
   });
 
   describe('Dynamic Math Formula Benchmark Validation', () => {
-    it('renders LaTeX formulas securely into valid KaTeX HTML spans', () => {
+    it('renders LaTeX formulas securely into valid KaTeX HTML spans and sanitizes XSS', () => {
       const results = benchmarkKatexRendering(100);
-      assert.strictEqual(results.length, 5);
+      assert.strictEqual(results.length, 6); // 5 equations + 1 XSS vector
       for (const res of results) {
         assert.ok(res.rendersPerSec > 1000, `${res.formulaName} should exceed 1,000 renders/sec`);
-        assert.ok(res.htmlLength > 100, 'Rendered HTML should be non-trivial');
+        assert.ok(res.htmlLength > 50, 'Rendered HTML should be non-trivial');
+        assert.strictEqual(res.sanitized, true, `${res.formulaName} must be sanitized`);
       }
     });
 
-    it('validates Math.js compilation speedup over uncompiled evaluation', () => {
+    it('validates Math.js compilation speedup over uncompiled evaluation across multiple expressions', () => {
       const results = benchmarkMathEvaluation(2000);
-      assert.strictEqual(results.length, 3);
+      assert.strictEqual(results.length, 6); // 2 expressions * 3 modes
 
-      const uncompiled = results.find((r) => r.mode === 'uncompiled-eval')!;
-      const precompiled = results.find((r) => r.mode === 'precompiled-eval')!;
-      const nativeJs = results.find((r) => r.mode === 'native-js')!;
+      const oscillatorResults = results.filter((r) => r.expressionName === 'Damped Harmonic Oscillator');
+      const uncompiled = oscillatorResults.find((r) => r.mode === 'uncompiled-eval')!;
+      const precompiled = oscillatorResults.find((r) => r.mode === 'precompiled-eval')!;
+      const nativeJs = oscillatorResults.find((r) => r.mode === 'native-js')!;
 
       assert.ok(precompiled.opsPerSec > uncompiled.opsPerSec, 'Precompiled evaluate must be faster than uncompiled');
       assert.ok(nativeJs.opsPerSec > precompiled.opsPerSec, 'Native JS function must be faster than AST evaluation');

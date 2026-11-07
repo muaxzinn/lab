@@ -25,7 +25,9 @@ export interface IntegratorMetrics {
   finalEnergy: number;
   maxEnergyError: number;
   finalEnergyError: number;
-  orbitalDrift: number;
+  maxOrbitalDrift: number;
+  finalOrbitalDrift: number;
+  orbitalDrift: number; // Alias to finalOrbitalDrift for backwards compatibility
   isSymplectic: boolean;
 }
 
@@ -36,6 +38,9 @@ export interface MatterJsBenchmarkResult {
   durationMs: number;
   stepsPerSecond: number;
   memoryUsageMb: number;
+  activePairsBeforeClear: number;
+  bodiesRemainingAfterClear: number;
+  cleanedUp: boolean;
 }
 
 /**
@@ -75,6 +80,7 @@ export function runExplicitEuler(
   let state = { ...initialState };
   const initialEnergy = computeSpecificEnergy(state);
   let maxEnergyError = 0;
+  let maxOrbitalDrift = 0;
 
   const start = performance.now();
   for (let i = 0; i < steps; i++) {
@@ -88,11 +94,16 @@ export function runExplicitEuler(
     const currentEnergy = computeSpecificEnergy(state);
     const err = Math.abs((currentEnergy - initialEnergy) / initialEnergy);
     if (err > maxEnergyError) maxEnergyError = err;
+
+    const r = Math.sqrt(state.x * state.x + state.y * state.y);
+    const drift = Math.abs(r - 1.0);
+    if (drift > maxOrbitalDrift) maxOrbitalDrift = drift;
   }
   const end = performance.now();
   const durationMs = end - start;
   const finalEnergy = computeSpecificEnergy(state);
   const finalRadius = Math.sqrt(state.x * state.x + state.y * state.y);
+  const finalOrbitalDrift = Math.abs(finalRadius - 1.0);
 
   return {
     name: 'Explicit Euler (1st Order)',
@@ -105,7 +116,9 @@ export function runExplicitEuler(
     finalEnergy,
     maxEnergyError,
     finalEnergyError: Math.abs((finalEnergy - initialEnergy) / initialEnergy),
-    orbitalDrift: Math.abs(finalRadius - 1.0),
+    maxOrbitalDrift,
+    finalOrbitalDrift,
+    orbitalDrift: finalOrbitalDrift,
     isSymplectic: false,
   };
 }
@@ -122,6 +135,7 @@ export function runSemiImplicitEuler(
   let state = { ...initialState };
   const initialEnergy = computeSpecificEnergy(state);
   let maxEnergyError = 0;
+  let maxOrbitalDrift = 0;
 
   const start = performance.now();
   for (let i = 0; i < steps; i++) {
@@ -137,11 +151,16 @@ export function runSemiImplicitEuler(
     const currentEnergy = computeSpecificEnergy(state);
     const err = Math.abs((currentEnergy - initialEnergy) / initialEnergy);
     if (err > maxEnergyError) maxEnergyError = err;
+
+    const r = Math.sqrt(state.x * state.x + state.y * state.y);
+    const drift = Math.abs(r - 1.0);
+    if (drift > maxOrbitalDrift) maxOrbitalDrift = drift;
   }
   const end = performance.now();
   const durationMs = end - start;
   const finalEnergy = computeSpecificEnergy(state);
   const finalRadius = Math.sqrt(state.x * state.x + state.y * state.y);
+  const finalOrbitalDrift = Math.abs(finalRadius - 1.0);
 
   return {
     name: 'Semi-Implicit Euler (1st Order Symplectic)',
@@ -154,7 +173,9 @@ export function runSemiImplicitEuler(
     finalEnergy,
     maxEnergyError,
     finalEnergyError: Math.abs((finalEnergy - initialEnergy) / initialEnergy),
-    orbitalDrift: Math.abs(finalRadius - 1.0),
+    maxOrbitalDrift,
+    finalOrbitalDrift,
+    orbitalDrift: finalOrbitalDrift,
     isSymplectic: true,
   };
 }
@@ -172,6 +193,7 @@ export function runVelocityVerlet(
   let state = { ...initialState };
   const initialEnergy = computeSpecificEnergy(state);
   let maxEnergyError = 0;
+  let maxOrbitalDrift = 0;
 
   const start = performance.now();
   let currentAccel = computeGravitationalAcceleration(state.x, state.y);
@@ -198,11 +220,16 @@ export function runVelocityVerlet(
     const currentEnergy = computeSpecificEnergy(state);
     const err = Math.abs((currentEnergy - initialEnergy) / initialEnergy);
     if (err > maxEnergyError) maxEnergyError = err;
+
+    const r = Math.sqrt(state.x * state.x + state.y * state.y);
+    const drift = Math.abs(r - 1.0);
+    if (drift > maxOrbitalDrift) maxOrbitalDrift = drift;
   }
   const end = performance.now();
   const durationMs = end - start;
   const finalEnergy = computeSpecificEnergy(state);
   const finalRadius = Math.sqrt(state.x * state.x + state.y * state.y);
+  const finalOrbitalDrift = Math.abs(finalRadius - 1.0);
 
   return {
     name: 'Velocity Verlet (2nd Order Symplectic)',
@@ -215,7 +242,9 @@ export function runVelocityVerlet(
     finalEnergy,
     maxEnergyError,
     finalEnergyError: Math.abs((finalEnergy - initialEnergy) / initialEnergy),
-    orbitalDrift: Math.abs(finalRadius - 1.0),
+    maxOrbitalDrift,
+    finalOrbitalDrift,
+    orbitalDrift: finalOrbitalDrift,
     isSymplectic: true,
   };
 }
@@ -233,6 +262,7 @@ export function runRK4(
   let state = { ...initialState };
   const initialEnergy = computeSpecificEnergy(state);
   let maxEnergyError = 0;
+  let maxOrbitalDrift = 0;
 
   const start = performance.now();
   for (let i = 0; i < steps; i++) {
@@ -287,11 +317,16 @@ export function runRK4(
     const currentEnergy = computeSpecificEnergy(state);
     const err = Math.abs((currentEnergy - initialEnergy) / initialEnergy);
     if (err > maxEnergyError) maxEnergyError = err;
+
+    const r = Math.sqrt(state.x * state.x + state.y * state.y);
+    const drift = Math.abs(r - 1.0);
+    if (drift > maxOrbitalDrift) maxOrbitalDrift = drift;
   }
   const end = performance.now();
   const durationMs = end - start;
   const finalEnergy = computeSpecificEnergy(state);
   const finalRadius = Math.sqrt(state.x * state.x + state.y * state.y);
+  const finalOrbitalDrift = Math.abs(finalRadius - 1.0);
 
   return {
     name: 'Runge-Kutta 4 (RK4 4th Order)',
@@ -304,7 +339,9 @@ export function runRK4(
     finalEnergy,
     maxEnergyError,
     finalEnergyError: Math.abs((finalEnergy - initialEnergy) / initialEnergy),
-    orbitalDrift: Math.abs(finalRadius - 1.0),
+    maxOrbitalDrift,
+    finalOrbitalDrift,
+    orbitalDrift: finalOrbitalDrift,
     isSymplectic: false,
   };
 }
@@ -312,6 +349,7 @@ export function runRK4(
 /**
  * 5. Matter.js 2D Rigid Body Engine Benchmark
  * Measures rigid body collision physics pipeline performance with 50 interacting bodies.
+ * Confirms deterministic cleanup via World.clear() and Engine.clear().
  */
 export function runMatterJsBenchmark(bodyCount = 50, steps = 1000): MatterJsBenchmarkResult {
   const { Engine, World, Bodies } = Matter;
@@ -349,9 +387,14 @@ export function runMatterJsBenchmark(bodyCount = 50, steps = 1000): MatterJsBenc
   const endMem = process.memoryUsage().heapUsed;
   const memoryDeltaMb = Math.max(0, (endMem - startMem) / (1024 * 1024));
 
+  const activePairsBeforeClear = engine.pairs.list.length;
+
   // Clean up world
   World.clear(engine.world, false);
   Engine.clear(engine);
+
+  const bodiesRemainingAfterClear = engine.world.bodies.length;
+  const cleanedUp = bodiesRemainingAfterClear === 0;
 
   return {
     engineName: 'Matter.js (Verlet-based Iterative Constraint Solver)',
@@ -360,6 +403,9 @@ export function runMatterJsBenchmark(bodyCount = 50, steps = 1000): MatterJsBenc
     durationMs,
     stepsPerSecond: Math.round((steps / durationMs) * 1000),
     memoryUsageMb: memoryDeltaMb,
+    activePairsBeforeClear,
+    bodiesRemainingAfterClear,
+    cleanedUp,
   };
 }
 
