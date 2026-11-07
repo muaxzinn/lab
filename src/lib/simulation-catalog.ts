@@ -99,6 +99,19 @@ export interface SimulationItem {
   path: string;
   source: "OpenLyceum" | "Internal" | "NASA / PDB";
   featured?: boolean;
+  embedUrl?: string;
+}
+
+/**
+ * Returns the interactive live embed URL for OpenLyceum simulations,
+ * or null if it is an internal native lab.
+ */
+export function getSimulationEmbedUrl(item: SimulationItem): string | null {
+  if (item.embedUrl) return item.embedUrl;
+  if (item.source === "OpenLyceum") {
+    return `https://openlyceum.github.io/${item.id}/`;
+  }
+  return null;
 }
 
 export const SIMULATION_ITEMS: SimulationItem[] = [

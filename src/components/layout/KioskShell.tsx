@@ -24,7 +24,7 @@ export function KioskShell({ children }: KioskShellProps) {
         ข้ามไปยังเนื้อหาหลัก (Skip to main content)
       </a>
 
-      <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col [overscroll-behavior-y:none] selection:bg-neutral-800 selection:text-neutral-200">
+      <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col selection:bg-neutral-800 selection:text-neutral-200">
         <div className="flex flex-1 min-h-screen">
           {/* Desktop Persistent Sidebar + Mobile Drawer */}
           <AppSidebar
@@ -43,8 +43,8 @@ export function KioskShell({ children }: KioskShellProps) {
             {/* Offline Detection Banner */}
             <OfflineStatusBanner />
 
-            {/* Content Area with bottom padding for mobile navbar */}
-            <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 pb-20 lg:pb-10 outline-none">
+            {/* Content Area with responsive padding */}
+            <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 px-4 sm:px-6 lg:px-8 py-6 pb-28 lg:pb-16 outline-none">
               {children}
             </main>
           </div>

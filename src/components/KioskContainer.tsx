@@ -16,7 +16,7 @@ export interface KioskContainerProps {
 }
 
 export function KioskContainer({ children, showTopBar = true }: KioskContainerProps) {
-  const [isKioskLocked, setIsKioskLocked] = useState<boolean>(true);
+  const [isKioskLocked, setIsKioskLocked] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isStandalone, setIsStandalone] = useState<boolean>(false);
   const [viewportDims, setViewportDims] = useState<{ width: number; height: number; dpr: number }>({
@@ -127,13 +127,7 @@ export function KioskContainer({ children, showTopBar = true }: KioskContainerPr
   }, []);
 
   return (
-    <div
-      className={`relative min-h-screen transition-all select-none ${
-        isKioskLocked
-          ? "[overscroll-behavior-y:none]"
-          : ""
-      }`}
-    >
+    <div className="relative min-h-screen transition-all">
       {/* Top Kiosk Control Bar */}
       {showTopBar && (
         <div className="sticky top-0 z-40 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800/80 px-4 py-2">
