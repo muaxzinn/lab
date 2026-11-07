@@ -26,6 +26,8 @@
 | 15 | Pre-Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูล, Route ย่อย และ App Shell ใน v0.5.1 | 99.89% overall coverage (17,774/17,793 symbols); All 7 routes & App Shell 100.00% | Verified |
 | 16 | Phase 8 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code และ Unused Exports หลังพัฒนา Circuit MNA, Chemical Stoichiometry และ Logic Gate Sandbox | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 17 | Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 8 (24,505 symbols) | 99.89% overall coverage (24,479/24,505 symbols); 100.00% across all new solvers & UI modules | Verified |
+| 18 | Phase 8 Review & Hardening | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code, Unused Exports หลังแก้ปัญหา Circuit Topology, Polarity และ Universal NOR | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
+| 19 | Phase 8 Review & Hardening | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลหลังเพิ่ม Wheatstone Bridge และ Universal NOR (25,524 symbols) | 99.90% overall coverage (25,498/25,524 symbols); 100.00% across all new solvers & UI modules | Verified |
 
 ---
 

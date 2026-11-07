@@ -115,6 +115,14 @@ export function solveLinearSystem(A: number[][], b: number[]): number[] | null {
     }
   }
 
+  // Check for inconsistency (0 = non-zero) indicating impossible loops (e.g. ideal short circuits)
+  for (let r = 0; r < n; r++) {
+    const allZero = M[r].slice(0, n).every((val) => Math.abs(val) < 1e-11);
+    if (allZero && Math.abs(M[r][n]) > 1e-6) {
+      return null;
+    }
+  }
+
   // Back-substitution
   const x = new Array(n).fill(0);
   for (let r = n - 1; r >= 0; r--) {
@@ -342,9 +350,12 @@ export function solveCircuit(netlist: CircuitNetlist): SimulationResult {
   const branchCurrentMap = new Map<string, number>();
   for (let k = 0; k < numV; k++) {
     const branch = voltageBranches[k];
-    // In MNA formulation, Iv is current flowing into node1 and out of node2 inside the branch,
-    // so current from node1 to node2 is -solution[numNodes + k].
-    const current = -solution[numNodes + k];
+    const iv = solution[numNodes + k];
+    // In MNA, iv is the current entering node1 and exiting node2 through the branch.
+    // For a DC voltage source, the source delivers current OUT of its positive terminal (node1),
+    // so the delivered current is -iv.
+    // For passive branches (switch, ammeter, wire), current flowing from node1 to node2 is +iv.
+    const current = branch.component.type === "dc_voltage" ? -iv : iv;
     branchCurrentMap.set(branch.component.id, current);
   }
 
@@ -578,6 +589,24 @@ export const CIRCUIT_PRESETS: readonly CircuitPreset[] = [
         { id: "ammeter", type: "ammeter", name: "Current Probe", thaiName: "โพรบวัดกระแส", node1: "p_in", node2: "p_res", value: 0 },
         { id: "potentiometer", type: "resistor", name: "Rheostat (100Ω)", thaiName: "ความต้านทานปรับค่าได้", node1: "p_res", node2: "0", value: 100.0 },
         { id: "voltmeter", type: "voltmeter", name: "Voltage Probe", thaiName: "โพรบวัดแรงดัน", node1: "p_res", node2: "0", value: 0 },
+      ],
+    },
+  },
+  {
+    id: "wheatstone-bridge",
+    title: "Wheatstone Bridge Network",
+    thaiTitle: "วงจรบริดจ์ของวีตสตันและการวัดความต้านทานสมดุล",
+    description: "Four-resistor bridge network demonstrating bridge balance when R1/R3 = R2/R4 and off-balance detector current.",
+    thaiDescription: "วงจรบริดจ์ตัวต้านทาน 4 ตัวพร้อมตัวตรวจจับบริดจ์ พิสูจน์ภาวะสมดุลไร้กระแสไหลผ่านบริดจ์",
+    netlist: {
+      groundNode: "0",
+      components: [
+        { id: "bat1", type: "dc_voltage", name: "DC Source (10V)", thaiName: "แหล่งจ่าย 10V", node1: "top", node2: "0", value: 10.0 },
+        { id: "r1", type: "resistor", name: "Bridge Arm R1 (100Ω)", thaiName: "กิ่ง R1 (100Ω)", node1: "top", node2: "left", value: 100.0 },
+        { id: "r2", type: "resistor", name: "Bridge Arm R2 (100Ω)", thaiName: "กิ่ง R2 (100Ω)", node1: "top", node2: "right", value: 100.0 },
+        { id: "r3", type: "resistor", name: "Bridge Arm R3 (100Ω)", thaiName: "กิ่ง R3 (100Ω)", node1: "left", node2: "0", value: 100.0 },
+        { id: "r4", type: "resistor", name: "Bridge Arm R4 (100Ω)", thaiName: "กิ่ง R4 (100Ω)", node1: "right", node2: "0", value: 100.0 },
+        { id: "galv", type: "resistor", name: "Bridge Detector (50Ω)", thaiName: "ตัวตรวจจับบริดจ์ (50Ω)", node1: "left", node2: "right", value: 50.0 },
       ],
     },
   },

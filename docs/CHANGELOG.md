@@ -31,10 +31,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Executed `npx --yes typescript-coverage-report -r text` achieving 99.89% overall TypeScript type coverage (24,479/24,505 symbols) with 100.00% across all new solvers, models, and UI components.
   - Documented executions #16 and #17 in `docs/NPX_SKILLS_REGISTRY.md`.
 - **Automated Unit Tests & Quality Assurance**:
-  - Created `src/lib/circuit-solver.test.ts` (12 unit tests) verifying Ohm's Law, series/parallel combinations, voltage division, switch cutoff, dynamic LED/bulb glow, and KVL/KCL conservation.
+  - Created `src/lib/circuit-solver.test.ts` (16 unit tests) verifying Ohm's Law, series/parallel combinations, voltage division, switch cutoff, dynamic LED/bulb glow, in-line ammeter/switch current polarity consistency, balanced/unbalanced Wheatstone bridge networks, singular short-circuit detection, and KVL/KCL conservation.
   - Created `src/lib/chemical-solver.test.ts` (13 unit tests) verifying formula parsing, polyatomics, exact rational balancing, mass conservation, and stoichiometry conversions.
-  - Created `src/lib/logic-gate-engine.test.ts` (7 unit tests) verifying gate primitives, Half/Full Adders, De Morgan equivalence, MUX data routing, and oscillator cycle guards.
-  - Expanded test suite from 75 to 107 unit tests (38 suites, 100% pass rate).
+  - Created `src/lib/logic-gate-engine.test.ts` (9 unit tests) verifying gate primitives, N-input gates, Half/Full Adders, Universal NOR logic synthesis, De Morgan equivalence, MUX data routing, and oscillator cycle guards.
+  - Expanded test suite to 113 unit tests (42 suites, 100% pass rate).
   - Clean linting (`pnpm lint`: 0 problems, 0 warnings), zero TypeScript errors (`pnpm typecheck`), and full Turbopack static prerendering (12/12 routes).
 
 ---

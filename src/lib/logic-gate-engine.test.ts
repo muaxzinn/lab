@@ -165,6 +165,45 @@ describe("Boolean Logic Gate & Digital Circuit Engine", () => {
     });
   });
 
+  describe("Multi-Input Gate Primitives", () => {
+    it("evaluates N-input gates with arbitrary input arrays accurately", () => {
+      // 3-input AND
+      assert.equal(evaluateGatePrimitive("AND", [true, true, true]), true);
+      assert.equal(evaluateGatePrimitive("AND", [true, false, true]), false);
+
+      // 3-input OR
+      assert.equal(evaluateGatePrimitive("OR", [false, false, false]), false);
+      assert.equal(evaluateGatePrimitive("OR", [false, false, true]), true);
+
+      // Multi-input NOR
+      assert.equal(evaluateGatePrimitive("NOR", [false, false, false]), true);
+      assert.equal(evaluateGatePrimitive("NOR", [false, true, false]), false);
+    });
+  });
+
+  describe("Universal NOR Gate Logic Verification", () => {
+    const norUniv = CS_LOGIC_PRESETS.find((p) => p.id === "nor-universal");
+    assert.ok(norUniv);
+
+    it("synthesizes valid NOR, OR, and AND functions from pure NOR gates", () => {
+      const table = generateTruthTable(norUniv);
+      assert.equal(table.length, 4);
+
+      for (const row of table) {
+        const a = row.inputs["in_a"];
+        const b = row.inputs["in_b"];
+
+        const expectedNor = !(a || b);
+        const expectedOr = a || b;
+        const expectedAnd = a && b;
+
+        assert.equal(row.outputs["out_nor"], expectedNor, `NOR mismatch at A=${a}, B=${b}`);
+        assert.equal(row.outputs["out_or"], expectedOr, `OR-from-NOR mismatch at A=${a}, B=${b}`);
+        assert.equal(row.outputs["out_and"], expectedAnd, `AND-from-NOR mismatch at A=${a}, B=${b}`);
+      }
+    });
+  });
+
   describe("Cycle Handling & Robustness", () => {
     it("safely detects circular connections without hanging or stack explosion", () => {
       // Ring oscillator (NOT gate feeding into its own input)

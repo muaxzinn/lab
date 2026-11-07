@@ -72,8 +72,31 @@ export function evaluateGatePrimitive(
   inputs: boolean[],
   defaultState: boolean = false
 ): boolean {
+  if (inputs.length === 0) {
+    switch (type) {
+      case "INPUT":
+        return defaultState;
+      case "OUTPUT":
+      case "BUFFER":
+        return false;
+      case "NOT":
+        return true;
+      case "AND":
+        return false;
+      case "OR":
+        return false;
+      case "XOR":
+        return false;
+      case "NAND":
+        return true;
+      case "NOR":
+        return true;
+      case "XNOR":
+        return true;
+    }
+  }
+
   const a = inputs[0] ?? false;
-  const b = inputs[1] ?? false;
 
   switch (type) {
     case "INPUT":
@@ -84,17 +107,17 @@ export function evaluateGatePrimitive(
     case "NOT":
       return !a;
     case "AND":
-      return a && b;
+      return inputs.every(Boolean);
     case "OR":
-      return a || b;
+      return inputs.some(Boolean);
     case "XOR":
-      return a !== b;
+      return inputs.reduce((acc, v) => acc !== v, false);
     case "NAND":
-      return !(a && b);
+      return !inputs.every(Boolean);
     case "NOR":
-      return !(a || b);
+      return !inputs.some(Boolean);
     case "XNOR":
-      return a === b;
+      return !inputs.reduce((acc, v) => acc !== v, false);
   }
 }
 
@@ -355,6 +378,44 @@ export const CS_LOGIC_PRESETS: readonly LogicCircuit[] = [
       { id: "w6", fromNodeId: "and_d0", toNodeId: "or_mux", toPinIndex: 0 },
       { id: "w7", fromNodeId: "and_d1", toNodeId: "or_mux", toPinIndex: 1 },
       { id: "w8", fromNodeId: "or_mux", toNodeId: "out_y", toPinIndex: 0 },
+    ],
+  },
+  {
+    id: "nor-universal",
+    name: "Universal NOR Gate Logic",
+    thaiName: "เกตครอบจักรวาล NOR (Universal NOR Gate)",
+    description: "Proves that NOR gates alone can construct NOT, OR, and AND functions, demonstrating functional completeness.",
+    thaiDescription: "พิสูจน์คุณสมบัติครอบจักรวาลของเกต NOR: สร้างฟังก์ชัน NOT, OR และ AND ได้ด้วยเกต NOR เพียงชนิดเดียว",
+    booleanExpression: "NOT = A ⊽ A, OR = ¬(A ⊽ B), AND = (¬A) ⊽ (¬B)",
+    nodes: [
+      { id: "in_a", type: "INPUT", label: "A", x: 80, y: 90, state: false },
+      { id: "in_b", type: "INPUT", label: "B", x: 80, y: 230, state: false },
+      // Branch 1: Single NOR
+      { id: "nor1", type: "NOR", label: "NOR 1", x: 260, y: 90 },
+      { id: "out_nor", type: "OUTPUT", label: "NOR (A⊽B)", x: 440, y: 90 },
+      // Branch 2: NOR followed by NOR inverter -> OR
+      { id: "nor_inv", type: "NOR", label: "NOR Inv", x: 380, y: 160 },
+      { id: "out_or", type: "OUTPUT", label: "OR (A+B)", x: 520, y: 160 },
+      // Branch 3: Invert A and B with NOR, then NOR them -> AND
+      { id: "nor_not_a", type: "NOR", label: "NOT A", x: 240, y: 220 },
+      { id: "nor_not_b", type: "NOR", label: "NOT B", x: 240, y: 280 },
+      { id: "nor_and", type: "NOR", label: "NOR AND", x: 380, y: 250 },
+      { id: "out_and", type: "OUTPUT", label: "AND (A·B)", x: 520, y: 250 },
+    ],
+    wires: [
+      { id: "w1", fromNodeId: "in_a", toNodeId: "nor1", toPinIndex: 0 },
+      { id: "w2", fromNodeId: "in_b", toNodeId: "nor1", toPinIndex: 1 },
+      { id: "w3", fromNodeId: "nor1", toNodeId: "out_nor", toPinIndex: 0 },
+      { id: "w4", fromNodeId: "nor1", toNodeId: "nor_inv", toPinIndex: 0 },
+      { id: "w5", fromNodeId: "nor1", toNodeId: "nor_inv", toPinIndex: 1 },
+      { id: "w6", fromNodeId: "nor_inv", toNodeId: "out_or", toPinIndex: 0 },
+      { id: "w7", fromNodeId: "in_a", toNodeId: "nor_not_a", toPinIndex: 0 },
+      { id: "w8", fromNodeId: "in_a", toNodeId: "nor_not_a", toPinIndex: 1 },
+      { id: "w9", fromNodeId: "in_b", toNodeId: "nor_not_b", toPinIndex: 0 },
+      { id: "w10", fromNodeId: "in_b", toNodeId: "nor_not_b", toPinIndex: 1 },
+      { id: "w11", fromNodeId: "nor_not_a", toNodeId: "nor_and", toPinIndex: 0 },
+      { id: "w12", fromNodeId: "nor_not_b", toNodeId: "nor_and", toPinIndex: 1 },
+      { id: "w13", fromNodeId: "nor_and", toNodeId: "out_and", toPinIndex: 0 },
     ],
   },
 ];

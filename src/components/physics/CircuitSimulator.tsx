@@ -18,7 +18,236 @@ import {
   type CircuitNetlist,
   type CircuitPreset,
   type SimulationResult,
+  type CircuitComponent,
+  type ComponentResult,
 } from "@/lib/circuit-solver";
+
+function renderBattery(
+  vSrc: CircuitComponent | undefined,
+  x: number,
+  y: number,
+  label: string = "DC Source"
+) {
+  const val = vSrc?.value ?? 9;
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect x="-10" y="-35" width="20" height="70" fill="#0a0a0a" />
+      <line x1="-24" y1="-10" x2="24" y2="-10" stroke="#22c55e" strokeWidth="4" />
+      <line x1="-14" y1="10" x2="14" y2="10" stroke="#ef4444" strokeWidth="5" />
+      <text x="32" y="-6" fill="#22c55e" fontSize="12" fontWeight="bold" fontFamily="monospace">
+        +
+      </text>
+      <text x="-38" y="5" textAnchor="end" fill="#f5f5f5" fontSize="12" fontFamily="monospace" fontWeight="bold">
+        {val}V
+      </text>
+      <text x="-38" y="18" textAnchor="end" fill="#737373" fontSize="9" fontFamily="sans-serif">
+        {label}
+      </text>
+    </g>
+  );
+}
+
+function renderSwitch(
+  sw: CircuitComponent | undefined,
+  x: number,
+  y: number,
+  label: string,
+  onToggle: (id: string) => void
+) {
+  const isClosed = sw ? sw.closed !== false : true;
+  return (
+    <g
+      transform={`translate(${x}, ${y})`}
+      className="cursor-pointer"
+      onClick={() => sw && onToggle(sw.id)}
+    >
+      <rect x="-30" y="-20" width="60" height="40" fill="#0a0a0a" stroke="#262626" rx="6" />
+      <circle cx="-16" cy="0" r="4" fill="#a3a3a3" />
+      <circle cx="16" cy="0" r="4" fill="#a3a3a3" />
+      <line
+        x1="-16"
+        y1="0"
+        x2="16"
+        y2={isClosed ? "0" : "-18"}
+        stroke={isClosed ? "#2ef2a0" : "#f43f5e"}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        className="transition-all duration-200"
+      />
+      <text
+        x="0"
+        y="28"
+        textAnchor="middle"
+        fill={isClosed ? "#2ef2a0" : "#f43f5e"}
+        fontSize="9"
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        {isClosed ? "ON" : "OFF"} ({label})
+      </text>
+    </g>
+  );
+}
+
+function renderResistor(
+  r: CircuitComponent | undefined,
+  resResult: ComponentResult | undefined,
+  x: number,
+  y: number,
+  vertical: boolean = false
+) {
+  const rVal = r?.value ?? 50;
+  const valStr = rVal >= 1000 ? `${(rVal / 1000).toFixed(1)}kΩ` : `${rVal}Ω`;
+  return (
+    <g transform={`translate(${x}, ${y}) rotate(${vertical ? 90 : 0})`}>
+      <rect x="-40" y="-15" width="80" height="30" fill="#0a0a0a" stroke="#00f0ff" strokeWidth="1.5" rx="4" />
+      <path
+        d="M -30 0 L -20 -8 L -10 8 L 0 -8 L 10 8 L 20 -8 L 30 0"
+        fill="none"
+        stroke="#00f0ff"
+        strokeWidth="2"
+      />
+      <g transform={vertical ? "rotate(-90)" : ""}>
+        <text
+          x="0"
+          y={vertical ? -22 : -20}
+          textAnchor="middle"
+          fill="#00f0ff"
+          fontSize="10"
+          fontFamily="monospace"
+          fontWeight="bold"
+        >
+          {r?.name.split("(")[0].trim() || "R"} = {valStr}
+        </text>
+        <text
+          x="0"
+          y={vertical ? 26 : 28}
+          textAnchor="middle"
+          fill="#a3a3a3"
+          fontSize="8"
+          fontFamily="monospace"
+        >
+          {resResult?.voltageDrop.toFixed(2) ?? 0}V | {((resResult?.current ?? 0) * 1000).toFixed(0)}mA
+        </text>
+      </g>
+    </g>
+  );
+}
+
+function renderLampOrLED(
+  lamp: CircuitComponent | undefined,
+  lampRes: ComponentResult | undefined,
+  x: number,
+  y: number
+) {
+  const isLit = lampRes?.state.isLit ?? false;
+  const brightnessPct = lampRes?.state.brightnessPct ?? 0;
+  const isLed = lamp?.type === "led";
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      {isLit && (
+        <circle
+          cx="0"
+          cy="0"
+          r={26 + brightnessPct * 0.25}
+          fill={isLed ? "url(#led-glow)" : "url(#lamp-glow)"}
+          className="animate-pulse"
+        />
+      )}
+      <rect x="-24" y="-24" width="48" height="48" fill="#0a0a0a" rx="24" />
+      <circle
+        cx="0"
+        cy="0"
+        r="18"
+        fill={isLit ? (isLed ? "#064e3b" : "#78350f") : "#171717"}
+        stroke={isLit ? (isLed ? "#2ef2a0" : "#facc15") : "#525252"}
+        strokeWidth="2"
+      />
+      {isLed ? (
+        <polygon
+          points="-7,6 7,6 0,-6"
+          fill={isLit ? "#2ef2a0" : "#737373"}
+        />
+      ) : (
+        <>
+          <line x1="-8" y1="-8" x2="8" y2="8" stroke={isLit ? "#fff" : "#737373"} strokeWidth="2" />
+          <line x1="8" y1="-8" x2="-8" y2="8" stroke={isLit ? "#fff" : "#737373"} strokeWidth="2" />
+        </>
+      )}
+      <text
+        x="28"
+        y="-4"
+        fill={isLit ? (isLed ? "#2ef2a0" : "#facc15") : "#737373"}
+        fontSize="10"
+        fontFamily="monospace"
+        fontWeight="bold"
+      >
+        {lamp?.name.split("(")[0].trim() || (isLed ? "LED" : "Lamp")}
+      </text>
+      <text x="28" y="10" fill="#a3a3a3" fontSize="8" fontFamily="monospace">
+        {isLit ? `GLOW ${brightnessPct}%` : "OFF"}
+      </text>
+      <text x="28" y="22" fill="#737373" fontSize="8" fontFamily="sans-serif">
+        P={lampRes?.power.toFixed(3) ?? 0}W
+      </text>
+    </g>
+  );
+}
+
+function renderAmmeter(
+  amm: CircuitComponent | undefined,
+  ammRes: ComponentResult | undefined,
+  x: number,
+  y: number
+) {
+  const currentMa = ((ammRes?.current ?? 0) * 1000).toFixed(1);
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect x="-35" y="-18" width="70" height="36" fill="#0a0a0a" stroke="#a855f7" strokeWidth="2" rx="6" />
+      <text x="0" y="-3" textAnchor="middle" fill="#c084fc" fontSize="9" fontFamily="monospace" fontWeight="bold">
+        [ A ] AMMETER
+      </text>
+      <text x="0" y="11" textAnchor="middle" fill="#f5f5f5" fontSize="10" fontFamily="monospace" fontWeight="bold">
+        {currentMa} mA
+      </text>
+    </g>
+  );
+}
+
+function renderVoltmeter(
+  vm: CircuitComponent | undefined,
+  vmRes: ComponentResult | undefined,
+  x: number,
+  y: number
+) {
+  const voltage = (vmRes?.voltageDrop ?? 0).toFixed(2);
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect x="-35" y="-18" width="70" height="36" fill="#0a0a0a" stroke="#00f0ff" strokeWidth="2" rx="6" />
+      <text x="0" y="-3" textAnchor="middle" fill="#00f0ff" fontSize="9" fontFamily="monospace" fontWeight="bold">
+        [ V ] VOLTMETER
+      </text>
+      <text x="0" y="11" textAnchor="middle" fill="#f5f5f5" fontSize="10" fontFamily="monospace" fontWeight="bold">
+        {voltage} V
+      </text>
+    </g>
+  );
+}
+
+function renderGround(x: number, y: number) {
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <line x1="0" y1="0" x2="0" y2="18" stroke="#737373" strokeWidth="2" />
+      <line x1="-12" y1="18" x2="12" y2="18" stroke="#737373" strokeWidth="2.5" />
+      <line x1="-8" y1="23" x2="8" y2="23" stroke="#737373" strokeWidth="2" />
+      <line x1="-4" y1="28" x2="4" y2="28" stroke="#737373" strokeWidth="1.5" />
+      <text x="16" y="24" fill="#737373" fontSize="9" fontFamily="monospace">
+        GND (0V)
+      </text>
+    </g>
+  );
+}
 
 export function CircuitSimulator() {
   const [selectedPresetId, setSelectedPresetId] = useState<string>("series-basic");
@@ -250,340 +479,288 @@ export function CircuitSimulator() {
             </pattern>
             <rect width="680" height="340" fill="url(#grid)" />
 
-            {/* Circuit Boundary Wire Loop */}
-            <path
-              d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
-              fill="none"
-              stroke="#404040"
-              strokeWidth="3"
-              strokeLinejoin="round"
-            />
-
-            {/* Dynamic Current Flow Particles when circuit is active */}
-            {simResult.totalPowerSupplied > 0.001 && (
-              <path
-                d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
-                fill="none"
-                stroke="#2ef2a0"
-                strokeWidth="2.5"
-                strokeDasharray="6 14"
-                className="animate-[spin_4s_linear_infinite]"
-                style={{
-                  strokeDashoffset: 100,
-                  animation: "dash 1.2s linear infinite",
-                }}
-              />
-            )}
-
-            {/* COMPONENT 1: DC Battery (Left side: x = 100, y = 140..200) */}
-            <g transform="translate(100, 170)">
-              {/* Wire cutout */}
-              <rect x="-10" y="-35" width="20" height="70" fill="#0a0a0a" />
-              {/* Positive Plate */}
-              <line
-                x1="-24"
-                y1="-10"
-                x2="24"
-                y2="-10"
-                stroke="#22c55e"
-                strokeWidth="4"
-              />
-              {/* Negative Plate */}
-              <line
-                x1="-14"
-                y1="10"
-                x2="14"
-                y2="10"
-                stroke="#ef4444"
-                strokeWidth="5"
-              />
-              {/* Plus sign */}
-              <text
-                x="32"
-                y="-6"
-                fill="#22c55e"
-                fontSize="12"
-                fontWeight="bold"
-                fontFamily="monospace"
-              >
-                +
-              </text>
-              {/* Voltage Value Label */}
-              <text
-                x="-38"
-                y="5"
-                textAnchor="end"
-                fill="#f5f5f5"
-                fontSize="12"
-                fontFamily="monospace"
-                fontWeight="bold"
-              >
-                {netlist.components.find((c) => c.type === "dc_voltage")?.value ?? 9}V
-              </text>
-              <text
-                x="-38"
-                y="18"
-                textAnchor="end"
-                fill="#737373"
-                fontSize="9"
-                fontFamily="sans-serif"
-              >
-                DC Source
-              </text>
-            </g>
-
-            {/* COMPONENT 2: Main Switch (Top side: x = 220, y = 80) */}
+            {/* Preset-Specific Dynamic Schematic Rendering */}
             {(() => {
+              const vSrc = netlist.components.find((c) => c.type === "dc_voltage");
+
+              if (selectedPresetId === "parallel-branches") {
+                const swMain = netlist.components.find((c) => c.id === "sw_main");
+                const swA = netlist.components.find((c) => c.id === "sw_a");
+                const bulbA = netlist.components.find((c) => c.id === "bulb_a");
+                const swB = netlist.components.find((c) => c.id === "sw_b");
+                const ledB = netlist.components.find((c) => c.id === "led_b");
+
+                const isMainClosed = swMain?.closed !== false;
+                const isAClosed = swA?.closed !== false;
+                const isBClosed = swB?.closed !== false;
+                const lampARes = bulbA ? simResult.componentResults[bulbA.id] : undefined;
+                const ledBRes = ledB ? simResult.componentResults[ledB.id] : undefined;
+
+                return (
+                  <>
+                    {/* Main Supply Wire */}
+                    <path
+                      d="M 80 80 L 250 80 M 80 260 L 560 260 M 80 80 L 80 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Branch A Wire (Top rail: y = 110) */}
+                    <path
+                      d="M 250 80 L 250 110 L 560 110 L 560 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Branch B Wire (Lower rail: y = 190) */}
+                    <path
+                      d="M 250 80 L 250 190 L 560 190 L 560 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+
+                    {/* Animated current particles for Branch A */}
+                    {isMainClosed && isAClosed && (lampARes?.current ?? 0) > 0.001 && (
+                      <path
+                        d="M 80 260 L 80 80 L 250 80 L 250 110 L 560 110 L 560 260 L 80 260"
+                        fill="none"
+                        stroke="#2ef2a0"
+                        strokeWidth="2.5"
+                        strokeDasharray="6 14"
+                        style={{ animation: "dash 1.2s linear infinite" }}
+                      />
+                    )}
+
+                    {/* Animated current particles for Branch B */}
+                    {isMainClosed && isBClosed && (ledBRes?.current ?? 0) > 0.001 && (
+                      <path
+                        d="M 80 260 L 80 80 L 250 80 L 250 190 L 560 190 L 560 260 L 80 260"
+                        fill="none"
+                        stroke="#00f0ff"
+                        strokeWidth="2.5"
+                        strokeDasharray="6 14"
+                        style={{ animation: "dash 1.2s linear infinite" }}
+                      />
+                    )}
+
+                    {renderBattery(vSrc, 80, 170, "12V Battery")}
+                    {renderSwitch(swMain, 170, 80, "Main Sw", handleToggleSwitch)}
+
+                    {/* Branch A: Switch A & Lamp A */}
+                    {renderSwitch(swA, 330, 110, "Sw A", handleToggleSwitch)}
+                    {renderLampOrLED(bulbA, lampARes, 460, 110)}
+
+                    {/* Branch B: Switch B & LED B */}
+                    {renderSwitch(swB, 330, 190, "Sw B", handleToggleSwitch)}
+                    {renderLampOrLED(ledB, ledBRes, 460, 190)}
+
+                    {renderGround(80, 260)}
+                  </>
+                );
+              }
+
+              if (selectedPresetId === "series-parallel-combo") {
+                const r1 = netlist.components.find((c) => c.id === "r1");
+                const r2 = netlist.components.find((c) => c.id === "r2");
+                const r3 = netlist.components.find((c) => c.id === "r3");
+
+                const r1Res = r1 ? simResult.componentResults[r1.id] : undefined;
+                const r2Res = r2 ? simResult.componentResults[r2.id] : undefined;
+                const r3Res = r3 ? simResult.componentResults[r3.id] : undefined;
+
+                return (
+                  <>
+                    <path
+                      d="M 80 80 L 270 80 M 80 260 L 560 260 M 80 80 L 80 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Parallel Branch 1 */}
+                    <path
+                      d="M 270 80 L 270 110 L 560 110 L 560 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Parallel Branch 2 */}
+                    <path
+                      d="M 270 80 L 270 190 L 560 190 L 560 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+
+                    {simResult.totalPowerSupplied > 0.001 && (
+                      <>
+                        <path
+                          d="M 80 260 L 80 80 L 270 80 L 270 110 L 560 110 L 560 260 L 80 260"
+                          fill="none"
+                          stroke="#2ef2a0"
+                          strokeWidth="2.5"
+                          strokeDasharray="6 14"
+                          style={{ animation: "dash 1.4s linear infinite" }}
+                        />
+                        <path
+                          d="M 270 80 L 270 190 L 560 190 L 560 260"
+                          fill="none"
+                          stroke="#00f0ff"
+                          strokeWidth="2.5"
+                          strokeDasharray="6 14"
+                          style={{ animation: "dash 1.4s linear infinite" }}
+                        />
+                      </>
+                    )}
+
+                    {renderBattery(vSrc, 80, 170, "10V Supply")}
+                    {renderResistor(r1, r1Res, 180, 80)}
+                    {renderResistor(r2, r2Res, 410, 110)}
+                    {renderResistor(r3, r3Res, 410, 190)}
+                    {renderGround(80, 260)}
+                  </>
+                );
+              }
+
+              if (selectedPresetId === "ohms-law-probe") {
+                const amm = netlist.components.find((c) => c.type === "ammeter");
+                const pot = netlist.components.find((c) => c.type === "resistor");
+                const vm = netlist.components.find((c) => c.type === "voltmeter");
+
+                const ammRes = amm ? simResult.componentResults[amm.id] : undefined;
+                const potRes = pot ? simResult.componentResults[pot.id] : undefined;
+                const vmRes = potRes; // Voltmeter is across the potentiometer
+
+                return (
+                  <>
+                    <path
+                      d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Voltmeter test lead taps */}
+                    <path
+                      d="M 580 110 L 460 110 L 460 145 M 580 230 L 460 230 L 460 195"
+                      fill="none"
+                      stroke="#00f0ff"
+                      strokeWidth="1.5"
+                      strokeDasharray="4 4"
+                    />
+
+                    {simResult.totalPowerSupplied > 0.001 && (
+                      <path
+                        d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
+                        fill="none"
+                        stroke="#2ef2a0"
+                        strokeWidth="2.5"
+                        strokeDasharray="6 14"
+                        style={{ animation: "dash 1.2s linear infinite" }}
+                      />
+                    )}
+
+                    {renderBattery(vSrc, 100, 170, "Variable DC")}
+                    {renderAmmeter(amm, ammRes, 340, 80)}
+                    {renderResistor(pot, potRes, 580, 170, true)}
+                    {renderVoltmeter(vm, vmRes, 460, 170)}
+                    {renderGround(100, 260)}
+                  </>
+                );
+              }
+
+              if (selectedPresetId === "wheatstone-bridge") {
+                const r1 = netlist.components.find((c) => c.id === "r1");
+                const r2 = netlist.components.find((c) => c.id === "r2");
+                const r3 = netlist.components.find((c) => c.id === "r3");
+                const r4 = netlist.components.find((c) => c.id === "r4");
+                const galv = netlist.components.find((c) => c.id === "galv");
+
+                const r1Res = r1 ? simResult.componentResults[r1.id] : undefined;
+                const r2Res = r2 ? simResult.componentResults[r2.id] : undefined;
+                const r3Res = r3 ? simResult.componentResults[r3.id] : undefined;
+                const r4Res = r4 ? simResult.componentResults[r4.id] : undefined;
+                const galvRes = galv ? simResult.componentResults[galv.id] : undefined;
+
+                return (
+                  <>
+                    <path
+                      d="M 80 60 L 340 60 M 80 260 L 340 260 M 80 60 L 80 260"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+                    {/* Bridge Diamond Frame */}
+                    <path
+                      d="M 340 60 L 220 160 L 340 260 M 340 60 L 460 160 L 340 260 M 220 160 L 460 160"
+                      fill="none"
+                      stroke="#404040"
+                      strokeWidth="3"
+                    />
+
+                    {simResult.totalPowerSupplied > 0.001 && (
+                      <path
+                        d="M 80 260 L 80 60 L 340 60 L 220 160 L 340 260 M 340 60 L 460 160 L 340 260"
+                        fill="none"
+                        stroke="#2ef2a0"
+                        strokeWidth="2"
+                        strokeDasharray="6 12"
+                        style={{ animation: "dash 1.5s linear infinite" }}
+                      />
+                    )}
+
+                    {renderBattery(vSrc, 80, 160, "10V Supply")}
+                    {renderResistor(r1, r1Res, 280, 105)}
+                    {renderResistor(r2, r2Res, 400, 105)}
+                    {renderResistor(galv, galvRes, 340, 160)}
+                    {renderResistor(r3, r3Res, 280, 215)}
+                    {renderResistor(r4, r4Res, 400, 215)}
+                    {renderGround(80, 260)}
+                  </>
+                );
+              }
+
+              // Default: series-basic
               const sw = netlist.components.find((c) => c.type === "switch");
-              const isClosed = sw ? sw.closed !== false : true;
-              return (
-                <g
-                  transform="translate(220, 80)"
-                  className="cursor-pointer"
-                  onClick={() => sw && handleToggleSwitch(sw.id)}
-                >
-                  <rect
-                    x="-30"
-                    y="-20"
-                    width="60"
-                    height="40"
-                    fill="#0a0a0a"
-                    stroke="#262626"
-                    rx="6"
-                  />
-                  {/* Switch contact terminals */}
-                  <circle cx="-16" cy="0" r="4" fill="#a3a3a3" />
-                  <circle cx="16" cy="0" r="4" fill="#a3a3a3" />
-                  {/* Lever arm */}
-                  <line
-                    x1="-16"
-                    y1="0"
-                    x2="16"
-                    y2={isClosed ? "0" : "-18"}
-                    stroke={isClosed ? "#2ef2a0" : "#f43f5e"}
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    className="transition-all duration-200"
-                  />
-                  <text
-                    x="0"
-                    y="28"
-                    textAnchor="middle"
-                    fill={isClosed ? "#2ef2a0" : "#f43f5e"}
-                    fontSize="10"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    {isClosed ? "CLOSED (ON)" : "OPEN (OFF)"}
-                  </text>
-                </g>
-              );
-            })()}
-
-            {/* COMPONENT 3: Resistor (Top side: x = 400, y = 80) */}
-            {(() => {
               const r = netlist.components.find((c) => c.type === "resistor");
-              const rRes = r ? simResult.componentResults[r.id] : undefined;
-              return (
-                <g transform="translate(400, 80)">
-                  <rect
-                    x="-40"
-                    y="-15"
-                    width="80"
-                    height="30"
-                    fill="#0a0a0a"
-                    stroke="#00f0ff"
-                    strokeWidth="1.5"
-                    rx="4"
-                  />
-                  {/* Resistor symbol / zigzag */}
-                  <path
-                    d="M -30 0 L -20 -8 L -10 8 L 0 -8 L 10 8 L 20 -8 L 30 0"
-                    fill="none"
-                    stroke="#00f0ff"
-                    strokeWidth="2"
-                  />
-                  <text
-                    x="0"
-                    y="-20"
-                    textAnchor="middle"
-                    fill="#00f0ff"
-                    fontSize="11"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    R1 = {r?.value ?? 50} Ω
-                  </text>
-                  <text
-                    x="0"
-                    y="30"
-                    textAnchor="middle"
-                    fill="#a3a3a3"
-                    fontSize="9"
-                    fontFamily="monospace"
-                  >
-                    V={rRes?.voltageDrop.toFixed(2) ?? 0}V | I=
-                    {((rRes?.current ?? 0) * 1000).toFixed(0)}mA
-                  </text>
-                </g>
-              );
-            })()}
-
-            {/* COMPONENT 4: Lamp or LED (Right side: x = 580, y = 170) */}
-            {(() => {
               const lamp = netlist.components.find(
                 (c) => c.type === "bulb" || c.type === "led"
               );
+              const amm = netlist.components.find((c) => c.type === "ammeter");
+
+              const rRes = r ? simResult.componentResults[r.id] : undefined;
               const lampRes = lamp ? simResult.componentResults[lamp.id] : undefined;
-              const isLit = lampRes?.state.isLit ?? false;
-              const brightnessPct = lampRes?.state.brightnessPct ?? 0;
+              const ammRes = amm ? simResult.componentResults[amm.id] : undefined;
 
               return (
-                <g transform="translate(580, 170)">
-                  {/* Dynamic Radiant Halo Glow when conducting */}
-                  {isLit && (
-                    <circle
-                      cx="0"
-                      cy="0"
-                      r={30 + brightnessPct * 0.3}
-                      fill={lamp?.type === "led" ? "url(#led-glow)" : "url(#lamp-glow)"}
-                      className="animate-pulse"
+                <>
+                  <path
+                    d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
+                    fill="none"
+                    stroke="#404040"
+                    strokeWidth="3"
+                    strokeLinejoin="round"
+                  />
+
+                  {simResult.totalPowerSupplied > 0.001 && (
+                    <path
+                      d="M 100 80 L 580 80 L 580 260 L 100 260 Z"
+                      fill="none"
+                      stroke="#2ef2a0"
+                      strokeWidth="2.5"
+                      strokeDasharray="6 14"
+                      style={{ animation: "dash 1.2s linear infinite" }}
                     />
                   )}
 
-                  <rect x="-25" y="-25" width="50" height="50" fill="#0a0a0a" rx="25" />
-                  {/* Bulb/LED Outer Circle */}
-                  <circle
-                    cx="0"
-                    cy="0"
-                    r="20"
-                    fill={
-                      isLit
-                        ? lamp?.type === "led"
-                          ? "#064e3b"
-                          : "#78350f"
-                        : "#171717"
-                    }
-                    stroke={
-                      isLit
-                        ? lamp?.type === "led"
-                          ? "#2ef2a0"
-                          : "#facc15"
-                        : "#525252"
-                    }
-                    strokeWidth="2.5"
-                  />
-
-                  {/* Filament X cross */}
-                  <line
-                    x1="-10"
-                    y1="-10"
-                    x2="10"
-                    y2="10"
-                    stroke={isLit ? "#fff" : "#737373"}
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1="10"
-                    y1="-10"
-                    x2="-10"
-                    y2="10"
-                    stroke={isLit ? "#fff" : "#737373"}
-                    strokeWidth="2"
-                  />
-
-                  <text
-                    x="35"
-                    y="-5"
-                    fill={isLit ? "#facc15" : "#737373"}
-                    fontSize="11"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    {lamp?.name ?? "Lamp"}
-                  </text>
-                  <text
-                    x="35"
-                    y="10"
-                    fill="#a3a3a3"
-                    fontSize="9"
-                    fontFamily="monospace"
-                  >
-                    {isLit ? `GLOW: ${brightnessPct}%` : "OFF"}
-                  </text>
-                  <text
-                    x="35"
-                    y="22"
-                    fill="#737373"
-                    fontSize="9"
-                    fontFamily="sans-serif"
-                  >
-                    P={lampRes?.power.toFixed(3) ?? 0} W
-                  </text>
-                </g>
+                  {renderBattery(vSrc, 100, 170, "9V Battery")}
+                  {renderSwitch(sw, 220, 80, "Main Sw", handleToggleSwitch)}
+                  {renderResistor(r, rRes, 400, 80)}
+                  {renderLampOrLED(lamp, lampRes, 580, 170)}
+                  {renderAmmeter(amm, ammRes, 340, 260)}
+                  {renderGround(100, 260)}
+                </>
               );
             })()}
-
-            {/* COMPONENT 5: In-Line Ammeter (Bottom side: x = 340, y = 260) */}
-            {(() => {
-              const amm = netlist.components.find((c) => c.type === "ammeter");
-              const ammRes = amm ? simResult.componentResults[amm.id] : undefined;
-              const currentMa = ((ammRes?.current ?? 0) * 1000).toFixed(1);
-
-              return (
-                <g transform="translate(340, 260)">
-                  <rect
-                    x="-35"
-                    y="-20"
-                    width="70"
-                    height="40"
-                    fill="#0a0a0a"
-                    stroke="#a855f7"
-                    strokeWidth="2"
-                    rx="8"
-                  />
-                  <text
-                    x="0"
-                    y="-4"
-                    textAnchor="middle"
-                    fill="#c084fc"
-                    fontSize="10"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    [ A ] AMMETER
-                  </text>
-                  <text
-                    x="0"
-                    y="12"
-                    textAnchor="middle"
-                    fill="#f5f5f5"
-                    fontSize="11"
-                    fontFamily="monospace"
-                    fontWeight="bold"
-                  >
-                    {currentMa} mA
-                  </text>
-                </g>
-              );
-            })()}
-
-            {/* Ground Symbol (Node 0 at Bottom-Left: x = 100, y = 260) */}
-            <g transform="translate(100, 260)">
-              <line x1="0" y1="0" x2="0" y2="18" stroke="#737373" strokeWidth="2" />
-              <line x1="-12" y1="18" x2="12" y2="18" stroke="#737373" strokeWidth="2.5" />
-              <line x1="-8" y1="23" x2="8" y2="23" stroke="#737373" strokeWidth="2" />
-              <line x1="-4" y1="28" x2="4" y2="28" stroke="#737373" strokeWidth="1.5" />
-              <text
-                x="16"
-                y="24"
-                fill="#737373"
-                fontSize="9"
-                fontFamily="monospace"
-              >
-                GND (0V)
-              </text>
-            </g>
           </svg>
 
           {/* Live Voltmeter Floating Overlay HUD */}
@@ -649,7 +826,7 @@ export function CircuitSimulator() {
               );
             })()}
 
-            {/* Resistors Sliders */}
+            {/* Resistors Sliders (1Ω - 10kΩ) */}
             {netlist.components
               .filter((c) => c.type === "resistor")
               .map((r) => (
@@ -657,14 +834,14 @@ export function CircuitSimulator() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-neutral-300 font-medium">{r.name}</span>
                     <span className="font-mono text-cyan-400 font-semibold">
-                      {r.value} Ω
+                      {r.value >= 1000 ? `${(r.value / 1000).toFixed(2)} kΩ` : `${r.value} Ω`}
                     </span>
                   </div>
                   <input
                     type="range"
                     min="1"
-                    max="500"
-                    step="5"
+                    max="10000"
+                    step={r.value > 1000 ? "50" : "5"}
                     value={r.value}
                     onChange={(e) =>
                       handleChangeValue(r.id, parseFloat(e.target.value))
@@ -673,8 +850,9 @@ export function CircuitSimulator() {
                   />
                   <div className="flex justify-between text-[10px] text-neutral-500 font-mono">
                     <span>1 Ω</span>
-                    <span>250 Ω</span>
-                    <span>500 Ω</span>
+                    <span>1 kΩ</span>
+                    <span>5 kΩ</span>
+                    <span>10 kΩ</span>
                   </div>
                 </div>
               ))}

@@ -195,7 +195,84 @@ describe("Modified Nodal Analysis (MNA) Circuit Solver", () => {
     });
   });
 
+  describe("Current Sensors & Polarity Consistency", () => {
+    it("reports positive current through in-line ammeter and closed switch in series loop", () => {
+      const basic = CIRCUIT_PRESETS.find((p) => p.id === "series-basic");
+      assert.ok(basic);
+
+      const res = solveCircuit(basic.netlist);
+      assert.equal(res.success, true);
+
+      // In 9V source with 50Ω resistor + 25Ω bulb = 75Ω total
+      // I = 9 / 75 = 0.12 A = 120 mA
+      const sw = res.componentResults["sw1"];
+      const amm = res.componentResults["amm1"];
+      const r1 = res.componentResults["r1"];
+      const bulb = res.componentResults["bulb1"];
+
+      assert.ok(Math.abs(sw.current - 0.12) < 1e-4, `Expected sw1 current ~0.12A, got ${sw.current}`);
+      assert.ok(Math.abs(amm.current - 0.12) < 1e-4, `Expected amm1 current ~0.12A, got ${amm.current}`);
+      assert.ok(Math.abs(r1.current - 0.12) < 1e-4);
+      assert.ok(Math.abs(bulb.current - 0.12) < 1e-4);
+    });
+  });
+
+  describe("Complex Bridge Networks (Wheatstone Bridge)", () => {
+    it("verifies null detection in balanced Wheatstone bridge (R1/R3 = R2/R4)", () => {
+      const bridge = CIRCUIT_PRESETS.find((p) => p.id === "wheatstone-bridge");
+      assert.ok(bridge);
+
+      const res = solveCircuit(bridge.netlist);
+      assert.equal(res.success, true);
+
+      // Midpoints must have equal potential (5.0V)
+      assert.ok(Math.abs(res.nodeVoltages["left"] - 5.0) < 1e-4);
+      assert.ok(Math.abs(res.nodeVoltages["right"] - 5.0) < 1e-4);
+
+      // Zero current through the bridge galvanometer
+      const galv = res.componentResults["galv"];
+      assert.ok(Math.abs(galv.current) < 1e-6);
+      assert.ok(Math.abs(galv.voltageDrop) < 1e-6);
+      assert.equal(res.kvlVerified, true);
+    });
+
+    it("verifies accurate off-balance current in unbalanced Wheatstone bridge", () => {
+      const unbalancedNetlist: CircuitNetlist = {
+        groundNode: "0",
+        components: [
+          { id: "bat1", type: "dc_voltage", name: "10V Supply", node1: "top", node2: "0", value: 10.0 },
+          { id: "r1", type: "resistor", name: "R1 (100Ω)", node1: "top", node2: "left", value: 100.0 },
+          { id: "r2", type: "resistor", name: "R2 (200Ω)", node1: "top", node2: "right", value: 200.0 },
+          { id: "r3", type: "resistor", name: "R3 (200Ω)", node1: "left", node2: "0", value: 200.0 },
+          { id: "r4", type: "resistor", name: "R4 (100Ω)", node1: "right", node2: "0", value: 100.0 },
+          { id: "galv", type: "resistor", name: "Bridge (50Ω)", node1: "left", node2: "right", value: 50.0 },
+        ],
+      };
+
+      const res = solveCircuit(unbalancedNetlist);
+      assert.equal(res.success, true);
+      assert.ok(res.nodeVoltages["left"] > res.nodeVoltages["right"]);
+      const galv = res.componentResults["galv"];
+      assert.ok(galv.current > 0.015 && galv.current < 0.025);
+      assert.equal(res.kvlVerified, true);
+    });
+  });
+
   describe("Validation & Robustness Guards", () => {
+    it("detects and rejects short-circuited ideal voltage loops", () => {
+      const shortNetlist: CircuitNetlist = {
+        groundNode: "0",
+        components: [
+          { id: "v1", type: "dc_voltage", name: "10V Battery", node1: "1", node2: "0", value: 10.0 },
+          { id: "w1", type: "wire", name: "Ideal Short", node1: "1", node2: "0", value: 0 },
+        ],
+      };
+
+      const res = solveCircuit(shortNetlist);
+      assert.equal(res.success, false);
+      assert.ok(res.error?.includes("Singular"));
+    });
+
     it("handles empty netlists gracefully", () => {
       const result = solveCircuit({ components: [] });
       assert.equal(result.success, false);
