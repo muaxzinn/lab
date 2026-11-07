@@ -24,9 +24,27 @@ An advanced interactive educational platform built with **Next.js 15 App Router*
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- **Node.js**: v20+ (recommended v22 or v26)
-- **Package Manager**: `pnpm` (v9 or v10)
+### Running with Docker (Recommended for Windows / Any OS)
+
+No Node.js or pnpm installation required on host machine:
+
+- **Windows Users (One-Click)**:
+  - Ensure **Docker Desktop** is running.
+  - Double-click **`run.bat`** (or right-click `run.ps1` -> *Run with PowerShell*).
+  - Automatically builds and opens `http://localhost:3000` in your browser!
+  - See detailed guide: [`DOCKER_GUIDE.md`](./DOCKER_GUIDE.md).
+
+- **Terminal / Docker Compose**:
+  ```bash
+  docker compose up --build -d
+  # Access at http://localhost:3000
+  ```
+
+- **Standalone Docker**:
+  ```bash
+  docker build -t interactive-lab .
+  docker run -d -p 3000:3000 --name interactive-lab --restart unless-stopped interactive-lab
+  ```
 
 ### Installation & Development
 

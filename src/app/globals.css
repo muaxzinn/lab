@@ -28,6 +28,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, input, select {
+  touch-action: manipulation;
+}
+
 body {
   min-height: 100vh;
   margin: 0;

@@ -104,33 +104,33 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-neutral-800 bg-neutral-950/85 backdrop-blur-md">
-        <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+        <div className="flex h-16 sm:h-18 items-center justify-between px-4 sm:px-6">
           {/* Left: Mobile Menu Toggle & Breadcrumbs */}
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onToggleMobileMenu}
               aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              className="lg:hidden p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-neutral-100 hover:bg-neutral-850 transition-colors"
+              className="lg:hidden p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-neutral-100 hover:bg-neutral-850 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               {isMobileMenuOpen ? (
-                <X className="h-4 w-4 stroke-[2]" />
+                <X className="h-5 w-5 stroke-[2]" />
               ) : (
-                <Menu className="h-4 w-4 stroke-[2]" />
+                <Menu className="h-5 w-5 stroke-[2]" />
               )}
             </button>
 
-            {/* Breadcrumb Trail */}
-            <nav aria-label="Breadcrumbs" className="flex items-center gap-1.5 text-xs font-mono">
+            {/* Breadcrumb Trail with enhanced tablet sizing */}
+            <nav aria-label="Breadcrumbs" className="flex items-center gap-2 text-xs sm:text-sm font-mono">
               {breadcrumbs.map((crumb, idx) => {
                 const isLast = idx === breadcrumbs.length - 1;
                 return (
                   <React.Fragment key={crumb.path}>
                     {idx > 0 && (
-                      <ChevronRight className="h-3.5 w-3.5 text-neutral-600 flex-shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-neutral-600 shrink-0" />
                     )}
                     {isLast ? (
-                      <span className="font-semibold text-neutral-200 flex items-center gap-1.5 truncate max-w-[160px] sm:max-w-[240px]">
+                      <span className="font-semibold text-neutral-200 flex items-center gap-1.5 truncate max-w-[160px] sm:max-w-[280px]">
                         <span className="truncate">{crumb.label}</span>
                         <span className="hidden sm:inline text-neutral-500 font-normal">
                           ({crumb.thaiLabel})
@@ -154,14 +154,14 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Active Subject Indicator */}
             {currentRoute && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-neutral-900/80 border border-neutral-800">
+              <div className="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono bg-neutral-900/80 border border-neutral-800">
                 <span
-                  className="h-2 w-2 rounded-full flex-shrink-0 animate-pulse"
+                  className="h-2 w-2 rounded-full shrink-0 animate-pulse"
                   style={{ background: "linear-gradient(135deg, #2ef2a0, #00f0ff)" }}
                 />
                 <span className="text-neutral-300 font-medium">{currentRoute.label}</span>
                 {currentRoute.badge && (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-800 border border-neutral-700 text-cyan-300">
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-cyan-300">
                     {currentRoute.badge}
                   </span>
                 )}
@@ -173,11 +173,11 @@ export function AppHeader({ onToggleMobileMenu, isMobileMenuOpen = false }: AppH
               type="button"
               onClick={() => setIsSearchOpen(true)}
               aria-label="Search navigation"
-              className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:border-neutral-700 transition-all text-xs font-mono"
+              className="flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:border-neutral-700 transition-all text-xs sm:text-sm font-mono min-h-[44px]"
             >
-              <Search className="h-3.5 w-3.5 text-cyan-400" />
+              <Search className="h-4 w-4 text-cyan-400" />
               <span className="hidden sm:inline">Search Labs...</span>
-              <kbd className="hidden lg:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-[10px] text-neutral-400">
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-[11px] text-neutral-400">
                 <Command className="h-2.5 w-2.5" />K
               </kbd>
             </button>

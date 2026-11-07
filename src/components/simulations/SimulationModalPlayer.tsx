@@ -47,62 +47,62 @@ export function SimulationModalPlayer({
       role="dialog"
       aria-modal="true"
       aria-labelledby="simulation-modal-title"
-      className="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-md p-2 sm:p-4 md:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex flex-col bg-black/90 backdrop-blur-md p-1.5 sm:p-4 md:p-6 animate-in fade-in duration-200"
     >
       {/* Modal Shell Container */}
-      <div className="flex flex-col w-full h-full max-w-7xl mx-auto rounded-2xl border border-neutral-800 bg-neutral-950 overflow-hidden shadow-2xl">
+      <div className="flex flex-col w-full h-full max-w-7xl mx-auto rounded-xl sm:rounded-2xl md:rounded-3xl border border-neutral-800 bg-neutral-950 overflow-hidden shadow-2xl">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-neutral-900/80">
+        <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-b border-neutral-800 bg-neutral-900/90">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="h-2.5 w-2.5 rounded-full bg-cyan-400" />
+            <span className="h-3 w-3 rounded-full bg-cyan-400 shrink-0" />
             <div className="min-w-0">
               <h2
                 id="simulation-modal-title"
-                className="text-sm sm:text-base font-heading font-medium text-neutral-100 truncate"
+                className="text-base sm:text-lg md:text-xl font-heading font-semibold text-neutral-100 truncate"
               >
                 {item.thaiTitle}
               </h2>
-              <span className="text-xs font-mono text-neutral-400 block truncate">
+              <span className="text-xs sm:text-sm font-mono text-neutral-400 block truncate mt-0.5">
                 {item.title} • {item.source}
               </span>
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Action buttons (Touch-friendly for tablet and phone) */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <a
               href={embedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-neutral-800 border border-neutral-700 hover:bg-neutral-750 text-neutral-200 transition-colors"
+              className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-sans font-medium bg-neutral-800 border border-neutral-700 hover:bg-neutral-750 text-neutral-200 transition-colors min-h-[44px]"
               title="เปิดในแท็บใหม่"
             >
-              <ExternalLink className="h-3.5 w-3.5 text-cyan-400" />
+              <ExternalLink className="h-4 w-4 text-cyan-400" />
               <span className="hidden sm:inline">เปิดแท็บใหม่</span>
             </a>
 
             <button
               type="button"
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="p-1.5 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-750 text-neutral-300 transition-colors hidden md:inline-flex"
+              className="p-2.5 sm:p-3 rounded-xl bg-neutral-800 border border-neutral-700 hover:bg-neutral-750 text-neutral-300 transition-colors hidden md:inline-flex min-h-[44px] min-w-[44px] items-center justify-center"
               title={isFullscreen ? "ย่อขนาด" : "ขยายขนาด"}
               aria-label={isFullscreen ? "ย่อขนาด" : "ขยายขนาด"}
             >
               {isFullscreen ? (
-                <Minimize2 className="h-4 w-4" />
+                <Minimize2 className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <Maximize2 className="h-4 w-4" />
+                <Maximize2 className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </button>
 
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-neutral-200 hover:text-white transition-colors"
+              className="p-2.5 sm:p-3 rounded-xl bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-neutral-200 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center active:scale-95"
               aria-label="ปิดแบบจำลอง"
               title="ปิด (Esc)"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -119,9 +119,9 @@ export function SimulationModalPlayer({
         </div>
 
         {/* Footer info bar */}
-        <div className="px-4 py-2 border-t border-neutral-800/80 bg-neutral-900/60 flex items-center justify-between text-xs text-neutral-400 font-sans">
+        <div className="px-4 py-2.5 sm:px-6 sm:py-3 border-t border-neutral-800/80 bg-neutral-900/60 flex items-center justify-between text-xs sm:text-sm text-neutral-400 font-sans">
           <span className="truncate max-w-2xl">{item.thaiDescription}</span>
-          <span className="hidden sm:inline font-mono text-[11px] text-neutral-500">
+          <span className="hidden sm:inline font-mono text-xs text-neutral-500">
             กด Esc เพื่อปิดแบบจำลอง
           </span>
         </div>
@@ -129,3 +129,4 @@ export function SimulationModalPlayer({
     </div>
   );
 }
+

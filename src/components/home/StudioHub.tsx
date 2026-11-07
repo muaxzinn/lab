@@ -204,31 +204,31 @@ export function StudioHub() {
   };
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto">
-      {/* Clean & Confident Header */}
-      <header className="space-y-3 pt-2">
-        <div className="flex items-center gap-2 text-xs font-mono tracking-wider text-neutral-400 uppercase">
+    <div className="space-y-8 sm:space-y-12 max-w-6xl mx-auto px-2 sm:px-4">
+      {/* Clean & Confident Header with tablet/phone responsive scaling */}
+      <header className="space-y-4 pt-2">
+        <div className="flex items-center gap-2 text-xs sm:text-sm font-mono tracking-wider text-neutral-400 uppercase">
           <span>Interactive Science Platform</span>
           <span>•</span>
           <span className="text-cyan-400">OpenLyceum & WebGL Fleet</span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-medium text-neutral-100 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-semibold text-neutral-100 tracking-tight leading-tight">
           ห้องปฏิบัติการและแบบจำลองวิทยาศาสตร์
         </h1>
 
-        <p className="text-sm sm:text-base text-neutral-400 font-sans max-w-2xl leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl text-neutral-300 font-sans max-w-3xl leading-relaxed">
           แพลตฟอร์มการเรียนรู้และทดลองวิทยาศาสตร์เชิงโต้ตอบระดับสูง รวมห้องปฏิบัติการ 3D WebGL
           และคลังซิมูเลชัน 61 รายการที่เปิดทดลองได้ทันที
         </p>
       </header>
 
-      {/* Main View Mode Switcher (Two Clean Tabs) */}
-      <div className="flex items-center gap-2 p-1 rounded-xl bg-neutral-900 border border-neutral-800 w-fit">
+      {/* Main View Mode Switcher (Touch-friendly for tablets and mobile) */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-neutral-900 border border-neutral-800 w-full sm:w-fit">
         <button
           type="button"
           onClick={() => setActiveTab("studios")}
-          className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-sans transition-all ${
+          className={`flex-1 sm:flex-initial px-5 py-3 rounded-xl text-sm sm:text-base font-sans transition-all min-h-[48px] flex items-center justify-center ${
             activeTab === "studios"
               ? "bg-neutral-800 text-neutral-100 font-medium shadow-xs"
               : "text-neutral-400 hover:text-neutral-200"
@@ -240,38 +240,38 @@ export function StudioHub() {
         <button
           type="button"
           onClick={() => setActiveTab("simulations")}
-          className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-sans transition-all flex items-center gap-2 ${
+          className={`flex-1 sm:flex-initial px-5 py-3 rounded-xl text-sm sm:text-base font-sans transition-all flex items-center justify-center gap-2 min-h-[48px] ${
             activeTab === "simulations"
               ? "bg-neutral-800 text-cyan-300 font-medium shadow-xs"
               : "text-neutral-400 hover:text-neutral-200"
           }`}
         >
           <span>คลังแบบจำลองทั้งหมด</span>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-950 text-cyan-400 border border-neutral-800">
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-950 text-cyan-400 border border-neutral-800">
             60+ ซิมูเลชัน
           </span>
         </button>
       </div>
 
-      {/* VIEW 1: Core 8 Studios (Clean, Spacious, Beautiful Cards) */}
+      {/* VIEW 1: Core 8 Studios (Spacious & High-Readability for Tablet & Mobile) */}
       {activeTab === "studios" && (
         <section className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-7">
             {CORE_STUDIOS.map((studio) => {
               const Icon = studio.icon;
               return (
                 <div
                   key={studio.id}
-                  className="flex flex-col justify-between rounded-xl border border-neutral-800/80 bg-neutral-900/20 hover:bg-neutral-900/40 hover:border-neutral-700/80 p-6 transition-all duration-200"
+                  className="flex flex-col justify-between rounded-2xl border border-neutral-800/80 bg-neutral-900/30 hover:bg-neutral-900/60 hover:border-neutral-700/80 p-6 sm:p-7 md:p-8 transition-all duration-200 shadow-sm"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {/* Header: Icon & Badge */}
                     <div className="flex items-center justify-between">
-                      <div className="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-200">
-                        <Icon className="h-5 w-5 stroke-[1.8]" />
+                      <div className="p-3 sm:p-3.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-200">
+                        <Icon className="h-6 w-6 stroke-[1.8]" />
                       </div>
                       <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${studio.badgeColor}`}
+                        className={`text-xs font-mono px-3 py-1 rounded-full border font-medium ${studio.badgeColor}`}
                       >
                         {studio.badge}
                       </span>
@@ -279,38 +279,38 @@ export function StudioHub() {
 
                     {/* Title */}
                     <div>
-                      <h2 className="text-base sm:text-lg font-heading font-medium text-neutral-100">
+                      <h2 className="text-xl sm:text-2xl font-heading font-semibold text-neutral-100">
                         {studio.thaiTitle}
                       </h2>
-                      <span className="text-xs font-mono text-neutral-500 block mt-0.5">
+                      <span className="text-xs sm:text-sm font-mono text-neutral-400 block mt-1">
                         {studio.title}
                       </span>
                     </div>
 
                     {/* Short Description */}
-                    <p className="text-xs font-sans text-neutral-400 leading-relaxed">
+                    <p className="text-sm sm:text-base font-sans text-neutral-300 leading-relaxed">
                       {studio.description}
                     </p>
 
-                    {/* Highlights Bullet List */}
-                    <ul className="space-y-1.5 pt-2 border-t border-neutral-850 text-xs font-sans text-neutral-400">
+                    {/* Highlights Bullet List with enlarged text for tablets */}
+                    <ul className="space-y-2.5 pt-3 border-t border-neutral-800 text-sm sm:text-base font-sans text-neutral-300">
                       {studio.highlights.map((h) => (
-                        <li key={h} className="flex items-center gap-2">
-                          <span className="h-1 w-1 rounded-full bg-cyan-400 flex-shrink-0" />
+                        <li key={h} className="flex items-center gap-2.5">
+                          <span className="h-2 w-2 rounded-full bg-cyan-400 shrink-0" />
                           <span>{h}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Launch Studio Action */}
-                  <div className="pt-5 mt-4">
+                  {/* Launch Studio Action (Large Touch Target) */}
+                  <div className="pt-6 mt-4">
                     <Link
                       href={studio.path}
-                      className="inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-sans font-medium bg-neutral-850 hover:bg-neutral-800 border border-neutral-750 text-neutral-200 hover:text-white transition-colors"
+                      className="inline-flex w-full items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-base font-sans font-medium bg-neutral-850 hover:bg-neutral-800 border border-neutral-700 text-neutral-100 hover:text-white transition-colors min-h-[50px] shadow-xs active:scale-[0.99]"
                     >
                       <span>เข้าสู่ห้องปฏิบัติการ</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
+                      <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Link>
                   </div>
                 </div>
@@ -325,29 +325,29 @@ export function StudioHub() {
         <section className="space-y-6">
           {/* Search & Category Filter Controls */}
           <div className="space-y-4">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500" />
+            <div className="relative max-w-lg">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ค้นหาชื่อแบบจำลอง เช่น The Ramp, Doppler, วงโคจร..."
-                className="w-full pl-10 pr-9 py-2 rounded-xl text-xs sm:text-sm font-sans bg-neutral-900 border border-neutral-800 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-cyan-700 transition-all"
+                placeholder="ค้นหาแบบจำลอง เช่น The Ramp, Doppler, วงโคจร..."
+                className="w-full pl-12 pr-11 py-3.5 rounded-2xl text-base font-sans bg-neutral-900 border border-neutral-800 text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-cyan-500 transition-all min-h-[50px]"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-neutral-500 hover:text-neutral-300"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-neutral-400 hover:text-neutral-200"
                   aria-label="ล้างคำค้นหา"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </button>
               )}
             </div>
 
-            {/* Category Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none border-b border-neutral-800">
+            {/* Category Pills with touch-scrolling & large tap targets */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none border-b border-neutral-800">
               {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 return (
@@ -355,9 +355,9 @@ export function StudioHub() {
                     key={cat.id}
                     type="button"
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-sans transition-all ${
+                    className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm sm:text-base font-sans transition-all min-h-[44px] ${
                       isActive
-                        ? "bg-neutral-800 text-cyan-300 font-medium"
+                        ? "bg-neutral-800 text-cyan-300 font-medium shadow-xs"
                         : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
                     }`}
                   >
@@ -369,52 +369,52 @@ export function StudioHub() {
           </div>
 
           {/* Simulation Count */}
-          <div className="text-xs text-neutral-400">
-            พบ {filteredItems.length} แบบจำลองทางวิทยาศาสตร์
+          <div className="text-sm sm:text-base text-neutral-400 font-sans">
+            พบ <span className="text-neutral-200 font-medium font-mono">{filteredItems.length}</span> แบบจำลองทางวิทยาศาสตร์
           </div>
 
-          {/* Clean Simulation Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Clean Simulation Cards Grid with spacious typography */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">
             {filteredItems.map((item) => {
               const embedUrl = getSimulationEmbedUrl(item);
 
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col justify-between rounded-xl border border-neutral-800/70 bg-neutral-900/20 hover:bg-neutral-900/40 hover:border-neutral-700/80 p-5 transition-all"
+                  className="flex flex-col justify-between rounded-2xl border border-neutral-800/80 bg-neutral-900/30 hover:bg-neutral-900/60 hover:border-neutral-700/80 p-6 transition-all shadow-sm"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div className="p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300">
-                        {renderItemIcon(item.iconName)}
+                      <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-200">
+                        {renderItemIcon(item.iconName, "h-5 w-5")}
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border text-neutral-400 bg-neutral-900 border-neutral-800">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono px-2.5 py-1 rounded-full border text-neutral-400 bg-neutral-900 border-neutral-800">
                           {item.badge}
                         </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-neutral-900 text-neutral-500 border border-neutral-800">
+                        <span className="text-xs font-mono px-2 py-0.5 rounded bg-neutral-900 text-neutral-500 border border-neutral-800">
                           {item.source}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-heading font-medium text-neutral-100">
+                      <h3 className="text-base sm:text-lg md:text-xl font-heading font-semibold text-neutral-100">
                         {item.thaiTitle}
                       </h3>
-                      <span className="text-xs font-mono text-neutral-500 block truncate">
+                      <span className="text-xs sm:text-sm font-mono text-neutral-400 block truncate mt-0.5">
                         {item.title}
                       </span>
                     </div>
 
-                    <p className="text-xs font-sans text-neutral-400 line-clamp-2 leading-relaxed">
+                    <p className="text-sm sm:text-base font-sans text-neutral-300 line-clamp-2 leading-relaxed">
                       {item.thaiDescription}
                     </p>
                   </div>
 
-                  {/* Action row */}
-                  <div className="pt-4 mt-4 border-t border-neutral-850 flex items-center justify-between">
-                    <span className="text-[11px] text-neutral-500 font-sans">
+                  {/* Action row with large touch buttons */}
+                  <div className="pt-5 mt-4 border-t border-neutral-800/80 flex items-center justify-between gap-3">
+                    <span className="text-xs sm:text-sm text-neutral-400 font-sans">
                       {item.categoryLabel}
                     </span>
 
@@ -422,18 +422,18 @@ export function StudioHub() {
                       <button
                         type="button"
                         onClick={() => handleLaunchSimulation(item)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-cyan-950/60 border border-cyan-800 text-cyan-300 hover:bg-cyan-900/80 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-sans font-medium bg-cyan-950/70 border border-cyan-800 text-cyan-300 hover:bg-cyan-900 transition-colors min-h-[46px] active:scale-[0.99]"
                       >
-                        <Play className="h-3 w-3 fill-current" />
+                        <Play className="h-3.5 w-3.5 fill-current" />
                         <span>เปิดจำลองทันที</span>
                       </button>
                     ) : (
                       <Link
                         href={item.path}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-mono bg-neutral-850 border border-neutral-750 text-neutral-300 hover:text-white transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-sans font-medium bg-neutral-850 border border-neutral-750 text-neutral-200 hover:text-white transition-colors min-h-[46px] active:scale-[0.99]"
                       >
                         <span>เปิดห้องแล็บ</span>
-                        <ArrowRight className="h-3 w-3" />
+                        <ArrowRight className="h-4 w-4" />
                       </Link>
                     )}
                   </div>
