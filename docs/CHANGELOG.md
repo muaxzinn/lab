@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.4.0] - 2026-11-07
+
+### Added
+- **Special Cross-Cutting Phase (Autonomous Skill & Tooling Discovery via `npx`)**:
+  - Established Zero-Install Tooling Governance and created `docs/NPX_SKILLS_REGISTRY.md`.
+  - Documented npx philosophy, version pinning, safe dry-run protocol, and execution matrix.
+  - Executed and verified `npx typescript-coverage-report` (99.76% overall type coverage; 100% across all 4 interactive components), `npx knip` (clean 0 dead code / 0 unused dependencies / 0 unused exports audit), and `npx license-checker-rseidelsohn` (recursive license validation across 340 packages).
+- **Phase 5 (System Architecture & Module Specifications)**:
+  - Created `docs/ARCHITECTURE.md` defining system topology, RSC vs client interactive boundaries, memory/GPU lifecycles, and security threat models.
+  - Created `docs/MODULE_SPECIFICATIONS.md` detailing mathematical and physical contracts for all core interactive modules, including Mafs 2D coordinate plotting and comprehensive phonological deconstruction heuristics.
+- **Phase 6 (Source Code Customization & Interactive Components)**:
+  - Created `src/components/FormulaViewer.tsx`: Interactive KaTeX mathematical typesetter with Math.js AST sandboxed variable evaluation across 6 presets (Kinetic Energy, Wave Speed, Harmonic Oscillator, Ohm's Law, Ideal Gas Law, Gravitation) and dynamic 2D function graph plotting via `Mafs` (v0.21.0).
+  - Created `src/components/VerletSimulationCanvas.tsx`: Symplectic planetary orbit physics canvas running Velocity Verlet vs. Explicit Euler with real-time Hamiltonian energy conservation gauge.
+  - Created `src/components/ThaiPhonologyVisualizer.tsx`: Interactive Thai syllable deconstructor, Triyang classifier, 8 spelling sections, live/dead analysis, and SVG pitch contour trajectories.
+  - Created `src/components/KioskContainer.tsx`: Viewport lockdown shell with `overscroll-behavior: none`, `touch-action`, navigation popstate trapping, Fullscreen API, and standalone PWA detection.
+  - Created and expanded `src/lib/thai-phonology.test.ts`: Comprehensive 45 unit tests verifying Thai phonological rules, leading consonants (ห นำ, อ นำ), true clusters, complex vowels (open/closed สระ อัว, เ-ีย, เ-ือ, เ-อ, เ-าะ), Thanthakhat silenced cluster stripping, and 5 tone derivations.
+  - Integrated interactive component showcase into `src/app/page.tsx` with responsive tabs and telemetry HUD.
+
+---
+
 ## [0.3.0] - 2026-11-07
 
 ### Added

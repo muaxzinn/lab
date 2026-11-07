@@ -35,7 +35,7 @@ export interface WebGLDisposalTarget {
 /**
  * Recursively disposes all textures attached to material properties.
  */
-export function disposeMaterialTextures(material: WebGLDisposable): void {
+function disposeMaterialTextures(material: WebGLDisposable): void {
   const mat = material as unknown as Record<string, unknown>;
   if (!mat || typeof mat !== 'object') return;
 
@@ -139,6 +139,10 @@ export function attachWebGLContextGuards(
   };
 }
 
+export function clampDevicePixelRatio(dpr: number, maxDpr = 2.0): number {
+  return Math.min(Math.max(dpr, 1.0), maxDpr);
+}
+
 /**
  * Clamp device pixel ratio to prevent GPU framebuffer bandwidth exhaustion.
  * Restricts DPR to maxDpr (default: 2.0).
@@ -147,5 +151,5 @@ export function getOptimalPixelRatio(maxDpr = 2.0): number {
   if (typeof window === 'undefined' || !window.devicePixelRatio) {
     return 1.0;
   }
-  return Math.min(window.devicePixelRatio, maxDpr);
+  return clampDevicePixelRatio(window.devicePixelRatio, maxDpr);
 }

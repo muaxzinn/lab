@@ -24,6 +24,8 @@ import {
 import {
   createSimulationFrame,
   getTransferables,
+  type SimulationCommand,
+  type SimulationEvent,
 } from './worker-protocol.ts';
 
 describe('Math Sanitization & Security Boundary', () => {
@@ -204,5 +206,18 @@ describe('Web Worker Transferable Protocols', () => {
     assert.strictEqual(transferables.length, 2);
     assert.strictEqual(transferables[0], frame.positionsBuffer);
     assert.strictEqual(transferables[1], frame.energiesBuffer);
+
+    // Verify typed worker protocol message structures
+    const initCmd: SimulationCommand = {
+      type: 'INIT_ORBIT',
+      payload: { m1: 1000, m2: 1, G: 1, dt: 0.02 },
+    };
+    assert.strictEqual(initCmd.type, 'INIT_ORBIT');
+
+    const frameEvent: SimulationEvent = {
+      type: 'FRAME_READY',
+      payload: frame,
+    };
+    assert.strictEqual(frameEvent.type, 'FRAME_READY');
   });
 });

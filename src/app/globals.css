@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
+@import "mafs/core.css";
 
 :root {
   --background: #070b16;
