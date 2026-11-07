@@ -223,7 +223,7 @@ export const LOGIC_CIRCUIT_PRESETS: LogicCircuitPreset[] = [
   import { Play } from "lucide-react";
   <button className="inline-flex items-center gap-2">
     <Play className="h-4 w-4 text-cyan-400" />
-    <span>เริ่มทดลอง (Start Simulation)</span>
+    <span>เริ่มทดลอง</span>
   </button>
   ```
 

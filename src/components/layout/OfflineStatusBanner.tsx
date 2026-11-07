@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { WifiOff, Wifi, RefreshCw } from "lucide-react";
 
 export function OfflineStatusBanner() {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [showReconnected, setShowReconnected] = useState<boolean>(false);
   const [swRegistered, setSwRegistered] = useState<boolean>(false);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Check initial online status in browser
@@ -17,23 +18,30 @@ export function OfflineStatusBanner() {
     const handleOnline = () => {
       setIsOnline(true);
       setShowReconnected(true);
-      const timer = setTimeout(() => {
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
+      reconnectTimerRef.current = setTimeout(() => {
         setShowReconnected(false);
+        reconnectTimerRef.current = null;
       }, 3500);
-      return () => clearTimeout(timer);
     };
 
     const handleOffline = () => {
       setIsOnline(false);
       setShowReconnected(false);
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
     };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
     // Register Service Worker in browser environment
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      const registerSW = async () => {
+    const registerSW = async () => {
+      if (typeof window !== "undefined" && "serviceWorker" in navigator) {
         try {
           const reg = await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
@@ -55,23 +63,23 @@ export function OfflineStatusBanner() {
             }
           });
         } catch {
-          // SW registration failed or unsupported in sandbox environment
+          // SW registration unsupported or restricted in sandbox environment
         }
-      };
-
-      if (document.readyState === "complete") {
-        registerSW();
-      } else {
-        window.addEventListener("load", registerSW);
-        return () => {
-          window.removeEventListener("load", registerSW);
-          window.removeEventListener("online", handleOnline);
-          window.removeEventListener("offline", handleOffline);
-        };
       }
+    };
+
+    if (document.readyState === "complete") {
+      registerSW();
+    } else {
+      window.addEventListener("load", registerSW);
     }
 
     return () => {
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+      window.removeEventListener("load", registerSW);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
@@ -95,7 +103,7 @@ export function OfflineStatusBanner() {
             />
             <Wifi className="h-3.5 w-3.5 text-emerald-400" />
             <span className="font-medium text-emerald-300 font-sans">
-              กลับมาเชื่อมต่อเครือข่ายแล้ว — ระบบอัปเดตข้อมูลแบบเรียลไทม์ (Network connection restored)
+              กลับมาเชื่อมต่อเครือข่ายแล้ว — ระบบอัปเดตข้อมูลแบบเรียลไทม์
             </span>
           </div>
           <span className="hidden sm:inline-block text-emerald-400/80 text-[11px]">
@@ -123,7 +131,7 @@ export function OfflineStatusBanner() {
                 โหมดออฟไลน์: ใช้งานผ่าน Service Worker Cache
               </span>
               <span className="text-amber-300/80 ml-1.5 hidden md:inline">
-                (คุณสามารถใช้งาน 8 โมดูลและการจำลองวิทยาศาสตร์ที่บันทึกไว้ในแคชได้ตามปกติ)
+                — สามารถใช้งาน 8 โมดูลและการจำลองวิทยาศาสตร์ที่บันทึกไว้ในแคชได้ตามปกติ
               </span>
             </div>
           </div>
@@ -139,11 +147,11 @@ export function OfflineStatusBanner() {
                   window.location.reload();
                 }
               }}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-900/80 hover:bg-amber-800 text-amber-200 border border-amber-700/80 transition"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-900/80 hover:bg-amber-800 text-amber-200 border border-amber-700/80 transition"
               aria-label="ลองเชื่อมต่อเครือข่ายอีกครั้ง"
             >
               <RefreshCw className="h-3 w-3" />
-              <span>Retry</span>
+              <span>เชื่อมต่อใหม่</span>
             </button>
           </div>
         </div>

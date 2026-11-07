@@ -1,24 +1,25 @@
 # Security & Vulnerability Audit Report
 
 > **Specification**: Interactive Learning Platform & Educational Feature Development  
-> **Milestone**: Phase 9 (Quality Assurance, Security & Accessibility Hardening)  
-> **Version**: 0.7.0  
-> **Audit Status**: PASSED (Zero High/Critical Runtime Vulnerabilities, Multi-Layer Defense-in-Depth)
+> **Milestone**: Phase 10 (Production Optimization & PWA Offline Caching) & Phase 11 (Release Packaging)  
+> **Version**: 1.0.0  
+> **Audit Status**: PASSED (Zero High/Critical Runtime Vulnerabilities, Multi-Layer Defense-in-Depth, PWA Scope Isolation)
 
 ---
 
 ## 1. Executive Summary
 
-This Security & Vulnerability Audit evaluates the security posture of the **Interactive Learning Platform**, focusing on input validation, cross-site scripting (XSS) prevention, mathematical expression sandboxing, prototype pollution defense, dependency vulnerabilities, and multibyte string handling.
+This Security & Vulnerability Audit evaluates the security posture of the **Interactive Learning Platform**, focusing on input validation, cross-site scripting (XSS) prevention, mathematical expression sandboxing, prototype pollution defense, dependency vulnerabilities, multibyte string handling, and Service Worker offline cache isolation.
 
-The platform operates in educational and kiosk environments where untrusted user input may be provided via dynamic LaTeX formula renderers, math expression evaluation fields, chemical formula balancers, DC circuit netlists, and interactive logic gate sandboxes.
+The platform operates in educational and kiosk environments where untrusted user input may be provided via dynamic LaTeX formula renderers, math expression evaluation fields, chemical formula balancers, DC circuit netlists, interactive logic gate sandboxes, and offline service worker network interception.
 
 ### Key Audit Findings
 1. **KaTeX Sanitization Boundary**: Configured strictly with `trust: false`, `throwOnError: false`, and bounded macro expansion (`maxExpand: 1000`, `maxSize: 500`). All `\href{javascript:...}`, `\url{vbscript:...}`, and `\htmlId` exploits are neutralized without executable DOM injection.
 2. **Mathematical AST Isolation**: Math.js evaluation is protected by `createSandboxedScope()` utilizing native ES6 `Map` instances, completely decoupling variable resolution from JavaScript `Object.prototype`. Forbidden prototype tokens (`__proto__`, `constructor`, `prototype`, `eval`, `Function`, `process`, `global`, `globalThis`, `window`, `document`, `import`) are intercepted and rejected prior to AST compilation.
 3. **Chemical & Netlist Parser Fuzzing**: Formula and netlist parsers enforce strict regular expression tokenization and grammar rules, safely rejecting prototype pollution identifiers and malformed payloads without process crashes.
 4. **Multibyte Unicode Safety**: Thai syllable deconstruction and truncation utilities (`safeTruncateThaiBytes`, `safeTruncateThaiGraphemes`) prevent incomplete UTF-8 sequence slicing across 3-byte boundaries (`0xE0`), eliminating character corruption and potential buffer desynchronization.
-5. **Dependency Audit (`pnpm audit`)**: Identified 6 upstream vulnerabilities in build-time devDependencies (Next.js bundled `postcss <= 8.5.11` and ESLint typescript-estree `minimatch < 11.0.1`), and mafs bundled `katex < 0.18.2`. The root application enforces `katex: ^0.19.1` and passes `trust: false`, eliminating the runtime attack vector.
+5. **Service Worker & PWA Scope Isolation**: The Service Worker operates strictly within scope `/`, validates HTTP/HTTPS protocols, filters out non-GET requests, prevents cross-origin opaque response pollution, handles cache storage exceptions safely with `.catch()`, and guarantees that offline fetch interception never resolves to `undefined` (eliminating client-side `TypeError` crashes).
+6. **Dependency Audit (`pnpm audit`)**: Identified 6 upstream vulnerabilities in build-time devDependencies (Next.js bundled `postcss <= 8.5.11` and ESLint typescript-estree `minimatch < 11.0.1`), and mafs bundled `katex < 0.18.2`. The root application enforces `katex: ^0.19.1` and passes `trust: false`, eliminating the runtime attack vector.
 
 ---
 

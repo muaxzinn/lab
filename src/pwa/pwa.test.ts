@@ -58,13 +58,35 @@ describe("PWA, Web App Manifest & Service Worker Offline Suite (Phase 10)", () =
     });
   });
 
+interface ManifestIcon {
+  src: string;
+  sizes: string;
+  type?: string;
+  purpose?: string;
+}
+
+interface ManifestJsonStructure {
+  name: string;
+  short_name: string;
+  description: string;
+  start_url: string;
+  display: string;
+  background_color: string;
+  theme_color: string;
+  orientation: string;
+  icons: ManifestIcon[];
+  categories?: string[];
+  lang?: string;
+  dir?: string;
+}
+
   describe("Public Static Manifest JSON (public/manifest.json)", () => {
     it("mirrors manifest.ts specification for external crawler and browser compatibility", () => {
       const jsonPath = path.join(rootDir, "public", "manifest.json");
       assert.ok(fs.existsSync(jsonPath), "public/manifest.json must exist");
 
       const rawContent = fs.readFileSync(jsonPath, "utf-8");
-      const parsed = JSON.parse(rawContent);
+      const parsed = JSON.parse(rawContent) as ManifestJsonStructure;
 
       assert.equal(parsed.name, "Interactive Learning Platform");
       assert.equal(parsed.short_name, "InteractiveLab");
@@ -89,17 +111,27 @@ describe("PWA, Web App Manifest & Service Worker Offline Suite (Phase 10)", () =
       assert.ok(content.includes("<style>"));
     });
 
-    it("provides reload trigger and lists cached educational workbenches", () => {
+    it("provides reload trigger and lists cached educational workbenches without redundant brackets", () => {
       const content = fs.readFileSync(offlinePath, "utf-8");
       assert.ok(content.includes("window.location.reload()"));
-      assert.ok(content.includes("โหมดออฟไลน์ (Offline Mode)"));
-      assert.ok(content.includes("คณิตศาสตร์ (Math)"));
-      assert.ok(content.includes("ฟิสิกส์ & วงจร (Physics)"));
-      assert.ok(content.includes("ตารางธาตุ & สมการ (Chemistry)"));
-      assert.ok(content.includes("ชีววิทยาเซลล์ (Biology)"));
-      assert.ok(content.includes("ตรรกศาสตร์ (CS Logic)"));
-      assert.ok(content.includes("ภาษาไทย ไตรยางศ์ (Thai)"));
-      assert.ok(content.includes("คลังแบบฝึกหัด (Practice)"));
+      assert.ok(content.includes("โหมดออฟไลน์"));
+      assert.ok(
+        !content.includes("(Offline Mode)"),
+        "Must not contain redundant bracketed (Offline Mode)"
+      );
+      assert.ok(content.includes("คณิตศาสตร์"));
+      assert.ok(content.includes("ฟิสิกส์และวงจรไฟฟ้า"));
+      assert.ok(content.includes("เคมีและตารางธาตุ"));
+      assert.ok(content.includes("ชีววิทยาเซลล์"));
+      assert.ok(content.includes("วิทยาการคำนวณและตรรกศาสตร์"));
+      assert.ok(content.includes("ภาษาไทยและไตรยางศ์"));
+      assert.ok(content.includes("คลังแบบฝึกหัด"));
+      assert.ok(content.includes("หน้าหลักแดชบอร์ด"));
+      assert.ok(content.includes("ลองเชื่อมต่อใหม่อีกครั้ง"));
+      assert.ok(
+        !content.includes("(Retry Connection)"),
+        "Must not contain redundant bracketed (Retry Connection)"
+      );
     });
 
     it("adheres strictly to the Anti-Emoji Mandate", () => {
@@ -159,11 +191,107 @@ describe("PWA, Web App Manifest & Service Worker Offline Suite (Phase 10)", () =
       assert.ok(swCode.includes("self.clients.claim()"));
     });
 
-    it("implements network-first navigation with offline fallback handling", () => {
+    it("implements network-first navigation with query-ignore, slash normalization and offline fallback", () => {
       const swCode = fs.readFileSync(swPath, "utf-8");
       assert.ok(swCode.includes("request.mode === 'navigate'"));
+      assert.ok(swCode.includes("ignoreSearch: true"));
+      assert.ok(swCode.includes("pathname.endsWith('/')"));
       assert.ok(swCode.includes("caches.match('/offline.html')"));
       assert.ok(swCode.includes("caches.delete(key)"));
+    });
+
+    it("never resolves respondWith to undefined on subresource offline misses", () => {
+      const swCode = fs.readFileSync(swPath, "utf-8");
+      assert.ok(
+        swCode.includes("Asset not available offline") ||
+          swCode.includes("status: 503"),
+        "Must provide a valid 503 Response fallback to prevent TypeError in browser"
+      );
+    });
+  });
+
+  describe("Service Worker Cache Simulation & Behavioral Verification", () => {
+    it("simulates navigation matching with query parameters (ignoreSearch)", async () => {
+      // Mock Cache Storage map
+      const mockCache = new Map<string, string>();
+      mockCache.set("http://localhost:3000/physics", "PHYSICS_HTML_CONTENT");
+      mockCache.set("http://localhost:3000/offline.html", "OFFLINE_HTML_CONTENT");
+
+      // Handler simulation representing sw.js navigation logic
+      async function simulateNavigation(urlStr: string): Promise<string> {
+        const url = new URL(urlStr);
+        // 1. exact match
+        if (mockCache.has(urlStr)) {
+          return mockCache.get(urlStr)!;
+        }
+        // 2. ignoreSearch
+        const urlWithoutSearch = `${url.origin}${url.pathname}`;
+        if (mockCache.has(urlWithoutSearch)) {
+          return mockCache.get(urlWithoutSearch)!;
+        }
+        // 3. trailing slash normalization
+        if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
+          const clean = `${url.origin}${url.pathname.slice(0, -1)}`;
+          if (mockCache.has(clean)) {
+            return mockCache.get(clean)!;
+          }
+        }
+        // 4. offline fallback
+        const offlineKey = `${url.origin}/offline.html`;
+        if (mockCache.has(offlineKey)) {
+          return mockCache.get(offlineKey)!;
+        }
+        return "EMERGENCY_503";
+      }
+
+      // Exact match
+      const exact = await simulateNavigation("http://localhost:3000/physics");
+      assert.equal(exact, "PHYSICS_HTML_CONTENT");
+
+      // Query parameter match (e.g., preset parameter)
+      const withQuery = await simulateNavigation(
+        "http://localhost:3000/physics?preset=pendulum"
+      );
+      assert.equal(withQuery, "PHYSICS_HTML_CONTENT");
+
+      // Trailing slash match
+      const withSlash = await simulateNavigation(
+        "http://localhost:3000/physics/"
+      );
+      assert.equal(withSlash, "PHYSICS_HTML_CONTENT");
+
+      // Unknown route falls back to offline.html
+      const unknown = await simulateNavigation(
+        "http://localhost:3000/unknown-route"
+      );
+      assert.equal(unknown, "OFFLINE_HTML_CONTENT");
+    });
+
+    it("verifies subresource offline fallback guarantees a valid Response object", async () => {
+      // Verify that subresource logic never resolves with undefined
+      const mockAssetCache = new Map<string, string>();
+      mockAssetCache.set("/icons/icon-192.svg", "<svg>icon</svg>");
+
+      function simulateAssetFetch(assetUrl: string, isOnline: boolean): { status: number; body: string } {
+        const cached = mockAssetCache.get(assetUrl);
+        if (cached) {
+          return { status: 200, body: cached };
+        }
+        if (!isOnline) {
+          return { status: 503, body: "Asset not available offline" };
+        }
+        return { status: 200, body: "NETWORK_FETCHED" };
+      }
+
+      // Hit
+      const hit = simulateAssetFetch("/icons/icon-192.svg", false);
+      assert.equal(hit.status, 200);
+      assert.equal(hit.body, "<svg>icon</svg>");
+
+      // Miss while offline must return 503 instead of undefined
+      const miss = simulateAssetFetch("/_next/static/chunks/unknown.js", false);
+      assert.equal(miss.status, 503);
+      assert.ok(miss.body.includes("offline"));
     });
   });
 

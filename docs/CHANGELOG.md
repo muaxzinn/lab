@@ -20,16 +20,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - **Self-Contained Offline Fallback Screen (`public/offline.html`)**:
     - Standalone HTML5 offline page styled in `#070b16` with zero external network dependencies.
     - Lists all cached workbenches available offline (Math, Physics, Chemistry, Biology, CS, Thai, Practice).
-    - Includes reload retry button (`window.location.reload()`) and strictly adheres to the Anti-Emoji Mandate (100% SVG iconography).
+    - Includes reload retry button (`window.location.reload()`), strictly adheres to the Anti-Emoji Mandate (100% SVG iconography), and eliminates redundant bracketed text.
   - **Client Offline Status Detection Banner (`src/components/layout/OfflineStatusBanner.tsx`)**:
     - Detects network connectivity via `navigator.onLine` and `online`/`offline` window events.
-    - Displays accessible alert banner (`role="alert"`, `aria-live="polite"`) with Lucide `WifiOff` icon and bilingual notices when offline.
-    - Displays transient reconnection badge (`role="status"`) with Lucide `Wifi` icon for 3.5 seconds when network connectivity is restored.
+    - Displays accessible alert banner (`role="alert"`, `aria-live="assertive"`) with Lucide `WifiOff` icon and clean notices when offline.
+    - Displays transient reconnection badge (`role="status"`, `aria-live="polite"`) with Lucide `Wifi` icon for 3.5 seconds when network connectivity is restored, with robust timer cleanup.
     - Automatically registers `/sw.js` in browser environment with update event listeners.
     - Seamlessly integrated into `src/components/layout/KioskShell.tsx`.
   - **Automated PWA Unit Test Suite (`src/pwa/pwa.test.ts`)**:
-    - Added 14 unit tests across 5 test suites validating manifest metadata, public json mirroring, offline fallback HTML self-containment, anti-emoji verification, Service Worker precache routes, and SVG icon vector integrity.
-    - Expanded test suite to **161 passing tests** across **58 test suites** with **0 failures**.
+    - Added 17 unit tests across 6 test suites validating manifest metadata, public json mirroring, offline fallback HTML self-containment, anti-emoji verification, Service Worker precache routes, SVG icon vector integrity, and offline query/subresource cache behavioral simulation.
+    - Expanded test suite to **164 passing tests** across **59 test suites** with **0 failures**.
 - **Phase 11: Release Packaging & Complete Project Documentation Suite**:
   - **Section 10 Complete Documentation**:
     - Created `docs/SOURCE_TRACKING.md`: Complete tracking table of adapted open-source packages, upstream versions, licenses, and custom modification records.
@@ -37,11 +37,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
     - Created `docs/USER_GUIDE.md`: End-user walkthrough for students and teachers across all 8 educational workbenches.
     - Created `docs/DEVELOPER_GUIDE.md`: Comprehensive developer architecture manual detailing directory structure, adding new simulation presets, coding standards, a11y rules, and NPX skill workflow.
     - Updated `docs/FEATURE_MATRIX.md`: Transitioned all implemented features to `COMPLETED` status.
-    - Updated `docs/NPX_SKILLS_REGISTRY.md`: Registered Phase 10 & 11 tool executions (#25 to #28).
+    - Updated `docs/TEST_REPORT.md`: Updated comprehensive test metrics to v1.0.0 (164 tests, 59 suites, 100% pass rate).
+    - Updated `docs/PERFORMANCE_REPORT.md`: Recorded 13/13 static routes and PWA Service Worker caching metrics.
+    - Updated `docs/SECURITY_REPORT.md`: Documented Service Worker scope isolation and offline network interception boundaries.
+    - Updated `docs/NPX_SKILLS_REGISTRY.md`: Registered Phase 10 & 11 tool executions (#25 to #29).
   - **Production Release v1.0.0 Packaging**:
     - Bumped `package.json` version to `1.0.0`.
     - Turbopack production build prerendered 100% static routes (13/13 routes).
-    - Verified 0 Knip dead-code issues, 99.84% TypeScript type coverage (100.00% across all production components), and 1.86% code duplication.
+    - Verified 0 Knip dead-code issues, 99.91% TypeScript type coverage (100.00% across all production components and PWA suites), and 1.84% code duplication.
 
 ---
 

@@ -1,6 +1,6 @@
 /**
  * Service Worker for Interactive Learning Platform
- * Provides offline precaching, background sync, and fallback shell caching.
+ * Provides offline precaching, robust fallback shell caching, and cache lifecycle management.
  */
 
 const CACHE_NAME = 'interactive-lab-v1';
@@ -23,19 +23,25 @@ const PRECACHE_ASSETS = [
   '/icons/icon-maskable.svg',
 ];
 
-// Install Event: Precache core application shell routes
+// Install Event: Precache core application shell routes with per-item resilience
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(PRECACHE_ASSETS);
+      .then(async (cache) => {
+        // Use resilient batch caching so one network blip does not abort all shell precaching
+        const results = await Promise.allSettled(
+          PRECACHE_ASSETS.map((asset) => cache.add(asset))
+        );
+        const failed = results.filter((r) => r.status === 'rejected');
+        if (failed.length > 0) {
+          console.warn('[ServiceWorker] Some precache assets failed to download:', failed.length);
+        }
       })
       .then(() => {
         return self.skipWaiting();
       })
       .catch((err) => {
-        // Precache error logging without throwing unhandled rejection
         console.warn('[ServiceWorker] Precache failed:', err);
       })
   );
@@ -52,7 +58,7 @@ self.addEventListener('activate', (event) => {
             if (key !== CACHE_NAME) {
               return caches.delete(key);
             }
-            return null;
+            return Promise.resolve();
           })
         );
       })
@@ -73,7 +79,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // Ignore cross-origin non-HTTP/HTTPS or extension requests
+  // Ignore non-HTTP/HTTPS protocols (e.g. chrome-extension://, file://)
   if (!url.protocol.startsWith('http')) {
     return;
   }
@@ -86,31 +92,48 @@ self.addEventListener('fetch', (event) => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
+              cache.put(request, responseClone).catch(() => {});
             });
           }
           return networkResponse;
         })
         .catch(async () => {
-          // Attempt exact match from cache
-          const cachedResponse = await caches.match(request);
+          // 1. Attempt exact match from cache
+          let cachedResponse = await caches.match(request);
           if (cachedResponse) {
             return cachedResponse;
           }
 
-          // Fallback to cached home page or offline fallback page
+          // 2. Attempt match ignoring search/query parameters (e.g. /physics?preset=pendulum)
+          cachedResponse = await caches.match(request, { ignoreSearch: true });
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+
+          // 3. Normalize trailing slashes (e.g. /physics/ -> /physics)
+          if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
+            const cleanPath = url.pathname.slice(0, -1);
+            cachedResponse = await caches.match(cleanPath);
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+          }
+
+          // 4. Fallback to cached dedicated offline page
           const offlineFallback = await caches.match('/offline.html');
           if (offlineFallback) {
             return offlineFallback;
           }
 
+          // 5. Fallback to cached home page shell
           const cachedHome = await caches.match('/');
           if (cachedHome) {
             return cachedHome;
           }
 
+          // 6. Final emergency HTML response (Never return undefined to respondWith)
           return new Response(
-            '<!DOCTYPE html><html><body><h1>Offline</h1><p>Interactive Learning Platform is currently offline.</p></body></html>',
+            '<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><title>ออฟไลน์</title></head><body style="background:#070b16;color:#f8fafc;font-family:sans-serif;padding:2rem;text-align:center;"><h1>โหมดออฟไลน์</h1><p>ระบบอยู่ในโหมดออฟไลน์และไม่พบหน้าที่ระบุในแคช</p></body></html>',
             {
               status: 503,
               statusText: 'Service Unavailable',
@@ -122,7 +145,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Static Assets (Scripts, Styles, Images, Fonts, Precached Shell): Stale-While-Revalidate
+  // 2. Static Assets (Scripts, Styles, Images, Fonts): Stale-While-Revalidate
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)
@@ -130,13 +153,21 @@ self.addEventListener('fetch', (event) => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
+              cache.put(request, responseClone).catch(() => {});
             });
           }
           return networkResponse;
         })
         .catch(() => {
-          return cachedResponse;
+          // Never resolve to undefined: return cached response or safe 503 fallback
+          return (
+            cachedResponse ||
+            new Response('Asset not available offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            })
+          );
         });
 
       return cachedResponse || fetchPromise;
