@@ -2,12 +2,14 @@
   "name": "interactive-learning-platform",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/**/*.test.ts"
   },
   "dependencies": {
     "lucide-react": "^1.69.0",

@@ -19,7 +19,11 @@ import {
   ChevronRight,
   ShieldCheck,
   Boxes,
+  Sparkles,
+  FileText,
+  GitBranch,
 } from "lucide-react";
+import { safeTruncateThaiBytes, safeTruncateThaiGraphemes } from "@/lib/utils";
 
 const FEATURE_MODULES = [
   {
@@ -96,7 +100,7 @@ const FEATURE_MODULES = [
   },
   {
     id: "FEAT-10",
-    name: "Content Management (CMS)",
+    name: "Content Management System",
     thaiName: "ระบบจัดการเนื้อหาและการเผยแพร่",
     icon: FileCode2,
     description: "Modular syllabus schema, versioning, preview sandboxes, and asset registry.",
@@ -117,6 +121,12 @@ const SUBJECTS = [
 ];
 
 export default function Home() {
+  const sampleThaiGrapheme = "น้ำดื่มสะอาดบริสุทธิ์เพื่อการศึกษา";
+  const truncatedGrapheme = safeTruncateThaiGraphemes(sampleThaiGrapheme, 3);
+
+  const sampleThaiBytes = "ภาษาไทยเพื่อการศึกษาค้นคว้า";
+  const truncatedBytes = safeTruncateThaiBytes(sampleThaiBytes, 12);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 selection:bg-neutral-800 selection:text-neutral-200">
       {/* Top Header */}
@@ -127,17 +137,20 @@ export default function Home() {
               <Atom className="h-5 w-5 stroke-[1.75]" />
             </div>
             <div>
-              <span className="font-semibold text-sm tracking-tight text-neutral-100 block">
+              <span className="font-heading font-semibold text-sm tracking-tight text-neutral-100 block">
                 Interactive Learning Platform
               </span>
-              <span className="text-xs text-neutral-400 block font-normal">
+              <span className="text-xs text-neutral-400 block font-normal font-sans">
                 แพลตฟอร์มการเรียนรู้และห้องทดลองเชิงโต้ตอบ
               </span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-neutral-800/80 border border-neutral-700 text-neutral-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-neutral-900 border border-neutral-800 text-neutral-300">
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ background: "linear-gradient(135deg, #2ef2a0, #00f0ff)" }}
+              />
               Phase 0: Workspace Initialized
             </span>
           </div>
@@ -152,10 +165,10 @@ export default function Home() {
             <ShieldCheck className="h-3.5 w-3.5 text-neutral-400" />
             <span>Masterplan SSOT Compliance | Firman Agentic OS Rigor</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-neutral-100 max-w-4xl">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-semibold tracking-tight text-neutral-100 max-w-4xl">
             Next-Generation Interactive Learning & Scientific Simulation Architecture
           </h1>
-          <p className="text-neutral-400 text-base sm:text-lg max-w-3xl leading-relaxed">
+          <p className="text-neutral-400 text-base sm:text-lg max-w-3xl leading-relaxed font-sans">
             ระบบแพลตฟอร์มการเรียนรู้ระดับโปรดักชัน รองรับการจำลองฟิสิกส์ เคมี ชีววิทยา คณิตศาสตร์เสมือนจริง
             และการวัดผลอย่างแม่นยำตามหลักสูตรแกนกลาง 9 กลุ่มวิชา
           </p>
@@ -163,7 +176,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-3 pt-2">
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
               <Check className="h-4 w-4 text-emerald-400" />
-              Next.js 15 (App Router)
+              Next.js 15 App Router
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
               <Check className="h-4 w-4 text-emerald-400" />
@@ -177,13 +190,58 @@ export default function Home() {
               <Check className="h-4 w-4 text-emerald-400" />
               Multi-byte Thai UTF-8 Safe
             </div>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs font-mono text-neutral-300">
+              <Check className="h-4 w-4 text-emerald-400" />
+              Sarabun & Prompt Typography
+            </div>
+          </div>
+        </section>
+
+        {/* Thai UTF-8 Safety Engine Showcase */}
+        <section className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="h-4 w-4 text-emerald-400" />
+              <h2 className="text-sm font-heading font-semibold text-neutral-200">
+                Thai Multibyte UTF-8 Engine Live Verification
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 px-2.5 py-0.5 rounded-full">
+              Safe Slicing Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            <div className="p-4 rounded-lg bg-neutral-950/80 border border-neutral-800/80 space-y-2">
+              <p className="text-xs font-mono text-neutral-400">Grapheme Cluster Slicing (Display Safe)</p>
+              <p className="text-xs text-neutral-500 font-sans">
+                Preserves compound clusters without detaching floating vowels or tone marks:
+              </p>
+              <div className="bg-neutral-900 p-2.5 rounded border border-neutral-800 font-mono text-xs text-neutral-300 flex justify-between items-center">
+                <span className="text-neutral-500">{sampleThaiGrapheme}</span>
+                <ChevronRight className="h-3 w-3 text-neutral-500" />
+                <span className="text-emerald-400 font-semibold">{truncatedGrapheme}</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg bg-neutral-950/80 border border-neutral-800/80 space-y-2">
+              <p className="text-xs font-mono text-neutral-400">Byte Length Slicing (Buffer & Storage Safe)</p>
+              <p className="text-xs text-neutral-500 font-sans">
+                Never cuts midway through a 3-byte sequence (0xE0 range) under strict byte caps:
+              </p>
+              <div className="bg-neutral-900 p-2.5 rounded border border-neutral-800 font-mono text-xs text-neutral-300 flex justify-between items-center">
+                <span className="text-neutral-500">12 bytes max</span>
+                <ChevronRight className="h-3 w-3 text-neutral-500" />
+                <span className="text-emerald-400 font-semibold">{truncatedBytes}</span>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Subjects Bar */}
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-400 font-mono">
+            <h2 className="text-sm font-heading font-semibold uppercase tracking-wider text-neutral-400 font-mono">
               9 Core Subject Areas
             </h2>
             <span className="text-xs text-neutral-500 font-mono">Full Coverage Target</span>
@@ -198,8 +256,8 @@ export default function Home() {
                 >
                   <Icon className="h-5 w-5 text-neutral-400 stroke-[1.75]" />
                   <div className="space-y-0.5">
-                    <p className="text-xs font-medium text-neutral-200">{subject.name}</p>
-                    <p className="text-[11px] text-neutral-500">{subject.thaiName}</p>
+                    <p className="text-xs font-heading font-medium text-neutral-200">{subject.name}</p>
+                    <p className="text-[11px] font-sans text-neutral-500">{subject.thaiName}</p>
                   </div>
                 </div>
               );
@@ -211,14 +269,14 @@ export default function Home() {
         <section className="space-y-6">
           <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
             <div>
-              <h2 className="text-lg font-semibold text-neutral-200">
+              <h2 className="text-lg font-heading font-semibold text-neutral-200">
                 10 Core Feature Modules
               </h2>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs font-sans text-neutral-500">
                 Tracking status from Section 2 & 10 of masterplan.md
               </p>
             </div>
-            <span className="text-xs font-mono text-neutral-400 px-2 py-1 bg-neutral-900 border border-neutral-800 rounded">
+            <span className="text-xs font-mono text-neutral-400 px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded">
               Status: 10 in DISCOVERY
             </span>
           </div>
@@ -238,17 +296,17 @@ export default function Home() {
                           <Icon className="h-4 w-4 stroke-[1.75]" />
                         </div>
                         <div>
-                          <h3 className="text-sm font-semibold text-neutral-200">
+                          <h3 className="text-sm font-heading font-semibold text-neutral-200">
                             {feat.name}
                           </h3>
-                          <span className="text-xs text-neutral-500">{feat.thaiName}</span>
+                          <span className="text-xs font-sans text-neutral-500">{feat.thaiName}</span>
                         </div>
                       </div>
                       <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-400">
                         {feat.status}
                       </span>
                     </div>
-                    <p className="text-xs text-neutral-400 leading-relaxed">
+                    <p className="text-xs font-sans text-neutral-400 leading-relaxed">
                       {feat.description}
                     </p>
                   </div>
@@ -270,28 +328,51 @@ export default function Home() {
         <section className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-base font-semibold text-neutral-200">
-                Governance Documents (Section 10 Baseline)
+              <h2 className="text-base font-heading font-semibold text-neutral-200">
+                Governance Documents: Section 10 Baseline
               </h2>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs font-sans text-neutral-400">
                 All tracking and architecture documents are maintained in the repository under /docs
               </p>
             </div>
             <Compass className="h-5 w-5 text-neutral-400" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
             <div className="p-3 rounded-lg bg-neutral-950/70 border border-neutral-800 text-xs space-y-1">
-              <p className="font-mono font-medium text-neutral-300">WORKSPACE_ASSESSMENT.md</p>
-              <p className="text-neutral-500 text-[11px]">Runtime, tools & environment baseline</p>
+              <div className="flex items-center gap-1.5 text-neutral-300 font-mono font-medium">
+                <FileText className="h-3.5 w-3.5 text-neutral-400" />
+                <p>WORKSPACE_ASSESSMENT</p>
+              </div>
+              <p className="text-neutral-500 text-[11px] font-sans">Runtime & environment baseline</p>
             </div>
             <div className="p-3 rounded-lg bg-neutral-950/70 border border-neutral-800 text-xs space-y-1">
-              <p className="font-mono font-medium text-neutral-300">REQUIREMENTS.md</p>
-              <p className="text-neutral-500 text-[11px]">Deconstructed Functional & Non-Functional</p>
+              <div className="flex items-center gap-1.5 text-neutral-300 font-mono font-medium">
+                <FileText className="h-3.5 w-3.5 text-neutral-400" />
+                <p>REQUIREMENTS</p>
+              </div>
+              <p className="text-neutral-500 text-[11px] font-sans">Deconstructed requirements FR & NFR</p>
             </div>
             <div className="p-3 rounded-lg bg-neutral-950/70 border border-neutral-800 text-xs space-y-1">
-              <p className="font-mono font-medium text-neutral-300">FEATURE_MATRIX.md</p>
-              <p className="text-neutral-500 text-[11px]">24 feature tracks across 9 core subjects</p>
+              <div className="flex items-center gap-1.5 text-neutral-300 font-mono font-medium">
+                <FileText className="h-3.5 w-3.5 text-neutral-400" />
+                <p>FEATURE_MATRIX</p>
+              </div>
+              <p className="text-neutral-500 text-[11px] font-sans">24 feature tracks across 9 subjects</p>
+            </div>
+            <div className="p-3 rounded-lg bg-neutral-950/70 border border-neutral-800 text-xs space-y-1">
+              <div className="flex items-center gap-1.5 text-neutral-300 font-mono font-medium">
+                <ShieldCheck className="h-3.5 w-3.5 text-neutral-400" />
+                <p>AGENT_RULES</p>
+              </div>
+              <p className="text-neutral-500 text-[11px] font-sans">Multi-agent protocol & constraints</p>
+            </div>
+            <div className="p-3 rounded-lg bg-neutral-950/70 border border-neutral-800 text-xs space-y-1">
+              <div className="flex items-center gap-1.5 text-neutral-300 font-mono font-medium">
+                <GitBranch className="h-3.5 w-3.5 text-neutral-400" />
+                <p>CHANGELOG</p>
+              </div>
+              <p className="text-neutral-500 text-[11px] font-sans">Phase 0 initialization history</p>
             </div>
           </div>
         </section>
