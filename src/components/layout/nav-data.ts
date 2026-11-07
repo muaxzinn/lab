@@ -5,6 +5,7 @@ import {
   Atom,
   FlaskConical,
   Dna,
+  Binary,
   Languages,
   BookOpen,
 } from "lucide-react";
@@ -75,6 +76,17 @@ export const NAV_ROUTES: readonly NavRoute[] = [
     thaiDescription: "แบบจำลองเซลล์พืชและเซลล์สัตว์พร้อม 12 ออร์แกเนลล์สำคัญและโหมดผ่าครึ่งเซลล์",
     category: "Core Sciences",
     keywords: ["biology", "cell", "organelle", "nucleus", "mitochondria", "ชีววิทยา", "เซลล์", "ออร์แกเนลล์"],
+  },
+  {
+    path: "/cs",
+    label: "Computer Science",
+    thaiLabel: "วิทยาการคอมพิวเตอร์และตรรกศาสตร์",
+    icon: Binary,
+    badge: "FEAT-19",
+    description: "Interactive Boolean logic gates, live signal propagation, and automated truth tables.",
+    thaiDescription: "เกตตรรกะดิจิทัล การแพร่กระจายสัญญาณแบบโต้ตอบ และการสร้างตารางค่าความจริงอัตโนมัติ",
+    category: "Core Sciences",
+    keywords: ["cs", "computer science", "logic", "gate", "boolean", "adder", "mux", "ตรรกศาสตร์", "วิทยาการคำนวณ", "เกต"],
   },
   {
     path: "/thai",

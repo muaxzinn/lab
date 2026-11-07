@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { FlaskConical, Atom, Sparkles } from "lucide-react";
-import { PeriodicTableViewer } from "@/components/chemistry/PeriodicTableViewer";
+import { FlaskConical, Scale, Sparkles } from "lucide-react";
+import { ChemistryLabContainer } from "@/components/chemistry/ChemistryLabContainer";
 
 export const metadata: Metadata = {
-  title: "Chemistry Workstation | IUPAC 118 Elements & Bohr Orbitals",
+  title: "Chemistry Workstation | IUPAC Periodic Table & Chemical Stoichiometry",
   description:
-    "Interactive IUPAC Periodic Table of all 118 elements with Bohr electron shell orbitals, Pauling electronegativity heatmap, and block filtering.",
+    "Interactive chemistry workstation featuring exact Gauss-Jordan chemical equation balancer, stoichiometry particle calculator, and IUPAC 118-element periodic table.",
 };
 
 export default function ChemistryPage() {
@@ -20,32 +20,32 @@ export default function ChemistryPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-heading font-semibold text-neutral-100">
-                Chemistry Workstation & Periodic System
+                Chemistry Workstation & Reaction Suite
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-950 border border-orange-800/80 text-orange-300">
-                FEAT-05 IUPAC 118
+                FEAT-05 & FEAT-06
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
-              สถานีปฏิบัติการเคมี: ตารางธาตุมาตรฐาน IUPAC ครบ 118 ธาตุ, แบบจำลองวงโคจรอิเล็กตรอนของบอห์ร และแผนภาพความหนาแน่นอิเล็กโตรเนกาติวิตี
+              สถานีปฏิบัติการเคมี: ดุลสมการเคมีด้วยเมทริกซ์และคำนวณปริมาณสารสัมพันธ์ พร้อมตารางธาตุมาตรฐาน IUPAC 118 ธาตุ
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
-            <Atom className="h-3.5 w-3.5 text-orange-400" />
-            <span>118 Elements Complete</span>
+            <Scale className="h-3.5 w-3.5 text-orange-400" />
+            <span>Exact Stoichiometry</span>
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
             <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Bohr Electron Shells</span>
+            <span>Mass Conserved</span>
           </span>
         </div>
       </div>
 
-      {/* Main Interactive Periodic Table */}
-      <PeriodicTableViewer />
+      {/* Main Interactive Chemistry Suite */}
+      <ChemistryLabContainer />
     </div>
   );
 }

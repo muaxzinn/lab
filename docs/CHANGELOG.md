@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [0.6.0] - 2026-11-07
+
+### Added
+- **Phase 8: Internal Module Integration & Advanced Simulation Modules**:
+  - **Interactive DC/AC Circuit Simulator & Modified Nodal Analysis Engine (`FEAT-04`)**:
+    - Created `src/lib/circuit-solver.ts`: Pure TypeScript Modified Nodal Analysis (MNA) linear solver using Gaussian elimination with partial pivoting. Solves arbitrary DC networks for node voltages, branch currents, and component power dissipation.
+    - Clean-Room Implementation (Zero GPL copyleft): Replaces GPL-licensed alternatives with clean-room pure TS modeling DC batteries (0-24V), fixed/variable resistors (1Ω-10kΩ), interactive switches (open/closed), lamps, LEDs with forward bias and dynamic radiant glow, and in-line ammeter/voltmeter probes.
+    - Created `src/components/physics/CircuitSimulator.tsx`: Interactive SVG circuit schematic with animated current particle flows, draggable/toggable switches, resistance sliders, live movable digital voltmeter probes, and KVL/KCL energy conservation telemetry.
+    - Created `src/components/physics/PhysicsLabContainer.tsx`: Tabbed laboratory container switching between DC Circuit Simulator and Keplerian Orbital Mechanics under `/physics`.
+  - **Chemical Equation Balancer & Stoichiometry Engine (`FEAT-06` & `FEAT-11`)**:
+    - Created `src/lib/chemical-solver.ts`: Stack-based chemical formula parser handling nested parentheses and brackets (`Ca(OH)2`, `(NH4)2SO4`, `Al2(SO4)3`), exact rational Gauss-Jordan elimination solving the nullspace of the atom conservation matrix, IUPAC molar mass calculations, and stoichiometric mole/mass/Avogadro particle count conversions.
+    - Law of Conservation of Mass: Verifies exact atom conservation and mass equality ($\Delta m = 0.0000\text{g}$) across reactants and products.
+    - Curriculum Presets: Water synthesis, Methane combustion, Plant photosynthesis, Iron rusting, Aluminum sulfate formation, Acid-base neutralization, and KMnO4 redox.
+    - Created `src/components/chemistry/ChemicalReactionViewer.tsx`: Interactive formula input with live validation, preset quick-selectors, coefficient badges, atom inventory breakdown, and live stoichiometry calculator.
+    - Created `src/components/chemistry/ChemistryLabContainer.tsx`: Tabbed workstation switching between Chemical Equation Balancer and IUPAC Periodic Table under `/chemistry`.
+  - **Logic Gate & Boolean Digital Circuit Sandbox (`FEAT-19`)**:
+    - Created `src/lib/logic-gate-engine.ts`: Boolean logic engine supporting AND, OR, NOT, XOR, NAND, NOR, XNOR, and BUFFER gates with topological relaxation propagation, cycle detection, and automated $2^n$-state truth table generation.
+    - Curriculum Presets: Half Adder (Sum & Carry), Full Adder (Cascaded 1-bit), 2-to-1 Multiplexer (MUX), and De Morgan's Laws equivalence verification.
+    - Created `src/components/cs/LogicGateSandbox.tsx`: Interactive SVG digital circuit schematic with high-contrast signal lines (Mint/Cyan for HIGH `1`, Dark Slate for LOW `0`), animated signal flow, clickable input switches, glowing output LEDs, and live truth table row tracking.
+    - Created new route `/cs` (`src/app/cs/page.tsx`): Dedicated Computer Science Laboratory route with metadata, HUD metrics, and App Shell integration.
+    - Integrated `/cs` into `src/components/layout/nav-data.ts` and `src/app/page.tsx` dashboard cards.
+- **AI Agent Skills via `npx` Integration**:
+  - Executed `npx --yes knip` verifying 0 dead files, 0 unused exports, and 0 unused dependencies across the entire workspace.
+  - Executed `npx --yes typescript-coverage-report -r text` achieving 99.89% overall TypeScript type coverage (24,479/24,505 symbols) with 100.00% across all new solvers, models, and UI components.
+  - Documented executions #16 and #17 in `docs/NPX_SKILLS_REGISTRY.md`.
+- **Automated Unit Tests & Quality Assurance**:
+  - Created `src/lib/circuit-solver.test.ts` (12 unit tests) verifying Ohm's Law, series/parallel combinations, voltage division, switch cutoff, dynamic LED/bulb glow, and KVL/KCL conservation.
+  - Created `src/lib/chemical-solver.test.ts` (13 unit tests) verifying formula parsing, polyatomics, exact rational balancing, mass conservation, and stoichiometry conversions.
+  - Created `src/lib/logic-gate-engine.test.ts` (7 unit tests) verifying gate primitives, Half/Full Adders, De Morgan equivalence, MUX data routing, and oscillator cycle guards.
+  - Expanded test suite from 75 to 107 unit tests (38 suites, 100% pass rate).
+  - Clean linting (`pnpm lint`: 0 problems, 0 warnings), zero TypeScript errors (`pnpm typecheck`), and full Turbopack static prerendering (12/12 routes).
+
+---
+
 ## [0.5.1] - 2026-11-07
 
 ### Added

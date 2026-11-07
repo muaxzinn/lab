@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Atom, Compass, Activity } from "lucide-react";
-import { VerletSimulationCanvas } from "@/components/VerletSimulationCanvas";
+import { Atom, Activity, Zap } from "lucide-react";
+import { PhysicsLabContainer } from "@/components/physics/PhysicsLabContainer";
 
 export const metadata: Metadata = {
-  title: "Physics Laboratory | Symplectic Orbital Mechanics & Kinematics",
+  title: "Physics Laboratory | DC Circuit Simulator & Symplectic Mechanics",
   description:
-    "Real-time 2-body Keplerian planetary orbit simulation comparing Velocity Verlet against Explicit Euler with real-time Hamiltonian energy conservation tracking.",
+    "Interactive physics simulation suite featuring Modified Nodal Analysis (MNA) DC circuit solver, Ohm's law, and 2-body Keplerian planetary orbit Velocity Verlet integrator.",
 };
 
 export default function PhysicsPage() {
@@ -20,32 +20,32 @@ export default function PhysicsPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-heading font-semibold text-neutral-100">
-                Physics Laboratory & Kinematics
+                Physics Laboratory & Simulation Suite
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800/80 text-emerald-300">
-                FEAT-02 Simulation
+                FEAT-04 & FEAT-02
               </span>
             </div>
             <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-0.5">
-              ห้องปฏิบัติการฟิสิกส์: การจำลองวงโคจรเคปเลอร์ 2 มิติ เปรียบเทียบ Velocity Verlet กับ Explicit Euler และตรวจวัดพลังงานฮามิลโทเนียน
+              ห้องปฏิบัติการฟิสิกส์: วงจรไฟฟ้ากระแสตรง (MNA Solver) และแบบจำลองวงโคจรเคปเลอร์ (Velocity Verlet) พร้อมตรวจวัดอนุรักษ์พลังงาน
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
-            <Compass className="h-3.5 w-3.5 text-cyan-400" />
-            <span>Symplectic ODE</span>
+            <Zap className="h-3.5 w-3.5 text-amber-400" />
+            <span>MNA Linear Solver</span>
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 border border-neutral-800">
             <Activity className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Hamiltonian Conserved</span>
+            <span>Energy Conserved</span>
           </span>
         </div>
       </div>
 
-      {/* Main Physics Simulation Canvas */}
-      <VerletSimulationCanvas />
+      {/* Main Physics Suite Container */}
+      <PhysicsLabContainer />
     </div>
   );
 }

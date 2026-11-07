@@ -8,9 +8,9 @@ import {
 } from "./nav-data.ts";
 
 describe("Layout & Navigation Architecture (App Router Multi-Route)", () => {
-  it("contains exactly 7 distinct educational routes", () => {
-    assert.equal(NAV_ROUTES.length, 7);
-    const expectedPaths = ["/", "/math", "/physics", "/chemistry", "/biology", "/thai", "/practice"];
+  it("contains exactly 8 distinct educational routes", () => {
+    assert.equal(NAV_ROUTES.length, 8);
+    const expectedPaths = ["/", "/math", "/physics", "/chemistry", "/biology", "/cs", "/thai", "/practice"];
     const actualPaths = NAV_ROUTES.map((r) => r.path);
     assert.deepEqual(actualPaths, expectedPaths);
   });
@@ -89,10 +89,13 @@ describe("Layout & Navigation Architecture (App Router Multi-Route)", () => {
 
   it("filters routes via multi-criteria search (English, Thai, and keywords)", () => {
     const allRoutes = searchNavRoutes("");
-    assert.equal(allRoutes.length, 7);
+    assert.equal(allRoutes.length, 8);
 
     const mathSearch = searchNavRoutes("math");
     assert.ok(mathSearch.some((r) => r.path === "/math"));
+
+    const csSearch = searchNavRoutes("boolean");
+    assert.ok(csSearch.some((r) => r.path === "/cs"));
 
     const thaiSearch = searchNavRoutes("ไตรยางศ์");
     assert.equal(thaiSearch.length, 1);

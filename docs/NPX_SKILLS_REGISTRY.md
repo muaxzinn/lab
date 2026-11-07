@@ -24,6 +24,8 @@
 | 13 | Pre-Phase 8 | 2026-11-07 | `npx --yes skills use vercel-labs/agent-skills@vercel-composition-patterns` | `vercel-labs/agent-skills` | สกัดกฎการออกแบบ Compound Component และ State Lifting ป้องกัน Boolean Prop Proliferation | ออกแบบ AppHeader, AppSidebar, AppNavbar และ KioskShell ได้ตามมาตรฐาน | Verified |
 | 14 | Pre-Phase 8 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code, Unused Exports และ Dependencies หลังปรับ Multi-Route Modular Platform | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 15 | Pre-Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูล, Route ย่อย และ App Shell ใน v0.5.1 | 99.89% overall coverage (17,774/17,793 symbols); All 7 routes & App Shell 100.00% | Verified |
+| 16 | Phase 8 Gate | 2026-11-07 | `npx --yes knip` | `knip` | ตรวจสอบ Dead Code และ Unused Exports หลังพัฒนา Circuit MNA, Chemical Stoichiometry และ Logic Gate Sandbox | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
+| 17 | Phase 8 Gate | 2026-11-07 | `npx --yes typescript-coverage-report -r text` | `typescript-coverage-report` | ตรวจวัด Type Coverage รวมทุกโมดูลใน Phase 8 (24,505 symbols) | 99.89% overall coverage (24,479/24,505 symbols); 100.00% across all new solvers & UI modules | Verified |
 
 ---
 

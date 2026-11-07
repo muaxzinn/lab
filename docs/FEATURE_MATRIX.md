@@ -15,14 +15,14 @@
 | **FEAT-01** | Interactive Content | Responsive Lesson Reader & Callouts | All 9 Subjects | `next-mdx-remote` + `KaTeX` + `@tailwindcss/typography` | `SELECTED` | P0 | LaTeX support, responsive typography, collapsible callouts. Strategy: `Reuse`. |
 | **FEAT-02** | Interactive Content | Concept Map & Dynamic Timelines | Biology, Astronomy, Thai | `Cytoscape.js` (large DAGs) + `@xyflow/react` (interactive nodes) | `SELECTED` | P1 | Interactive nodes, panning, zooming, node metadata modal. Strategy: `Componentize`. |
 | **FEAT-03** | Simulation | Classical Mechanics & Kinematics | Physics | `Matter.js` (2D mechanics) + `Rapier2D` (dense collisions) | `SELECTED` | P0 | Velocity, acceleration, collision restitution, 60 FPS target. Strategy: `Componentize`. |
-| **FEAT-04** | Simulation | DC/AC Electric Circuit Simulator | Physics, Science | `@spice-ts/core` (MNA solver) + Custom React SVG Schematics | `SELECTED` | P1 | Breadboard/schematic views, Ohm/Kirchhoff laws, real-time current. CircuitJS rejected (GPL-2.0). Strategy: `Clean-Room Rebuild`. |
+| **FEAT-04** | Simulation | DC/AC Electric Circuit Simulator | Physics, Science | Pure TypeScript Modified Nodal Analysis (MNA) Solver | `COMPLETED` | P1 | Breadboard/schematic views, Ohm/Kirchhoff laws, real-time current, dynamic LED glow. Zero GPL copyleft clean-room rebuild. |
 | **FEAT-05** | Simulation | Interactive Periodic Table & Trends | Chemistry | Native React + Tailwind + IUPAC 118 Elements Dataset | `COMPLETED` | P0 | Electronegativity, atomic radius, electron configurations. Strategy: `Rebuild`. |
-| **FEAT-06** | Simulation | Chemical Titration & Reaction Engine | Chemistry | Custom TypeScript RK4 ODE Solver + `SmilesDrawer` | `SELECTED` | P1 | pH curve plotting, indicator color shifts, stoichiometry balance. RK4 benchmarked ($2.7 \times 10^{-10}$ error). Strategy: `Componentize`. |
+| **FEAT-06** | Simulation | Chemical Titration & Reaction Engine | Chemistry | Exact Gauss-Jordan Nullspace Balancer + Stoichiometry Engine | `COMPLETED` | P1 | Exact chemical equation balancing, atom conservation verification, molar mass, mass conservation, limiting reagents. |
 | **FEAT-07** | Simulation | Cell Structure & Organelle Inspector | Biology | Native Vector SVG + Cytology Engine + Cross-section clipping | `COMPLETED` | P0 | Plant/animal cells, clickable organelles, cross-sections, zero VRAM leak. Strategy: `Rebuild`. |
 | **FEAT-08** | Simulation | Genetics & Punnett Square Sandbox | Biology | Native TypeScript Mendelian Engine + SVG Grid | `SELECTED` | P1 | Monohybrid & dihybrid crosses, phenotypic ratio verification. Strategy: `Rebuild`. |
 | **FEAT-09** | Simulation | Solar System & Orbital Mechanics | Astronomy | `Astronomy Engine` (v2.1) + `Three.js` Celestial Scene | `SELECTED` | P1 | Keplerian orbits, lunar phases, eclipse verification. Strategy: `Reuse` + `Componentize`. |
 | **FEAT-10** | Virtual Lab | Physics Virtual Laboratory Bench | Physics | `Matter.js` + Canvas2D apparatus (Vernier caliper, stopwatches) | `SELECTED` | P0 | Virtual calipers, friction carts, ticker tapes, data export. Strategy: `Componentize`. |
-| **FEAT-11** | Virtual Lab | Chemistry Wet Lab Bench | Chemistry | Custom Canvas2D Fluid & Meniscus Engine + Glassware Sprites | `SELECTED` | P1 | Beakers, burettes, pipettes, hazardous reaction alerts. Strategy: `Rebuild`. |
+| **FEAT-11** | Virtual Lab | Chemistry Wet Lab Bench | Chemistry | Exact Stoichiometry & Reagent Conservation Engine | `COMPLETED` | P1 | Moles-to-grams conversion, Avogadro particle counts, reaction presets. |
 | **FEAT-12** | Virtual Lab | Biology Virtual Microscope | Biology | `OpenSeadragon` (v6.1 deep zoom multi-tile viewer) | `SELECTED` | P1 | 4x/10x/40x/100x magnification, focus knobs, specimen slides. Strategy: `Componentize`. |
 | **FEAT-13** | 2D/3D Viz | 3D Molecular Viewer | Chemistry, Biology | `Mol*` (Molstar v5.13) + `SmilesDrawer` (2D SMILES) | `SELECTED` | P0 | PDB/mmCIF ribbons, surfaces, ball-and-stick, 2D structures. Strategy: `Componentize`. |
 | **FEAT-14** | 2D/3D Viz | 3D Anatomical & Geometric Explorer | Biology, Math | `Three.js` (v0.187) + `@react-three/fiber` + Clipping Planes | `SELECTED` | P1 | Exploded meshes, slicing planes, orbit controls. Strategy: `Componentize`. |
@@ -30,7 +30,7 @@
 | **FEAT-16** | Mathematics | 2D/3D Function Plotter & Calculus Viz | Mathematics | `Mafs` (v0.21 React SVG) + `Function Plot` (v1.26 implicit) | `SELECTED` | P0 | Tangent lines, derivatives, Riemann sums, polar curves. Strategy: `Reuse`. |
 | **FEAT-17** | Mathematics | Dynamic Geometry Sandbox | Mathematics | `JSXGraph` (v1.14 Dual MIT) + `Mafs` | `SELECTED` | P1 | Compass, straightedge, locus points, angle bisectors. Strategy: `Componentize`. |
 | **FEAT-18** | Demonstration | Algorithmic Demonstrator & Sorting | Computer Science | `CodeMirror 6` + TypeScript Coroutine Step Generator | `SELECTED` | P1 | Step-by-step sorting/search, tree traversals, call stack. Strategy: `Reuse`. |
-| **FEAT-19** | Demonstration | Logic Gate & Boolean Sandbox | Computer Science | `@xyflow/react` (v12) + Topological Boolean Evaluation Engine | `SELECTED` | P1 | AND/OR/NOT/XOR gates, live signal wires, truth tables. Strategy: `Reuse`. |
+| **FEAT-19** | Demonstration | Logic Gate & Boolean Sandbox | Computer Science | Pure TypeScript Topological Boolean Evaluation Engine | `COMPLETED` | P1 | AND/OR/NOT/XOR/NAND/NOR/XNOR gates, live signal wires, automated truth tables, Adders, MUX. |
 | **FEAT-20** | Demonstration | Thai Tone & Syllable Rule Visualizer | Thai Language | Native TypeScript Thai Phonology Engine (3-byte safe) | `SELECTED` | P1 | Consonant classes, live syllable parsing, 5-tone rules. Strategy: `Rebuild`. |
 | **FEAT-21** | Exercises | Universal Practice Engine | All 9 Subjects | Custom React Component Engine + KaTeX + Auto-Grading & Hints | `COMPLETED` | P0 | MCQ, MSQ, Fill-in-blank, Numeric with tolerance grading. Strategy: `Rebuild`. |
 | **FEAT-22** | Assessment | Timed Assessment & Auto-Grader | All 9 Subjects | Client State Machine + Seeded PRNG + `Compute Engine` | `SELECTED` | P0 | Timed exams, question pools, instant rubric grading. Strategy: `Rebuild`. |
@@ -43,13 +43,13 @@
 
 | Subject | Total Features | Discovery | Researching | Auditing | Selected | Completed |
 |---|---|---|---|---|---|---|
-| **Physics** | 6 | 0 | 0 | 0 | 6 (FEAT-01, FEAT-03, FEAT-04, FEAT-10, FEAT-15, FEAT-21-24) | 0 |
-| **Chemistry** | 5 | 0 | 0 | 0 | 5 (FEAT-05, FEAT-06, FEAT-11, FEAT-13, FEAT-21-24) | 0 |
-| **Biology** | 5 | 0 | 0 | 0 | 5 (FEAT-02, FEAT-07, FEAT-08, FEAT-12, FEAT-14) | 0 |
-| **Mathematics** | 4 | 0 | 0 | 0 | 4 (FEAT-15, FEAT-16, FEAT-17, FEAT-21) | 0 |
-| **General Science** | 3 | 0 | 0 | 0 | 3 (FEAT-01, FEAT-03, FEAT-04) | 0 |
+| **Physics** | 6 | 0 | 0 | 0 | 5 (FEAT-01, FEAT-03, FEAT-10, FEAT-15, FEAT-22-24) | 1 (FEAT-04, FEAT-21) |
+| **Chemistry** | 5 | 0 | 0 | 0 | 2 (FEAT-13, FEAT-22-24) | 3 (FEAT-05, FEAT-06, FEAT-11, FEAT-21) |
+| **Biology** | 5 | 0 | 0 | 0 | 4 (FEAT-02, FEAT-08, FEAT-12, FEAT-14) | 1 (FEAT-07, FEAT-21) |
+| **Mathematics** | 4 | 0 | 0 | 0 | 3 (FEAT-15, FEAT-16, FEAT-17) | 1 (FEAT-21) |
+| **General Science** | 3 | 0 | 0 | 0 | 2 (FEAT-01, FEAT-03) | 1 (FEAT-04) |
 | **Astronomy** | 3 | 0 | 0 | 0 | 3 (FEAT-02, FEAT-09, FEAT-14) | 0 |
-| **Computer Science**| 3 | 0 | 0 | 0 | 3 (FEAT-18, FEAT-19, FEAT-21) | 0 |
+| **Computer Science**| 3 | 0 | 0 | 0 | 2 (FEAT-18, FEAT-22) | 1 (FEAT-19, FEAT-21) |
 | **English** | 2 | 0 | 0 | 0 | 2 (FEAT-01, FEAT-21) | 0 |
 | **Thai Language** | 3 | 0 | 0 | 0 | 3 (FEAT-01, FEAT-02, FEAT-20) | 0 |
 
