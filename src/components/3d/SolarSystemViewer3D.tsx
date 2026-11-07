@@ -18,6 +18,17 @@ export function SolarSystemViewer3D() {
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
+  const speedMultiplierRef = useRef<number>(speedMultiplier);
+  const isPausedRef = useRef<boolean>(isPaused);
+
+  useEffect(() => {
+    speedMultiplierRef.current = speedMultiplier;
+  }, [speedMultiplier]);
+
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -211,9 +222,10 @@ export function SolarSystemViewer3D() {
         controlsRef.current.update();
       }
 
-      if (!isPaused) {
+      if (!isPausedRef.current) {
         // Base delta time scaled by speed
-        const dt = 0.005 * speedMultiplier;
+        const currentSpeed = speedMultiplierRef.current;
+        const dt = 0.005 * currentSpeed;
 
         // Orbit planets using Keplerian period ratios (T ~ r^(3/2))
         PLANETS.forEach((planet) => {
@@ -225,11 +237,11 @@ export function SolarSystemViewer3D() {
           entry.orbitPivot.rotation.y += orbitalSpeed * dt;
 
           // Axial rotation of the planet itself
-          entry.mesh.rotation.y += 0.02 * speedMultiplier;
+          entry.mesh.rotation.y += 0.02 * currentSpeed;
 
           // Moon orbit around Earth
           if (entry.moonPivot) {
-            entry.moonPivot.rotation.y += 0.1 * speedMultiplier;
+            entry.moonPivot.rotation.y += 0.1 * currentSpeed;
           }
         });
 
@@ -249,7 +261,7 @@ export function SolarSystemViewer3D() {
       controls.dispose();
       disposeThreeScene(scene, renderer);
     };
-  }, [isPaused, speedMultiplier]);
+  }, []);
 
   const resetView = () => {
     if (!cameraRef.current || !controlsRef.current) return;
@@ -305,7 +317,7 @@ export function SolarSystemViewer3D() {
             {isPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
           </button>
           <span className="text-neutral-600">|</span>
-          {[1, 5, 10, 50].map((mult) => (
+          {[1, 5, 10, 50, 100].map((mult) => (
             <button
               key={mult}
               type="button"

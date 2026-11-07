@@ -120,6 +120,11 @@ export function CellViewer3D() {
   const [selectedOrganelleId, setSelectedOrganelleId] = useState<string>("nucleus");
   const [isAutoRotating, setIsAutoRotating] = useState<boolean>(true);
 
+  const isAutoRotatingRef = useRef<boolean>(isAutoRotating);
+  useEffect(() => {
+    isAutoRotatingRef.current = isAutoRotating;
+  }, [isAutoRotating]);
+
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -134,16 +139,21 @@ export function CellViewer3D() {
   const buildCellModel = useCallback((type: "animal" | "plant") => {
     if (!cellGroupRef.current) return;
 
-    // Clear existing
-    while (cellGroupRef.current.children.length > 0) {
-      const child = cellGroupRef.current.children[0] as THREE.Mesh;
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) {
-        if (Array.isArray(child.material)) child.material.forEach((m) => m.dispose());
-        else child.material.dispose();
+    // Clear existing children and recursively dispose all geometries/materials
+    const geometriesToDispose = new Set<THREE.BufferGeometry>();
+    const materialsToDispose = new Set<THREE.Material>();
+    cellGroupRef.current.traverse((child) => {
+      if (child instanceof THREE.Mesh || child instanceof THREE.Points || child instanceof THREE.Line) {
+        if (child.geometry) geometriesToDispose.add(child.geometry);
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach((m) => materialsToDispose.add(m));
+          else materialsToDispose.add(child.material);
+        }
       }
-      cellGroupRef.current.remove(child);
-    }
+    });
+    geometriesToDispose.forEach((g) => g.dispose());
+    materialsToDispose.forEach((m) => m.dispose());
+    cellGroupRef.current.clear();
 
     const group = cellGroupRef.current;
 
@@ -197,6 +207,7 @@ export function CellViewer3D() {
     const nucleolusMat = new THREE.MeshStandardMaterial({ color: 0x6d28d9 });
     const nucleolus = new THREE.Mesh(nucleolusGeom, nucleolusMat);
     nucleolus.position.set(0.1, 0.1, 0.4);
+    nucleolus.userData = { organelleId: "nucleus" };
     nucleus.add(nucleolus);
 
     // 3. Mitochondria (2 or 3 capsules with cristae ridges)
@@ -393,7 +404,7 @@ export function CellViewer3D() {
         controlsRef.current.update();
       }
 
-      if (cellGroupRef.current && isAutoRotating) {
+      if (cellGroupRef.current && isAutoRotatingRef.current) {
         cellGroupRef.current.rotation.y += 0.005;
       }
 
@@ -410,7 +421,7 @@ export function CellViewer3D() {
       controls.dispose();
       disposeThreeScene(scene, renderer);
     };
-  }, [isAutoRotating]);
+  }, []);
 
   // Rebuild model when cellType changes
   useEffect(() => {

@@ -117,7 +117,16 @@ export function PhysicsLabContainer() {
 
       {/* Active Laboratory View */}
       {activeTab === "solar3d" && <SolarSystemViewer3D />}
-      {activeTab === "lessons" && <LessonViewer discipline="physics" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="physics"
+          onOpenLabAction={(lessonId) => {
+            if (lessonId.includes("orbit") || lessonId.includes("newton")) setActiveTab("solar3d");
+            else if (lessonId.includes("circuit") || lessonId.includes("kirchhoff")) setActiveTab("circuits");
+            else setActiveTab("orbits");
+          }}
+        />
+      )}
       {activeTab === "circuits" && <CircuitSimulator />}
       {activeTab === "orbits" && <VerletSimulationCanvas />}
     </div>

@@ -69,7 +69,14 @@ export function ThaiStudioContainer() {
 
       {/* Active Tab View */}
       {activeTab === "phonology" && <ThaiPhonologyVisualizer />}
-      {activeTab === "lessons" && <LessonViewer discipline="thai" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="thai"
+          onOpenLabAction={() => {
+            setActiveTab("phonology");
+          }}
+        />
+      )}
     </div>
   );
 }

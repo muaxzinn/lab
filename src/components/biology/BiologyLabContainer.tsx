@@ -92,7 +92,23 @@ export function BiologyLabContainer() {
 
       {/* Active Tab View */}
       {activeTab === "cell3d" && <CellViewer3D />}
-      {activeTab === "lessons" && <LessonViewer discipline="biology" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="biology"
+          onOpenLabAction={(lessonId) => {
+            if (
+              lessonId.includes("organelle") ||
+              lessonId.includes("membrane") ||
+              lessonId.includes("energetics") ||
+              lessonId.includes("atp")
+            ) {
+              setActiveTab("cell3d");
+            } else {
+              setActiveTab("organelles");
+            }
+          }}
+        />
+      )}
       {activeTab === "organelles" && <CellStructureViewer />}
     </div>
   );

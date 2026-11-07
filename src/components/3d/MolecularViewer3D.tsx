@@ -21,6 +21,11 @@ export function MolecularViewer3D() {
   const [isAutoRotating, setIsAutoRotating] = useState<boolean>(true);
   const [selectedAtom, setSelectedAtom] = useState<{ atom: Atom3D; index: number } | null>(null);
 
+  const isAutoRotatingRef = useRef<boolean>(isAutoRotating);
+  useEffect(() => {
+    isAutoRotatingRef.current = isAutoRotating;
+  }, [isAutoRotating]);
+
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -34,19 +39,36 @@ export function MolecularViewer3D() {
   const buildMoleculeMesh = useCallback((molecule: Molecule3D, mode: RenderingMode) => {
     if (!moleculeGroupRef.current) return;
 
-    // Clear existing children in group
-    while (moleculeGroupRef.current.children.length > 0) {
-      const child = moleculeGroupRef.current.children[0] as THREE.Mesh;
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) {
-        if (Array.isArray(child.material)) {
-          child.material.forEach((m) => m.dispose());
-        } else {
-          child.material.dispose();
+    // Traverse and dispose existing geometries and materials cleanly without duplicates
+    const geometriesToDispose = new Set<THREE.BufferGeometry>();
+    const materialsToDispose = new Set<THREE.Material>();
+    moleculeGroupRef.current.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) geometriesToDispose.add(child.geometry);
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach((m) => materialsToDispose.add(m));
+          else materialsToDispose.add(child.material);
         }
       }
-      moleculeGroupRef.current.remove(child);
-    }
+    });
+    geometriesToDispose.forEach((g) => g.dispose());
+    materialsToDispose.forEach((m) => m.dispose());
+    moleculeGroupRef.current.clear();
+
+    // Reset group position to origin
+    moleculeGroupRef.current.position.set(0, 0, 0);
+
+    // Compute centroid of atoms to center the molecule at local (0, 0, 0)
+    let cx = 0, cy = 0, cz = 0;
+    const atomCount = molecule.atoms.length || 1;
+    molecule.atoms.forEach((atom) => {
+      cx += atom.position[0];
+      cy += atom.position[1];
+      cz += atom.position[2];
+    });
+    cx /= atomCount;
+    cy /= atomCount;
+    cz /= atomCount;
 
     const sphereGeomCache = new Map<number, THREE.SphereGeometry>();
     const getSphereGeom = (radius: number) => {
@@ -68,7 +90,7 @@ export function MolecularViewer3D() {
       });
 
       const sphere = new THREE.Mesh(geom, material);
-      sphere.position.set(...atom.position);
+      sphere.position.set(atom.position[0] - cx, atom.position[1] - cy, atom.position[2] - cz);
       sphere.castShadow = true;
       sphere.receiveShadow = true;
       sphere.userData = { atomIndex: index, atom };
@@ -91,8 +113,8 @@ export function MolecularViewer3D() {
         const atom2 = molecule.atoms[bond.atom2];
         if (!atom1 || !atom2) return;
 
-        const p1 = new THREE.Vector3(...atom1.position);
-        const p2 = new THREE.Vector3(...atom2.position);
+        const p1 = new THREE.Vector3(atom1.position[0] - cx, atom1.position[1] - cy, atom1.position[2] - cz);
+        const p2 = new THREE.Vector3(atom2.position[0] - cx, atom2.position[1] - cy, atom2.position[2] - cz);
 
         const distance = p1.distanceTo(p2);
         const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
@@ -110,12 +132,6 @@ export function MolecularViewer3D() {
         moleculeGroupRef.current?.add(cylinder);
       });
     }
-
-    // Compute bounding sphere and center molecule
-    const box = new THREE.Box3().setFromObject(moleculeGroupRef.current);
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    moleculeGroupRef.current.position.sub(center);
   }, []);
 
   // Initialize Three.js scene
@@ -221,7 +237,7 @@ export function MolecularViewer3D() {
         controlsRef.current.update();
       }
 
-      if (moleculeGroupRef.current && isAutoRotating) {
+      if (moleculeGroupRef.current && isAutoRotatingRef.current) {
         moleculeGroupRef.current.rotation.y += 0.006;
       }
 
@@ -238,7 +254,7 @@ export function MolecularViewer3D() {
       controls.dispose();
       disposeThreeScene(scene, renderer);
     };
-  }, [isAutoRotating]);
+  }, []);
 
   // Rebuild mesh when molecule or mode changes
   useEffect(() => {

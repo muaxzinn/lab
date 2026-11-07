@@ -114,7 +114,29 @@ export function ChemistryLabContainer() {
 
       {/* Active Tab View */}
       {activeTab === "molecules3d" && <MolecularViewer3D />}
-      {activeTab === "lessons" && <LessonViewer discipline="chemistry" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="chemistry"
+          onOpenLabAction={(lessonId) => {
+            if (
+              lessonId.includes("vsepr") ||
+              lessonId.includes("orbital") ||
+              lessonId.includes("organic") ||
+              lessonId.includes("biomolecule")
+            ) {
+              setActiveTab("molecules3d");
+            } else if (
+              lessonId.includes("equilibrium") ||
+              lessonId.includes("stoichiometry") ||
+              lessonId.includes("reaction")
+            ) {
+              setActiveTab("reactions");
+            } else {
+              setActiveTab("periodic");
+            }
+          }}
+        />
+      )}
       {activeTab === "reactions" && <ChemicalReactionViewer />}
       {activeTab === "periodic" && <PeriodicTableViewer />}
     </div>

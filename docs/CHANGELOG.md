@@ -20,35 +20,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - **Heliocentric 3D Solar System Engine (`src/components/3d/SolarSystemViewer3D.tsx`)**:
     - Glowing Sun with PointLight and coronal atmosphere.
     - 8 planets (Mercury through Neptune) plus Earth's Moon and Saturn's rings with Keplerian orbital ellipse trails.
-    - Speed multiplier controls (1x, 5x, 10x, 50x) and pause/resume simulation toggles.
+    - Speed multiplier controls (1x, 5x, 10x, 50x, 100x) and pause/resume simulation toggles.
     - Planet tracking and camera zoom focus with astronomical ephemeris cards.
+    - Ref-based animation loops preventing WebGL context recreation and orbit resets during play/pause/speed toggles.
     - Integrated as a dedicated tab in `src/app/physics/page.tsx` (`PhysicsLabContainer.tsx`).
   - **3D Cutaway Eukaryotic Cytology Explorer (`src/components/3d/CellViewer3D.tsx`)**:
     - 3D cutaway eukaryotic cell model exposing internal organelles.
     - Mode toggle between Animal Cell and Plant Cell (with rigid cell wall and chloroplasts).
     - 3D organelles: Nucleus, Nucleolus, Mitochondria, RER, SER, Golgi Apparatus, Lysosomes, and Ribosomes.
-    - Click-to-inspect raycasting with organelle function, membrane counts, and exam invariants.
+    - Subtree traversal memory disposal and click-to-inspect raycasting with organelle function, membrane counts, and exam invariants.
     - Integrated as a dedicated tab in `src/app/biology/page.tsx` (`BiologyLabContainer.tsx`).
 - **Deep Step-by-Step Interactive Curriculum Lessons (`FEAT-01`)**:
-  - **Curriculum Dataset (`src/lib/lesson-data.ts`)**:
-    - In-depth, multi-step lessons across 6 core disciplines:
-      - **Physics**: Newtonian Dynamics ($F=ma$, momentum derivatives), Keplerian Orbits & Harmonic Periods.
-      - **Chemistry**: Quantum Orbitals & Electron Configuration (Aufbau, Hund, Pauli), VSEPR Molecular Geometry & Steric Numbers.
-      - **Biology**: Eukaryotic Endomembrane Secretory Superhighway, Endosymbiotic Theory, DNA Replication & Central Dogma.
-      - **Mathematics**: Differential Calculus & Limits ($\epsilon$-$\delta$), Riemann Integration & Fundamental Theorem of Calculus.
-      - **Computer Science**: Boolean Logic & Universal Gates, Binary Half/Full Adders, Big-O Algorithmic Complexity.
-      - **Thai Language**: Triyang Consonant Classes, Live vs. Dead Syllables (คำเป็น-คำตาย), Kam Samas & Kam Sondhi Morphology.
+  - **Modular Curriculum Dataset (`src/lib/lesson-data.ts` & `src/lib/lessons/`)**:
+    - In-depth, 3-step lessons across 22 topics in 6 core disciplines:
+      - **Physics (4)**: Newtonian Dynamics ($F=ma$), Projectile & Circular Motion, Keplerian Orbits, Kirchhoff's DC Circuit Laws (MNA).
+      - **Chemistry (4)**: Quantum Orbitals & Aufbau/Hund/Pauli, VSEPR Geometry, Chemical Equilibrium & Le Chatelier, Organic Functional Groups & Biomolecules.
+      - **Biology (4)**: Eukaryotic Cell Ultrastructure, Membrane Dynamics & Osmosis, Bioenergetics (Photosynthesis, Respiration, ATP Synthase), Central Dogma of Molecular Biology.
+      - **Mathematics (4)**: Differential Calculus & Limits ($\epsilon$-$\delta$), Riemann Integration & FTC, Linear Algebra & Vectors/Eigenvalues, Simple Harmonic Motion & Trigonometry.
+      - **Computer Science (3)**: Boolean Logic & Binary Adders, Fundamental Data Structures (Trees, Graphs, Hash Tables), Big-O Algorithmic Complexity & Sorting Algorithms.
+      - **Thai Language (3)**: Triyang Consonant Classes, 8 Spelling Sections & Live/Dead Syllable Tone Rules, Kam Samas & Kam Sondhi Morphology.
   - **Interactive Lesson Component (`src/components/content/LessonViewer.tsx`)**:
     - Step-by-step progress tracking with responsive dot navigation.
     - Mathematical formulation rendering via secure KaTeX with detailed symbol legends.
     - Expandable deep theoretical analysis with real-world engineering and scientific applications.
     - Interactive Concept Checkpoints with instantaneous answer verification and conceptual explanations.
     - Mounted into all subject workspaces: `/physics`, `/chemistry`, `/biology`, `/math`, `/cs`, and `/thai`.
-- **Clean & Decluttered Studio Hub UI Redesign (Apple / Linear Grade)**:
-  - **Spacious Studio Hub (`src/components/home/StudioHub.tsx` & `src/app/page.tsx`)**:
-    - Stripped redundant HUD telemetry clutter, status boxes, and badge noise.
-    - Added category filter pills: ทั้งหมด, วิทยาศาสตร์กายภาพ, ชีววิทยาและเคมี, คณิตศาสตร์และคอมพิวเตอร์, ภาษาศาสตร์และการฝึกฝน.
-    - Redesigned subject studio cards with subtle gradients, crisp Lucide SVG vector icons, key technology tags (`3D WebGL`, `Verlet Physics`, `Interactive Lessons`), and direct laboratory access actions.
+- **Minimalist Card-Categorized Scientific Hub & OpenLyceum Fleet (`src/components/home/StudioHub.tsx`)**:
+  - Eliminated visual clutter: removed loud telemetry number counter bars ("7", "3D WebGL", "KaTeX", "FEAT-01") and animated neon dots.
+  - Implemented responsive, clean card layout with matte dark background, subtle borders, Lucide SVG vector icons, and concise Thai descriptions.
+  - Added integrated real-time search input for instant filtering across English and Thai queries.
+  - Created `src/lib/simulation-catalog.ts` indexing all 61 OpenLyceum simulations and platform laboratories across 9 standard scientific domains (Astronomy, Physics, Waves & Optics, Electricity, Chemistry, Quantum, Biology, Mathematics & CS, Linguistics).
 - **Fluid Vertical Scrolling & Viewport Fix**:
   - Updated `src/app/globals.css`: changed `html, body` height constraints to `min-height: 100%; height: auto; overflow-y: auto; scroll-behavior: smooth; overscroll-behavior-y: none;`.
   - Updated `src/components/layout/KioskShell.tsx`: configured `<main id="main-content">` and parent containers with `min-h-screen overflow-y-auto`.
@@ -56,7 +57,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Automated Unit Testing & Quality Verification**:
   - Added `src/lib/three-and-lessons.test.ts` validating 3D molecular coordinates, CPK colors, lesson structural integrity, and Three.js scene disposal.
   - Added `src/lib/astronomy-data.test.ts` validating OpenLyceum Keplerian orbits, semi-major axes, sidereal periods, and planetary rings.
-  - Test suite expanded to **178 tests** across **63 suites** with **100% pass rate**.
+  - Added `src/lib/simulation-catalog.test.ts` validating the 70+ simulation catalog across all 9 subject domains and bilingual search filtering.
+  - Test suite expanded to **184 tests** across **64 suites** with **100% pass rate**.
   - Verified 0 Knip issues, 0 ESLint warnings, 0 TypeScript errors, and successful Turbopack production build.
 
 ---

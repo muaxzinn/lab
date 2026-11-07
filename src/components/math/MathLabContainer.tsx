@@ -69,7 +69,14 @@ export function MathLabContainer() {
 
       {/* Active Tab View */}
       {activeTab === "graphing" && <FormulaViewer />}
-      {activeTab === "lessons" && <LessonViewer discipline="mathematics" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="mathematics"
+          onOpenLabAction={() => {
+            setActiveTab("graphing");
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -69,7 +69,14 @@ export function CSLabContainer() {
 
       {/* Active Tab View */}
       {activeTab === "sandbox" && <LogicGateSandbox />}
-      {activeTab === "lessons" && <LessonViewer discipline="cs" />}
+      {activeTab === "lessons" && (
+        <LessonViewer
+          discipline="cs"
+          onOpenLabAction={() => {
+            setActiveTab("sandbox");
+          }}
+        />
+      )}
     </div>
   );
 }

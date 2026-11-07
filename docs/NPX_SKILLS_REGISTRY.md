@@ -39,7 +39,7 @@
 | 28 | Phase 11 Release Gate | 2026-11-07 | `npx --yes knip` | `knip` | Final Release Gate ตรวจสอบความสะอาดของ Codebase ทั้งหมดก่อนส่งมอบ v1.0.0 | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 29 | Phase 11 Release Audit | 2026-11-07 | `npx --yes knip` | `knip` | Post-Hardening Verification ตรวจสอบความสมบูรณ์ของ Codebase ทั้งหมด | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
 | 30 | Phase 12 (v1.1.0) | 2026-11-07 | `pnpm knip` | `knip` | ตรวจสอบ Dead Code, Unused Files หลังผสาน 3D WebGL (Three.js), Lessons และ Studio Hub | 0 dead files, 0 unused dependencies, 0 unused exports (Exit code 0) | Verified |
-| 31 | Phase 12 (v1.1.0) | 2026-11-07 | `pnpm test` | `node --test` | รันชุดทดสอบทั้งหมดรวม 3D dataset, Keplerian astronomy, Three.js cleanup และ FEAT-01 lessons | 178 tests, 63 suites passing 100% (0 failures) | Verified |
+| 31 | Phase 12 (v1.1.0) | 2026-11-07 | `pnpm test` | `node --test` | รันชุดทดสอบทั้งหมดรวม 3D dataset, Keplerian astronomy, 65-repo simulation catalog, Three.js cleanup และ 22 FEAT-01 lessons | 184 tests, 64 suites passing 100% (0 failures) | Verified |
 | 32 | Phase 12 (v1.1.0) | 2026-11-07 | `pnpm build` | `next build --turbopack` | คอมไพล์โปรดักชันบิลด์ Next.js 15 ทุก 13 static routes | Prerendered 100% static routes (13/13) cleanly | Verified |
 
 ---
